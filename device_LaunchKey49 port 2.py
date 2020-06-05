@@ -1,10 +1,10 @@
-#   name=LaunchKey49 Mk2
+#   name=LaunchKey49 Mk2 (Port 2)
 # url=
 # version = 0.0.1
 
 """
-This file is the controller file for port 1 of the LaunchKey49 Mk2.
-It handles most note and controller events.
+This file is the controller file for port 2 of the LaunchKey49 Mk2.
+It handles communication with the device, including colours.
 
 """
 
@@ -32,15 +32,18 @@ import config
 import internal
 
 
+
 class TGeneric():
     def __init__(self):
         return
 
     def OnInit(self):
+        # Set the device into InControl Mode
+        
         print('Initialisation complete')
 
     def OnDeInit(self):
-        print('Deinitialisation complete')
+        print('deinit ready')
 
     def OnMidiIn(self, event):
         event.handled = False
