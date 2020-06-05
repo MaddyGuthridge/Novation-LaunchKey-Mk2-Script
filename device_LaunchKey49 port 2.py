@@ -31,22 +31,29 @@ import utils
 import config
 import internal
 
-
+initialisation_flag = False
+initialisation_flag_response = False
 
 class TGeneric():
     def __init__(self):
         return
 
     def OnInit(self):
-        # Set the device into InControl Mode
+        initialisation_flag = True
+        # Set the device into Extended Mode
+        device.midiOutMsg(internal.toMidiMessage(0x9F, 0x0C, 0x7F))
+        
         
         print('Initialisation complete')
 
     def OnDeInit(self):
-        print('deinit ready')
+        # Return the device into Basic Mode
+        device.midiOutMsg(internal.toMidiMessage(0x9F, 0x0C, 0x00))
+        print('Deinitialisation complete')
 
     def OnMidiIn(self, event):
         event.handled = False
+        
         
         
         # If the event is unhandled, print out what it is:
