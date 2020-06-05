@@ -1,4 +1,5 @@
 """
+config.py
 This file contains variables intended for the user to edit to suit their needs.
 It also contains constants which are used to enable featurs such as snapping.
 You can modify those values too, and the script will still work, but it may not operate in ways you would expect.
