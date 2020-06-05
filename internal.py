@@ -10,13 +10,28 @@ This file contains functions common to  scripts loaded by both files.
 
 import device
 
-# Queries whether extended mode is active. Only accessible from port 2
-def queryExtendedMode():
-    # TODO: send query
-    return True
+extendedMode = False
 
 # The previous mesage sent to the MIDI out device
 previous_event_out = 0
+
+# TODO: process extended mode messages.
+
+# Queries whether extended mode is active. Only accessible from port 2
+def queryExtendedMode():
+    global extendedMode
+    return extendedMode
+
+# Sets extended mode on the device
+def setExtendedMode(newMode):
+    global extendedMode
+    if newMode is True:
+        sendMidiMessage(0x9F, 0x0C, 0x7F)
+        extendedMode = True
+    elif newMode is False:
+        sendMidiMessage(0x9F, 0x0C, 0x00)
+        extendedMode = False
+    else: logError("Extended mode not boolean")
 
 # Compares revieved event to previous
 def compareEvent(event):

@@ -45,18 +45,18 @@ class TGeneric():
     def OnInit(self):
         initialisation_flag = True
         # Set the device into Extended Mode
-        internal.sendMidiMessage(0x9F, 0x0C, 0x7F)
         
-        
-        
-        
+        lighting.lightShow()
+        internal.setExtendedMode(True)
+
         
         print('Initialisation complete')
 
     def OnDeInit(self):
         # Return the device into Basic Mode
-        internal.sendMidiMessage(0x9F, 0x0C, 0x00)
+        internal.setExtendedMode(False)
         print('Deinitialisation complete')
+        
 
     def OnMidiIn(self, event):
         event.handled = False
