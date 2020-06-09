@@ -53,6 +53,7 @@ def lightShow():
             setPadColour(eventconsts.PAD_BOTTOM_5, rainbowColours[x - 4])
             setPadColour(eventconsts.PAD_TOP_4, rainbowColours[x - 4])
         
+    
         # Group 6
         if (x >= 5) and (x < len(rainbowColours) + 5):
             setPadColour(eventconsts.PAD_BOTTOM_6, rainbowColours[x - 5])

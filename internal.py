@@ -53,3 +53,10 @@ def toMidiMessage(status, data1, data2):
 # Print out error message
 def logError(message):
     print("Error: ", message)
+
+# Return a simulation of the tab character
+def getTab(length):
+    a = ""
+    for x in range(length):
+        a += ' '
+    return a
