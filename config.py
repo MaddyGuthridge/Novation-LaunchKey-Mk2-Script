@@ -10,8 +10,6 @@ You can modify those values too, and the script will still work, but it may not 
 # USER VARIABLES
 #-------------------------------
 
-ENABLE_PY_AUTO_GUI = True # Disable this if you haven't installed PyAutoGui. This will disable tool selection in the playlist and pianoroll
-
 LONG_PRESS_TIME = 0.5 # Change how long a long press needs to be held for
 
 ENABLE_SNAPPING = True # Change to False to prevent faders and knobs from snapping to default values
