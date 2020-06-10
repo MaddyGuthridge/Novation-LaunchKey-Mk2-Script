@@ -13,7 +13,10 @@ import internal
 
 class processedEvent:
     def __init__(self, event):
-
+        
+        # Number of spaces per column in output
+        self.TAB_INDENT = 16
+        
         # Bit-shift status and data bytes to get event ID
         self.id = (event.status + (event.data1 << 8))
 
@@ -25,84 +28,133 @@ class processedEvent:
         if self.id in eventconsts.InControlButtons: 
             self.type = eventconsts.TYPE_INCONTROL
             self.isBinary = True
-        if self.id in eventconsts.SystemMessages: 
+        elif self.id in eventconsts.SystemMessages: 
             self.type = eventconsts.TYPE_SYSTEM_MSG
             self.isBinary = True
-        if self.id in eventconsts.TransportControls: 
+        elif self.id in eventconsts.TransportControls: 
             self.type = eventconsts.TYPE_TRANSPORT
             self.isBinary = True
-        #if self.id in eventconsts.Knobs: 
+        #elif self.id in eventconsts.Knobs: 
         #    self.type = eventconsts.TYPE_KNOB
-        if self.id in eventconsts.Faders: 
+        elif self.id in eventconsts.Faders: 
             self.type = eventconsts.TYPE_FADER
+        else: 
+            # Check for pads is different as they use multiple signals
+            temp = self.id // 0x100
+            if temp in eventconsts.Pads:
+                self.type = eventconsts.TYPE_PAD
+                self.isBinary = True
         
-        # Check for pads is different as they use multiple signals
-        temp = self.id // 0x100
-        if temp in eventconsts.Pads:
-            self.type = eventconsts.TYPE_PAD
-        
-        self.handled = False
-        self.is_long_press = False
-        self.is_double_press = device.isDoubleClick(internal.toMidiMessage(event.status, event.data1, event.data2))
-
         self.value = event.data2
 
         if self.value is 0: self.is_Lift = True
         else: self.is_Lift = False
+        
+        self.handled = False
+        self.is_long_press = False
+
+        # Process double presses only for lifted buttons
+        self.is_double_click = False
+        if self.is_Lift is True and self.isBinary is True: 
+            self.is_double_click = device.isDoubleClick(internal.toMidiMessage(event.status, event.data1, event.data2))
+
+        
 
         
     
     # Prints event data
     def printOut(self):
 
-        TAB_INDENT = 16
-
         out = "Event: "
 
-        # Event type
+        # Event type and ID
         temp = self.getType()
-        out += temp + internal.getTab(TAB_INDENT - len(temp))
-        
-        # Event ID
-        temp = self.getId()
-        out += temp + internal.getTab(TAB_INDENT - len(temp))
+        out += temp
 
         # Event value
-        temp = str(self.value)
-        out += temp + internal.getTab(TAB_INDENT - len(temp))
+        temp = self.getValue()
+        out += temp + internal.getTab(self.TAB_INDENT - len(temp))
 
         # Event full data
-        temp = self.getFullData()
-        out += temp + internal.getTab(TAB_INDENT - len(temp))
+        temp = self.getDataString()
+        out += temp + internal.getTab(self.TAB_INDENT - len(temp))
 
-        if self.is_double_press:
-            out += " [Double click]"
-
+        # Handled
         if self.handled is False:
-            out += " [Unhandled]"
+            temp = " [Unhandled]"
+        else: temp = " [Handled]"
+        out += temp + internal.getTab(self.TAB_INDENT - len(temp))
+
+        if self.is_double_click:
+            out += " [Double Click]"
+        
+        if self.is_long_press:
+            out += " [Long Press]"
+
+
+        
         
         print(out)
 
+    # Returns string with type and ID of event
     def getType(self):
-        if self.type is eventconsts.TYPE_UNRECOGNISED: return "Unrecognised"
-        elif self.type is eventconsts.TYPE_SYSTEM_MSG: return "System"
-        elif self.type is eventconsts.TYPE_INCONTROL: return "InControl"
-        elif self.type is eventconsts.TYPE_TRANSPORT: return "Transport"
-        elif self.type is eventconsts.TYPE_KNOB: return "Knob"
-        elif self.type is eventconsts.TYPE_FADER: return "Fader"
-        elif self.type is eventconsts.TYPE_MIXER_BUTTON: return "Mixer Button"
-        elif self.type is eventconsts.TYPE_PAD: return "Pad"
+        a = ""
+        b = ""
+        if self.type is eventconsts.TYPE_UNRECOGNISED: 
+            a = "Unrecognised"
+        elif self.type is eventconsts.TYPE_SYSTEM_MSG: 
+            a = "System"
+            b = self.getID_System()
+        elif self.type is eventconsts.TYPE_INCONTROL: 
+            a = "InControl"
+            b = self.getID_InControl()
+        elif self.type is eventconsts.TYPE_TRANSPORT: 
+            a = "Transport"
+            b = self.getID_Transport()
+        elif self.type is eventconsts.TYPE_KNOB: 
+            a = "Knob"
+        elif self.type is eventconsts.TYPE_FADER: 
+            a = "Fader"
+        elif self.type is eventconsts.TYPE_MIXER_BUTTON: 
+            a = "Mixer Button"
+        elif self.type is eventconsts.TYPE_PAD: 
+            a = "Pad"
         else: 
             internal.logError("Bad event type")
-            return "ERROR!!!"
+            a = "ERROR!!!"
 
-    def getId(self):
-        # TODO: set up string returner thing for ID
-        a = ""
+        return a + internal.getTab(self.TAB_INDENT - len(a)) + b + internal.getTab(self.TAB_INDENT - len(b))
 
-        return a
+    def getID_System(self):
+        return "InControl"
 
-    def getFullData(self):
+    def getID_InControl(self):
+        if self.id == eventconsts.INCONTROL_KNOBS: return "Knobs"
+        elif self.id == eventconsts.INCONTROL_FADERS: return "Faders"
+        elif self.id == eventconsts.INCONTROL_PADS: return "Pads"
+        else: return "ERROR"
+
+    def getID_Transport(self):
+        if self.id == eventconsts.TRANSPORT_BACK: return "Back"
+        elif self.id == eventconsts.TRANSPORT_FORWARD: return "Forward"
+        elif self.id == eventconsts.TRANSPORT_STOP: return "Stop"
+        elif self.id == eventconsts.TRANSPORT_PLAY: return "Play"
+        elif self.id == eventconsts.TRANSPORT_LOOP: return "Loop"
+        elif self.id == eventconsts.TRANSPORT_RECORD: return "Record"
+        else: return "ERROR"
+    
+    # Returns (formatted) value
+    def getValue(self):
+        a = str(self.value)
+        b = ""
+        if self.isBinary:
+            if self.value == 0:
+                b = "(Off)"
+            else: b = "(On)"
+        return a + internal.getTab(5 - len(a)) + b
+
+    # Returns string with (formatted) hex of event
+    def getDataString(self):
         # Append hex value of ID
         a = str(hex(self.id + (self.value << 16)))
         # If string requires leading zeros
@@ -114,7 +166,14 @@ class processedEvent:
         elif len(a) is 2: a = "0x000000" + a[2:].upper()
         else: a = "0x" + a[2:].upper()
 
+        a = a[:2] + " " + a[2:4] + " " + a[4:6] + " " + a[6:8]
+        
         return a
+
+    # Returns int with hex of event
+    def getDataMIDI(self):
+        return hex(self.id + (self.value << 16))
+
 
     
 # Internal functions
