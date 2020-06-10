@@ -38,6 +38,9 @@ class processedEvent:
         #    self.type = eventconsts.TYPE_KNOB
         elif self.id in eventconsts.Faders: 
             self.type = eventconsts.TYPE_FADER
+        elif self.id in eventconsts.FaderButtons: 
+            self.type = eventconsts.TYPE_FADER_BUTTON
+            self.isBinary = True
         else: 
             # Check for pads is different as they use multiple signals
             temp = self.id // 0x100
@@ -115,8 +118,8 @@ class processedEvent:
             a = "Knob"
         elif self.type is eventconsts.TYPE_FADER: 
             a = "Fader"
-        elif self.type is eventconsts.TYPE_MIXER_BUTTON: 
-            a = "Mixer Button"
+        elif self.type is eventconsts.TYPE_FADER_BUTTON: 
+            a = "Fader Button"
         elif self.type is eventconsts.TYPE_PAD: 
             a = "Pad"
         else: 
@@ -125,15 +128,20 @@ class processedEvent:
 
         return a + internal.getTab(self.TAB_INDENT - len(a)) + b + internal.getTab(self.TAB_INDENT - len(b))
 
+    # Returns string event ID for system events
     def getID_System(self):
-        return "InControl"
+        if self.id == eventconsts.SYSTEM_IN_CONTROL: return "InControl"
+        elif self.id == eventconsts.SYSTEM_MISC: return "Misc"
+        else: return "ERROR"
 
+    # Returns string event ID for InControl events
     def getID_InControl(self):
         if self.id == eventconsts.INCONTROL_KNOBS: return "Knobs"
         elif self.id == eventconsts.INCONTROL_FADERS: return "Faders"
         elif self.id == eventconsts.INCONTROL_PADS: return "Pads"
         else: return "ERROR"
 
+    # Returns string event ID for transport events
     def getID_Transport(self):
         if self.id == eventconsts.TRANSPORT_BACK: return "Back"
         elif self.id == eventconsts.TRANSPORT_FORWARD: return "Forward"
@@ -141,6 +149,8 @@ class processedEvent:
         elif self.id == eventconsts.TRANSPORT_PLAY: return "Play"
         elif self.id == eventconsts.TRANSPORT_LOOP: return "Loop"
         elif self.id == eventconsts.TRANSPORT_RECORD: return "Record"
+        elif self.id == eventconsts.TRANSPORT_TRACK_NEXT: return "Next Track"
+        elif self.id == eventconsts.TRANSPORT_TRACK_PREVIOUS: return "Previous Track"
         else: return "ERROR"
     
     # Returns (formatted) value

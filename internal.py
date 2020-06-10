@@ -56,6 +56,7 @@ def logError(message):
 
 # Return a simulation of the tab character
 def getTab(length):
+    if length < 0: print("ERROR: not enough spacing, need to use greater tab indents")
     a = ""
     for x in range(length):
         a += ' '
