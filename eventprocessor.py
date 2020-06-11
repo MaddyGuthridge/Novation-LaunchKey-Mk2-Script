@@ -16,6 +16,10 @@ class processedEvent:
         
         # Number of spaces per column in output
         self.TAB_INDENT = 16
+
+        self.status = event.status
+        self.note = event.data1
+        self.value = event.data2
         
         # Bit-shift status and data bytes to get event ID
         self.id = (event.status + (event.data1 << 8))
@@ -34,26 +38,37 @@ class processedEvent:
         elif self.id in eventconsts.TransportControls: 
             self.type = eventconsts.TYPE_TRANSPORT
             self.isBinary = True
-        #elif self.id in eventconsts.Knobs: 
-        #    self.type = eventconsts.TYPE_KNOB
+        elif self.id in eventconsts.Knobs: 
+            self.type = eventconsts.TYPE_KNOB
+        elif self.id in eventconsts.BasicKnobs: 
+            self.type = eventconsts.TYPE_BASIC_KNOB
         elif self.id in eventconsts.Faders: 
             self.type = eventconsts.TYPE_FADER
+        elif self.id in eventconsts.BasicFaders: 
+            self.type = eventconsts.TYPE_BASIC_FADER
         elif self.id in eventconsts.FaderButtons: 
             self.type = eventconsts.TYPE_FADER_BUTTON
             self.isBinary = True
-        else: 
-            # Check for pads is different as they use multiple signals
-            temp = self.id // 0x100
-            if temp in eventconsts.Pads:
-                self.type = eventconsts.TYPE_PAD
-                self.isBinary = True
+        # Pads have different signals for note on and note off
+        elif (self.status == 0x9F or self.status == 0x8F) and self.note in eventconsts.Pads:
+            self.type = eventconsts.TYPE_PAD
+            self.isBinary = True
+        elif (self.status == 0x99 or self.status == 0x89) and self.note in eventconsts.BasicPads:
+            self.type = eventconsts.TYPE_BASIC_PAD
+            self.isBinary = True
+        # And also different signals for the buttons in basic mode
+        elif self.status == 0xB0 and self.note in eventconsts.BasicPads:
+            self.type = eventconsts.TYPE_BASIC_PAD
+            self.isBinary = True
         
-        self.value = event.data2
-
+        
+        # Check if buttons were lifted
         if self.value is 0: self.is_Lift = True
         else: self.is_Lift = False
         
         self.handled = False
+
+        # Process long presses: TODO
         self.is_long_press = False
 
         # Process double presses only for lifted buttons
@@ -114,14 +129,18 @@ class processedEvent:
         elif self.type is eventconsts.TYPE_TRANSPORT: 
             a = "Transport"
             b = self.getID_Transport()
-        elif self.type is eventconsts.TYPE_KNOB: 
+        elif self.type is eventconsts.TYPE_KNOB or self.type is eventconsts.TYPE_BASIC_KNOB: 
             a = "Knob"
-        elif self.type is eventconsts.TYPE_FADER: 
+            b = self.getID_Knobs()
+        elif self.type is eventconsts.TYPE_FADER or self.type is eventconsts.TYPE_BASIC_FADER: 
             a = "Fader"
-        elif self.type is eventconsts.TYPE_FADER_BUTTON: 
+            b = self.getID_Fader()
+        elif self.type is eventconsts.TYPE_FADER_BUTTON or self.type is eventconsts.TYPE_BASIC_FADER_BUTTON: 
             a = "Fader Button"
-        elif self.type is eventconsts.TYPE_PAD: 
+            b = self.getID_FaderButton()
+        elif self.type is eventconsts.TYPE_PAD or self.type is eventconsts.TYPE_BASIC_PAD: 
             a = "Pad"
+            b = self.getID_Pads()
         else: 
             internal.logError("Bad event type")
             a = "ERROR!!!"
@@ -130,20 +149,20 @@ class processedEvent:
 
     # Returns string event ID for system events
     def getID_System(self):
-        if self.id == eventconsts.SYSTEM_IN_CONTROL: return "InControl"
+        if   self.id == eventconsts.SYSTEM_IN_CONTROL: return "InControl"
         elif self.id == eventconsts.SYSTEM_MISC: return "Misc"
         else: return "ERROR"
 
     # Returns string event ID for InControl events
     def getID_InControl(self):
-        if self.id == eventconsts.INCONTROL_KNOBS: return "Knobs"
+        if   self.id == eventconsts.INCONTROL_KNOBS: return "Knobs"
         elif self.id == eventconsts.INCONTROL_FADERS: return "Faders"
         elif self.id == eventconsts.INCONTROL_PADS: return "Pads"
         else: return "ERROR"
 
     # Returns string event ID for transport events
     def getID_Transport(self):
-        if self.id == eventconsts.TRANSPORT_BACK: return "Back"
+        if   self.id == eventconsts.TRANSPORT_BACK: return "Back"
         elif self.id == eventconsts.TRANSPORT_FORWARD: return "Forward"
         elif self.id == eventconsts.TRANSPORT_STOP: return "Stop"
         elif self.id == eventconsts.TRANSPORT_PLAY: return "Play"
@@ -152,6 +171,67 @@ class processedEvent:
         elif self.id == eventconsts.TRANSPORT_TRACK_NEXT: return "Next Track"
         elif self.id == eventconsts.TRANSPORT_TRACK_PREVIOUS: return "Previous Track"
         else: return "ERROR"
+    
+    # Returns string eventID for knob events
+    def getID_Pads(self):
+        if   self.note == eventconsts.PAD_TOP_1 or self.note == eventconsts.BASIC_PAD_TOP_1: return "Top 1"
+        elif self.note == eventconsts.PAD_TOP_2 or self.note == eventconsts.BASIC_PAD_TOP_2: return "Top 2"
+        elif self.note == eventconsts.PAD_TOP_3 or self.note == eventconsts.BASIC_PAD_TOP_3: return "Top 3"
+        elif self.note == eventconsts.PAD_TOP_4 or self.note == eventconsts.BASIC_PAD_TOP_4: return "Top 4"
+        elif self.note == eventconsts.PAD_TOP_5 or self.note == eventconsts.BASIC_PAD_TOP_5: return "Top 5"
+        elif self.note == eventconsts.PAD_TOP_6 or self.note == eventconsts.BASIC_PAD_TOP_6: return "Top 6"
+        elif self.note == eventconsts.PAD_TOP_7 or self.note == eventconsts.BASIC_PAD_TOP_7: return "Top 7"
+        elif self.note == eventconsts.PAD_TOP_8 or self.note == eventconsts.BASIC_PAD_TOP_8: return "Top 8"
+
+        elif self.note == eventconsts.PAD_BOTTOM_1 or self.note == eventconsts.BASIC_PAD_BOTTOM_1: return "Bottom 1"
+        elif self.note == eventconsts.PAD_BOTTOM_2 or self.note == eventconsts.BASIC_PAD_BOTTOM_2: return "Bottom 2"
+        elif self.note == eventconsts.PAD_BOTTOM_3 or self.note == eventconsts.BASIC_PAD_BOTTOM_3: return "Bottom 3"
+        elif self.note == eventconsts.PAD_BOTTOM_4 or self.note == eventconsts.BASIC_PAD_BOTTOM_4: return "Bottom 4"
+        elif self.note == eventconsts.PAD_BOTTOM_5 or self.note == eventconsts.BASIC_PAD_BOTTOM_5: return "Bottom 5"
+        elif self.note == eventconsts.PAD_BOTTOM_6 or self.note == eventconsts.BASIC_PAD_BOTTOM_6: return "Bottom 6"
+        elif self.note == eventconsts.PAD_BOTTOM_7 or self.note == eventconsts.BASIC_PAD_BOTTOM_7: return "Bottom 7"
+        elif self.note == eventconsts.PAD_BOTTOM_8 or self.note == eventconsts.BASIC_PAD_BOTTOM_8: return "Bottom 8"
+
+        elif self.note == eventconsts.PAD_TOP_BUTTON or self.note == eventconsts.BASIC_PAD_TOP_BUTTON: return "Top Button"
+        elif self.note == eventconsts.PAD_BOTTOM_BUTTON or self.note == eventconsts.BASIC_PAD_BOTTOM_BUTTON: return "Bottom Button"
+
+        else: return "ERROR"
+    
+    # Returns string eventID for fader events
+    def getID_Fader(self):
+        if   self.id == eventconsts.FADER_1 or self.id == eventconsts.BASIC_FADER_1: return "1"
+        elif self.id == eventconsts.FADER_2 or self.id == eventconsts.BASIC_FADER_2: return "2"
+        elif self.id == eventconsts.FADER_3 or self.id == eventconsts.BASIC_FADER_3: return "3"
+        elif self.id == eventconsts.FADER_4 or self.id == eventconsts.BASIC_FADER_4: return "4"
+        elif self.id == eventconsts.FADER_5 or self.id == eventconsts.BASIC_FADER_5: return "5"
+        elif self.id == eventconsts.FADER_6 or self.id == eventconsts.BASIC_FADER_6: return "6"
+        elif self.id == eventconsts.FADER_7 or self.id == eventconsts.BASIC_FADER_7: return "7"
+        elif self.id == eventconsts.FADER_8 or self.id == eventconsts.BASIC_FADER_8: return "8"
+        elif self.id == eventconsts.FADER_9 or self.id == eventconsts.BASIC_FADER_9: return "9 / Master"
+        else: return "ERROR"
+
+        # Returns string eventID for fader events
+    def getID_FaderButton(self):
+        if   self.id == eventconsts.FADER_BUTTON_1 or self.id == eventconsts.BASIC_FADER_BUTTON_1: return "1"
+        elif self.id == eventconsts.FADER_BUTTON_2 or self.id == eventconsts.BASIC_FADER_BUTTON_2: return "2"
+        elif self.id == eventconsts.FADER_BUTTON_3 or self.id == eventconsts.BASIC_FADER_BUTTON_3: return "3"
+        elif self.id == eventconsts.FADER_BUTTON_4 or self.id == eventconsts.BASIC_FADER_BUTTON_4: return "4"
+        elif self.id == eventconsts.FADER_BUTTON_5 or self.id == eventconsts.BASIC_FADER_BUTTON_5: return "5"
+        elif self.id == eventconsts.FADER_BUTTON_6 or self.id == eventconsts.BASIC_FADER_BUTTON_6: return "6"
+        elif self.id == eventconsts.FADER_BUTTON_7 or self.id == eventconsts.BASIC_FADER_BUTTON_7: return "7"
+        elif self.id == eventconsts.FADER_BUTTON_8 or self.id == eventconsts.BASIC_FADER_BUTTON_8: return "8"
+        elif self.id == eventconsts.FADER_BUTTON_9 or self.id == eventconsts.BASIC_FADER_BUTTON_9: return "9 / Master"
+        else: return "ERROR"
+    
+    def getID_Knobs(self):
+        if   self.id == eventconsts.KNOB_1 or self.id == eventconsts.BASIC_KNOB_1: return "1"
+        elif self.id == eventconsts.KNOB_2 or self.id == eventconsts.BASIC_KNOB_2: return "2"
+        elif self.id == eventconsts.KNOB_3 or self.id == eventconsts.BASIC_KNOB_3: return "3"
+        elif self.id == eventconsts.KNOB_4 or self.id == eventconsts.BASIC_KNOB_4: return "4"
+        elif self.id == eventconsts.KNOB_5 or self.id == eventconsts.BASIC_KNOB_5: return "5"
+        elif self.id == eventconsts.KNOB_6 or self.id == eventconsts.BASIC_KNOB_6: return "6"
+        elif self.id == eventconsts.KNOB_7 or self.id == eventconsts.BASIC_KNOB_7: return "7"
+        elif self.id == eventconsts.KNOB_8 or self.id == eventconsts.BASIC_KNOB_8: return "8"
     
     # Returns (formatted) value
     def getValue(self):

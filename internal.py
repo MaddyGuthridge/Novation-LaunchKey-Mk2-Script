@@ -10,6 +10,8 @@ This file contains functions common to  scripts loaded by both files.
 
 import device
 
+PORT = -1 # Set in initialisation function then left constant
+
 extendedMode = False
 
 # The previous mesage sent to the MIDI out device

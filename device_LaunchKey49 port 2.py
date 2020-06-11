@@ -46,6 +46,10 @@ class TGeneric():
 
     def OnInit(self):
         initialisation_flag = True
+
+        # Set port to 2 since this is the script for extended events
+        internal.PORT = 2
+
         # Set the device into Extended Mode
         
         lighting.lightShow()
