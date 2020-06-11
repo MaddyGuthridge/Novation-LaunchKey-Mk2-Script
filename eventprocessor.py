@@ -4,10 +4,13 @@ This file processes events and returns objects for events.
 
 """
 
+import time
+
 import device
 
 import eventconsts
 import internal
+import config
 
 
 
@@ -71,10 +74,13 @@ class processedEvent:
         # Process long presses: TODO
         self.is_long_press = False
 
-        # Process double presses only for lifted buttons
+        # Process double presses (seperate for lifted and pressed buttons)
         self.is_double_click = False
-        if self.is_Lift is True and self.isBinary is True: 
-            self.is_double_click = device.isDoubleClick(internal.toMidiMessage(event.status, event.data1, event.data2))
+        if self.isBinary is True: 
+            if self.is_Lift is True:
+                self.is_double_click = isDoubleClickLift(self.id)
+            elif self.is_Lift is False and self.isBinary is True: 
+                self.is_double_click = isDoubleClickPress(self.id)
 
         
 
@@ -289,3 +295,31 @@ def convertPadMapping(padNumber):
     elif padNumber is eventconsts.PAD_TOP_BUTTON: return eventconsts.BASIC_PAD_TOP_BUTTON
     elif padNumber is eventconsts.PAD_BOTTOM_BUTTON: return eventconsts.BASIC_PAD_BOTTOM_BUTTON
     internal.logError("Pad number not defined")
+
+# Returns true if is a double click for a press
+lastPressID = -1
+lastPressTime = -1
+def isDoubleClickPress(id):
+    global lastPressID
+    global lastPressTime
+    ret = False
+    currentTime = time.perf_counter()
+    if id == lastPressID and (currentTime - lastPressTime < config.DOUBLE_PRESS_TIME):
+        ret = True
+    lastPressID = id
+    lastPressTime = currentTime
+    return ret
+
+# Returns true if is a double click for a lift
+lastLiftID = -1
+lastLiftTime = -1
+def isDoubleClickLift(id):
+    global lastLiftID
+    global lastLiftTime
+    ret = False
+    currentTime = time.perf_counter()
+    if id == lastLiftID and (currentTime - lastLiftTime < config.DOUBLE_PRESS_TIME):
+        ret = True
+    lastLiftID = id
+    lastLiftTime = currentTime
+    return ret

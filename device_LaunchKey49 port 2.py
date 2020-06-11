@@ -1,4 +1,4 @@
-#   name=LaunchKey49 Mk2 (Port 2)
+#   name=LaunchKey49 Mk2 (Extended)
 # url=
 # version = 0.0.1
 
@@ -31,11 +31,15 @@ import utils
 
 import time
 
+# Other project files
 import config
 import internal
 import lighting
 import eventconsts
 import eventprocessor
+
+# Command processors
+import processdefault
 
 initialisation_flag = False
 initialisation_flag_response = False
@@ -73,6 +77,11 @@ class TGeneric():
         # Process the event into processedEvent format
         command = eventprocessor.processedEvent(event)
         
+
+
+        # If command hasn't been handled by any above uses, use the default controls
+        if command.handled is False:
+            processdefault.process(command)
         
         # Print out event
         command.printOut()
@@ -84,10 +93,9 @@ class TGeneric():
         return
     
     def OnUpdateBeatIndicator(self, beat):
-        print("Update beat: ", beat)
-        if beat is 1: lighting.setPadColour(eventconsts.PAD_TOP_BUTTON, lighting.COLOUR_RED) # Bar
-        elif beat is 2: lighting.setPadColour(eventconsts.PAD_TOP_BUTTON, lighting.COLOUR_YELLOW) # Beat
-        elif beat is 0: lighting.setPadColour(eventconsts.PAD_TOP_BUTTON, lighting.COLOUR_OFF) # Off
+        if beat is 1: internal.sendMidiMessage(0xBF, 0x3B, 0x7F) # Bar
+        elif beat is 2: internal.sendMidiMessage(0xBF, 0x3B, 0x7F) # Beat
+        elif beat is 0: internal.sendMidiMessage(0xBF, 0x3B, 0x00) # Off
 
 Generic = TGeneric()
 
