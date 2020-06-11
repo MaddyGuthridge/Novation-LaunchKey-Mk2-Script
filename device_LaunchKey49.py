@@ -31,6 +31,7 @@ import utils
 
 import config
 import internal
+import eventprocessor
 
 
 class TGeneric():
@@ -46,10 +47,14 @@ class TGeneric():
     def OnMidiIn(self, event):
         event.handled = False
         
+        # Process the event into processedEvent format
+        command = eventprocessor.processedEvent(event)
+
+        # Print out event
+        command.printOut()
+        print("")
         
-        # If the event is unhandled, print out what it is:
-        if event.handled is False:
-            print("Unhandled event: {:X} {:X} {:2X} {}".format(event.status, event.data1, event.data2,  internal.EventNameT[(event.status - 0x80) // 16] + ': '+  utils.GetNoteName(event.data1)))
+        
 
 
 Generic = TGeneric()
