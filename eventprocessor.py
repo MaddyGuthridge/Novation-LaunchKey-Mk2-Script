@@ -149,7 +149,7 @@ class processedEvent:
 
     # Returns string event ID for system events
     def getID_System(self):
-        if   self.id == eventconsts.SYSTEM_IN_CONTROL: return "InControl"
+        if   self.id == eventconsts.SYSTEM_EXTENDED: return "InControl"
         elif self.id == eventconsts.SYSTEM_MISC: return "Misc"
         else: return "ERROR"
 

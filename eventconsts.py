@@ -22,10 +22,10 @@ TYPE_BASIC_FADER_BUTTON = 15
 TYPE_BASIC_PAD = 16
 
 # Define System Message
-SYSTEM_IN_CONTROL = 0x0C9F
+SYSTEM_EXTENDED = 0x0C9F
 SYSTEM_MISC = 0x109F # I don't actually know what this does but it is called upon pressing and lifting the knobs' InControl button
 
-SystemMessages = [SYSTEM_IN_CONTROL, SYSTEM_MISC]
+SystemMessages = [SYSTEM_EXTENDED, SYSTEM_MISC]
 
 # Define InControl Buttons
 

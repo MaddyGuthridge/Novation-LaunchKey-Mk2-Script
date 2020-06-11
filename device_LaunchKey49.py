@@ -39,10 +39,9 @@ class TGeneric():
         return
 
     def OnInit(self):
-        # Set port to 1 since this is the script for basic events
-        internal.PORT = 1
+        # Set port to basic
+        internal.PORT = config.DEVICE_PORT_BASIC
 
-        print('Initialisation complete')
 
     def OnDeInit(self):
         print('Deinitialisation complete')

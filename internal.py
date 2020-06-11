@@ -10,30 +10,129 @@ This file contains functions common to  scripts loaded by both files.
 
 import device
 
+import eventconsts
+
 PORT = -1 # Set in initialisation function then left constant
 
 extendedMode = False
+inControl_Knobs = False
+inControl_Faders = False
+inControl_Pads = False
 
 # The previous mesage sent to the MIDI out device
 previous_event_out = 0
 
 # TODO: process extended mode messages.
 
-# Queries whether extended mode is active. Only accessible from port 2
-def queryExtendedMode():
+# Queries whether extended mode is active. Only accessible from extended port
+def queryExtendedMode(option = eventconsts.SYSTEM_EXTENDED):
     global extendedMode
-    return extendedMode
+    global inControl_Knobs
+    global inControl_Faders
+    global inControl_Pads
+    
+    if option == eventconsts.SYSTEM_EXTENDED: return extendedMode
+    elif option == eventconsts.INCONTROL_KNOBS: return inControl_Knobs
+    elif option == eventconsts.INCONTROL_FADERS: return inControl_Faders
+    elif option == eventconsts.INCONTROL_PADS: return inControl_Pads
 
-# Sets extended mode on the device
-def setExtendedMode(newMode):
+# Sets extended mode on the device, use inControl constants to choose which
+def setExtendedMode(newMode, option = eventconsts.SYSTEM_EXTENDED):
     global extendedMode
-    if newMode is True:
-        sendMidiMessage(0x9F, 0x0C, 0x7F)
-        extendedMode = True
-    elif newMode is False:
-        sendMidiMessage(0x9F, 0x0C, 0x00)
-        extendedMode = False
-    else: logError("Extended mode not boolean")
+    global inControl_Knobs
+    global inControl_Faders
+    global inControl_Pads
+
+    # Set all
+    if option == eventconsts.SYSTEM_EXTENDED:
+        if newMode is True:
+            sendMidiMessage(0x9F, 0x0C, 0x7F)
+            extendedMode = True
+            inControl_Knobs = True
+            inControl_Faders = True
+            inControl_Pads = True
+        elif newMode is False:
+            sendMidiMessage(0x9F, 0x0C, 0x00)
+            extendedMode = False
+            inControl_Knobs = False
+            inControl_Faders = False
+            inControl_Pads = False
+        else: logError("New mode mode not boolean")
+    
+    # Set knobs
+    elif option == eventconsts.INCONTROL_KNOBS:
+        if newMode is True:
+            sendMidiMessage(0x9F, 0x0D, 0x7F)
+            inControl_Knobs = True
+        elif newMode is False:
+            sendMidiMessage(0x9F, 0x0D, 0x00)
+            inControl_Knobs = False
+        else: logError("New mode mode not boolean")
+    
+    # Set faders
+    elif option == eventconsts.INCONTROL_FADERS:
+        if newMode is True:
+            sendMidiMessage(0x9F, 0x0E, 0x7F)
+            inControl_Faders = True
+        elif newMode is False:
+            sendMidiMessage(0x9F, 0x0E, 0x00)
+            inControl_Faders = False
+        else: logError("New mode mode not boolean")
+    
+    # Set pads
+    elif option == eventconsts.INCONTROL_PADS:
+        if newMode is True:
+            sendMidiMessage(0x9F, 0x0F, 0x7F)
+            inControl_Pads = True
+        elif newMode is False:
+            sendMidiMessage(0x9F, 0x0F, 0x00)
+            inControl_Pads = False
+        else: logError("New mode mode not boolean")
+
+# Processes extended mode messages from device
+def recieveExtendedMode(newMode, option = eventconsts.SYSTEM_EXTENDED):
+    global extendedMode
+    global inControl_Knobs
+    global inControl_Faders
+    global inControl_Pads
+
+    # Set all
+    if option == eventconsts.SYSTEM_EXTENDED:
+        if newMode is True:
+            extendedMode = True
+            inControl_Knobs = True
+            inControl_Faders = True
+            inControl_Pads = True
+        elif newMode is False:
+            extendedMode = False
+            inControl_Knobs = False
+            inControl_Faders = False
+            inControl_Pads = False
+        else: logError("New mode mode not boolean")
+    
+    # Set knobs
+    elif option == eventconsts.INCONTROL_KNOBS:
+        if newMode is True:
+            inControl_Knobs = True
+        elif newMode is False:
+            inControl_Knobs = False
+        else: logError("New mode mode not boolean")
+    
+    # Set faders
+    elif option == eventconsts.INCONTROL_FADERS:
+        if newMode is True:
+            inControl_Faders = True
+        elif newMode is False:
+            inControl_Faders = False
+        else: logError("New mode mode not boolean")
+    
+    # Set pads
+    elif option == eventconsts.INCONTROL_PADS:
+        if newMode is True:
+            inControl_Pads = True
+        elif newMode is False:
+            inControl_Pads = False
+        else: logError("New mode mode not boolean")
 
 # Compares revieved event to previous
 def compareEvent(event):

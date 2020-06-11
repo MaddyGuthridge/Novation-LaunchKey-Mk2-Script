@@ -45,15 +45,19 @@ class TGeneric():
         return
 
     def OnInit(self):
-        initialisation_flag = True
 
-        # Set port to 2 since this is the script for extended events
-        internal.PORT = 2
+        # Set port to extended
+        internal.PORT = config.DEVICE_PORT_EXTENDED
 
         # Set the device into Extended Mode
         
         lighting.lightShow()
         internal.setExtendedMode(True)
+
+        # Process inControl preferences
+        if config.START_IN_INCONTROL_KNOBS == False: internal.setExtendedMode(False, eventconsts.INCONTROL_KNOBS) 
+        if config.START_IN_INCONTROL_FADERS == False: internal.setExtendedMode(False, eventconsts.INCONTROL_FADERS) 
+        if config.START_IN_INCONTROL_PADS == False: internal.setExtendedMode(False, eventconsts.INCONTROL_PADS) 
         
         print('Initialisation complete')
 
