@@ -15,7 +15,7 @@ DEVICE_PORT_BASIC = 220
 DEVICE_PORT_EXTENDED = 225
 
 LONG_PRESS_TIME = 0.5 # Change how long a long press needs to be held for
-DOUBLE_PRESS_TIME = 0.2 # Change how long
+DOUBLE_PRESS_TIME = 0.2 # Change how quickly a double press needs to be done to be detected
 
 ENABLE_SNAPPING = True # Change to False to prevent faders and knobs from snapping to default values
 SNAP_RANGE = 0.03 # Will snap if within this disatnce of snap value
