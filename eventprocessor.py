@@ -43,7 +43,8 @@ class actionPrinter:
             out = internal.newGetTab(out)
             out += self.eventActions[x]
             print(out)
-            ui.setHintMsg(self.eventActions[x])
+            if self.eventActions[x] != "":
+                ui.setHintMsg(self.eventActions[x])
 
         self.eventActions.clear()
         self.eventProcessors.clear()
@@ -186,6 +187,7 @@ class processedEvent:
         
         
         print(out)
+        print("")
         self.actions.flush()
 
     # Returns string with type and ID of event

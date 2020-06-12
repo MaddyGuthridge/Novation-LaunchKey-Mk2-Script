@@ -20,50 +20,56 @@ def process(command):
 
     # Fader 1
     if command.id == eventconsts.FADER_1: 
-        setVolume(1, command.value)
+        setVolume(command, 1, command.value)
         command.handled = True
     
     # Fader 2
     if command.id == eventconsts.FADER_2: 
-        setVolume(2, command.value)
+        setVolume(command, 2, command.value)
         command.handled = True
 
     # Fader 3
     if command.id == eventconsts.FADER_3: 
-        setVolume(3, command.value)
+        setVolume(command, 3, command.value)
         command.handled = True
     
     # Fader 4
     if command.id == eventconsts.FADER_4: 
-        setVolume(4, command.value)
+        setVolume(command, 4, command.value)
         command.handled = True
 
     # Fader 5
     if command.id == eventconsts.FADER_5: 
-        setVolume(5, command.value)
+        setVolume(command, 5, command.value)
         command.handled = True
     
     # Fader 6
     if command.id == eventconsts.FADER_6: 
-        setVolume(6, command.value)
+        setVolume(command, 6, command.value)
         command.handled = True
     
     # Fader 7
     if command.id == eventconsts.FADER_7: 
-        setVolume(7, command.value)
+        setVolume(command, 7, command.value)
         command.handled = True
 
     # Fader 8
     if command.id == eventconsts.FADER_8: 
-        setVolume(8, command.value)
+        setVolume(command, 8, command.value)
         command.handled = True
 
     # Fader 9
     if command.id == eventconsts.FADER_9: 
-        # Get current track number
-        track = mixer.trackNumber()
-        setVolume(track, command.value)
-        command.handled = True
+        # If shift key held, change master track
+        if command.shifted:
+            setVolume(command, 0, command.value)
+            command.handled = True
+        # Otherwise change current track
+        else:
+            # Get current track number
+            track = mixer.trackNumber()
+            setVolume(command, track, command.value)
+            command.handled = True
 
     
     
@@ -72,10 +78,10 @@ def process(command):
     if command.handled is False: 
         command.actions.appendAction("[Did not handle]")
 
-def setVolume(track, value):
+def setVolume(command, track, value):
     volume = getVolumeSend(value)
     mixer.setTrackVolume(track, volume)
-    command.actions.appendAction("Set Track " + str(track) + " volume to " + getVolumeValue(value))
+    command.actions.appendAction("Set " + mixer.getTrackName(track) + " volume to " + getVolumeValue(value))
     if internal.didSnap(internal.toFloat(value), config.MIXER_VOLUME_SNAP_TO):
         command.actions.appendAction("[Snapped]")
 

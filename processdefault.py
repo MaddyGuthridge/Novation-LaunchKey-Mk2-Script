@@ -84,6 +84,36 @@ def process(command):
         ui.previous()
         command.actions.appendAction("Previous UI Element")
         command.handled = True
+
+    # Extended mode events
+
+    # Extended Mode
+    if command.id == eventconsts.SYSTEM_EXTENDED:
+        internal.recieveExtendedMode(not command.is_Lift)
+        command.actions.appendAction("Set Extended Mode to " + str(not command.is_Lift))
+        command.handled = True
+
+    # Knobs
+    if command.id == eventconsts.INCONTROL_KNOBS:
+        internal.recieveExtendedMode(not command.is_Lift, eventconsts.INCONTROL_KNOBS)
+        command.actions.appendAction("Set Extended Mode (Knobs) to " + str(not command.is_Lift))
+        command.handled = True
+    
+    # Faders
+    if command.id == eventconsts.INCONTROL_FADERS:
+        internal.recieveExtendedMode(not command.is_Lift, eventconsts.INCONTROL_FADERS)
+        command.actions.appendAction("Set Extended Mode (Faders) to " + str(not command.is_Lift))
+        command.handled = True
+    
+    # Pads
+    if command.id == eventconsts.INCONTROL_PADS:
+        internal.recieveExtendedMode(not command.is_Lift, eventconsts.INCONTROL_PADS)
+        command.actions.appendAction("Set Extended Mode (Pads) to " + str(not command.is_Lift))
+        command.handled = True
+    
+    # That random event on the knobs button
+    if command.id == eventconsts.SYSTEM_MISC:
+        command.handled = True
     
     # Add did not handle flag if not handled
     if command.handled is False: 
