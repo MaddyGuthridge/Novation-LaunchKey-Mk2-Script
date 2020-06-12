@@ -45,6 +45,8 @@ import processmixer
 initialisation_flag = False
 initialisation_flag_response = False
 
+
+
 class TGeneric():
     def __init__(self):
         return
@@ -65,23 +67,31 @@ class TGeneric():
         if config.START_IN_INCONTROL_PADS == False: internal.setExtendedMode(False, eventconsts.INCONTROL_PADS) 
         
         print('Initialisation complete')
+        print("-----------------------")
+        print("")
+        print("")
 
     def OnDeInit(self):
         # Return the device into Basic Mode
         internal.setExtendedMode(False)
         print('Deinitialisation complete')
+        print("-------------------------")
+        print("")
+        print("")
         
 
     def OnMidiIn(self, event):
         event.handled = False
         
+        # Update active window (ui.onRefresh() isnt working properly)
+        internal.ActiveWindow = ui.getFocusedFormCaption()
+
         # Process the event into processedEvent format
         command = eventprocessor.processedEvent(event)
-        
-        # Get active window
-
 
         # Use mixer processor if mixer is active window
+        if "Mixer - " in internal.ActiveWindow:
+            processmixer.process(command)
 
         # If command hasn't been handled by any above uses, use the default controls
         if command.handled is False:
@@ -89,19 +99,19 @@ class TGeneric():
         
         # Print out event
         command.printOut()
+        internal.actionStr.flush()
         print("")
         
         event.handled = True
     
     lastIdle = -1
     def OnIdle(self):
-        
+        internal.ActiveWindow = ui.getFocusedFormCaption()
         temp = time.perf_counter()
         self.lastIdle = temp
         return
 
     def OnRefresh(self, flags):
-        internal.ActiveWindow = ui.getFocusedFormCaption()
         return
     
     def OnUpdateBeatIndicator(self, beat):

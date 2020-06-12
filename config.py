@@ -25,6 +25,7 @@ START_IN_INCONTROL_KNOBS = True
 START_IN_INCONTROL_FADERS = True
 START_IN_INCONTROL_PADS = True
 
+TAB_LENGTH = 12
 
 #-------------------------------
 # CONSTANTS

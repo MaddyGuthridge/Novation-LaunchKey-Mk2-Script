@@ -16,9 +16,6 @@ import config
 
 class processedEvent:
     def __init__(self, event):
-        
-        # Number of spaces per column in output
-        self.TAB_INDENT = 16
 
         self.status = event.status
         self.note = event.data1
@@ -89,31 +86,38 @@ class processedEvent:
     # Prints event data
     def printOut(self):
 
-        out = "Event: "
+        out = "Event:"
+        out = internal.newGetTab(out)
 
         # Event type and ID
         temp = self.getType()
         out += temp
+        out = internal.newGetTab(out)
 
         # Event value
         temp = self.getValue()
-        out += temp + internal.getTab(self.TAB_INDENT - len(temp))
+        out += temp
+        out = internal.newGetTab(out)
 
         # Event full data
         temp = self.getDataString()
-        out += temp + internal.getTab(self.TAB_INDENT - len(temp))
+        out += temp
+        out = internal.newGetTab(out)
 
         # Handled
         if self.handled is False:
             temp = " [Unhandled]"
         else: temp = " [Handled]"
-        out += temp + internal.getTab(self.TAB_INDENT - len(temp))
+        out += temp
+        out = internal.newGetTab(out)
 
         if self.is_double_click:
-            out += " [Double Click]"
+            out += "[Double Click]"
+            out = internal.newGetTab(out)
         
         if self.is_long_press:
-            out += " [Long Press]"
+            out += "[Long Press]"
+            out = internal.newGetTab(out)
 
 
         
@@ -150,8 +154,8 @@ class processedEvent:
         else: 
             internal.logError("Bad event type")
             a = "ERROR!!!"
-
-        return a + internal.getTab(self.TAB_INDENT - len(a)) + b + internal.getTab(self.TAB_INDENT - len(b))
+        a = internal.newGetTab(a)
+        return a + b
 
     # Returns string event ID for system events
     def getID_System(self):
@@ -247,7 +251,8 @@ class processedEvent:
             if self.value == 0:
                 b = "(Off)"
             else: b = "(On)"
-        return a + internal.getTab(5 - len(a)) + b
+        a = internal.newGetTab(a, 5)
+        return a + b
 
     # Returns string with (formatted) hex of event
     def getDataString(self):

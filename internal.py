@@ -9,8 +9,10 @@ This file contains functions common to  scripts loaded by both files.
 #-------------------------------
 
 import device
+import ui
 
 import eventconsts
+import config
 
 PORT = -1 # Set in initialisation function then left constant
 
@@ -24,7 +26,57 @@ ActiveWindow = "Nil"
 # The previous mesage sent to the MIDI out device
 previous_event_out = 0
 
-# TODO: process extended mode messages.
+# Return a simulation of the tab character
+'''def getTab(length):
+    while length < 0:
+        length += config.TAB_LENGTH
+    
+    a = ""
+    for x in range(length):
+        a += " "
+    return a
+'''
+
+# Returns string with tab characters at the end
+def newGetTab(string, length = config.TAB_LENGTH):
+    string += " "
+    toAdd = length - len(string) % length
+
+    for x in range(toAdd):
+        string += " "
+    return string
+
+
+class actionPrinter:
+    # String that is output after each event is processed
+    eventActions = [""]
+    eventProcessors = [""]
+
+    # Set event processor
+    def addProcessor(self, string):
+        if self.eventProcessors[0] == "":
+            self.eventProcessors[0] = string
+        else:
+            self.eventProcessors.append(string)
+            self.eventActions.append("")
+
+    # Add to event action
+    def appendAction(self, string):
+        self.eventActions[len(self.eventProcessors) - 1] += string
+        self.eventActions[len(self.eventProcessors) - 1] = newGetTab(self.eventActions[len(self.eventProcessors) - 1])
+
+    def flush(self):
+        for x in range(len(self.eventProcessors)):
+            out = self.eventProcessors[x]
+            out = newGetTab(out)
+            out += self.eventActions[x]
+            print(out)
+            ui.setHintMsg(self.eventActions[x])
+
+        self.eventActions = [""]
+        self.eventProcessors = [""]
+
+actionStr = actionPrinter()
 
 # Queries whether extended mode is active. Only accessible from extended port
 def queryExtendedMode(option = eventconsts.SYSTEM_EXTENDED):
@@ -153,14 +205,17 @@ def sendMidiMessage(status, data1, data2):
 def toMidiMessage(status, data1, data2):
     return status + (data1 << 8) + (data2 << 16)
 
+# Returns snap value
+def snap(value, snapTo):
+    if abs(value - snapTo) <= config.SNAP_RANGE:
+        return snapTo
+    else: return value
+
+# Converts MIDI event range to float for use in volume, pan, etc functions
+def toFloat(value, min = 0, max = 1):
+    return (value / 127) * (max - min) + min
+
 # Print out error message
 def logError(message):
     print("Error: ", message)
 
-# Return a simulation of the tab character
-def getTab(length):
-    if length < 0: print("ERROR: not enough spacing, need to use greater tab indents")
-    a = ""
-    for x in range(length):
-        a += ' '
-    return a

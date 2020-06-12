@@ -26,7 +26,6 @@ def resetPads():
 
 # OoooOooOOOooO PREETTTTTYYYY!!!!!!
 def lightShow():
-    print("Lights: Begin show")
     sleepTime = 0.05
     x = 0
     while True:
@@ -80,7 +79,6 @@ def lightShow():
         if x > len(rainbowColours) + 8: break
 
     resetPads()
-    print("Lights: End show")
 
 # Quick update of pads (redrawing bouncers or something)
 def updatePads(event = None):
