@@ -90,6 +90,10 @@ class TGeneric():
 
         # Process the event into processedEvent format
         command = eventprocessor.processedEvent(event)
+        # Check for shift button releases (return early)
+        if event.handled:
+            internal.printCommand(command)
+            return
 
         # Use mixer processor if mixer is active window
         if "Mixer - " in internal.ActiveWindow:
@@ -99,12 +103,7 @@ class TGeneric():
         if command.handled is False:
             processdefault.process(command)
         
-        # Print out event
-        command.printOut()
-        print("")
-        internal.actionStr.flush()
-        internal.printLineBreak()
-        print("")
+        internal.printCommand(command)
         
         event.handled = True
     

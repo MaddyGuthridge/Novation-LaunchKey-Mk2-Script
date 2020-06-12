@@ -11,6 +11,10 @@ import eventconsts
 # USER VARIABLES
 #-------------------------------
 
+# Shift button allows override of standard functions.
+# Change this to change which button is treated as the shift button
+SHIFT_BUTTON = eventconsts.TRANSPORT_LOOP
+
 # Port values. Change these to match the ports for each device set in FL Studio
 DEVICE_PORT_BASIC = 220
 DEVICE_PORT_EXTENDED = 225
@@ -26,7 +30,7 @@ START_IN_INCONTROL_KNOBS = True
 START_IN_INCONTROL_FADERS = True
 START_IN_INCONTROL_PADS = True
 
-TAB_LENGTH = 14 # How much spacing to add in console output
+TAB_LENGTH = 16 # How much spacing to add in console output
 
 #-------------------------------
 # CONSTANTS

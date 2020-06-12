@@ -7,15 +7,53 @@ This file processes events and returns objects for events.
 import time
 
 import device
+import ui
 
 import eventconsts
 import internal
 import config
 
+shiftDown = False
+shiftUsed = False
 
+class actionPrinter:
+    
+
+    def __init__(self):
+        # String that is output after each event is processed
+        self.eventActions = [""]
+        self.eventProcessors = [""]
+
+    # Set event processor
+    def addProcessor(self, string):
+        if self.eventProcessors[0] == "":
+            self.eventProcessors[0] = string
+        else:
+            self.eventProcessors.append(string)
+            self.eventActions.append("")
+
+    # Add to event action
+    def appendAction(self, string):
+        self.eventActions[len(self.eventProcessors) - 1] += string
+        self.eventActions[len(self.eventProcessors) - 1] = internal.newGetTab(self.eventActions[len(self.eventProcessors) - 1])
+
+    def flush(self):
+        for x in range(len(self.eventProcessors)):
+            out = self.eventProcessors[x]
+            out = internal.newGetTab(out)
+            out += self.eventActions[x]
+            print(out)
+            ui.setHintMsg(self.eventActions[x])
+
+        self.eventActions.clear()
+        self.eventProcessors.clear()
 
 class processedEvent:
     def __init__(self, event):
+
+        self.actions = actionPrinter()
+
+        self.handled = False
 
         self.status = event.status
         self.note = event.data1
@@ -23,6 +61,23 @@ class processedEvent:
         
         # Bit-shift status and data bytes to get event ID
         self.id = (event.status + (event.data1 << 8))
+
+        self.shifted = False
+
+        global shiftDown
+        global shiftUsed
+        # Process shift button
+        if self.id == config.SHIFT_BUTTON:
+            if self.value == 127:
+                shiftUsed = False
+                shiftDown = True
+            elif self.value == 0:
+                shiftDown = False
+                if shiftUsed:
+                    self.handled = True
+        elif shiftDown:
+            self.shifted = True
+            shiftUsed = True
 
         # Indicates whether to consider as a value or as an on/off
         self.isBinary = False
@@ -66,7 +121,7 @@ class processedEvent:
         if self.value is 0: self.is_Lift = True
         else: self.is_Lift = False
         
-        self.handled = False
+        
 
         # Process long presses: TODO
         self.is_long_press = False
@@ -118,11 +173,20 @@ class processedEvent:
         if self.is_long_press:
             out += "[Long Press]"
             out = internal.newGetTab(out)
+        
+        if self.shifted:
+            out += "[Shifted]"
+            out = internal.newGetTab(out)
+        
+        if self.id == config.SHIFT_BUTTON:
+            out += "[Shift Key]"
+            out = internal.newGetTab(out)
 
 
         
         
         print(out)
+        self.actions.flush()
 
     # Returns string with type and ID of event
     def getType(self):

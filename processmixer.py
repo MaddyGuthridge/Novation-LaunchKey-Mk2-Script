@@ -12,7 +12,7 @@ import config
 
 def process(command):
 
-    internal.actionStr.addProcessor("Mixer Processor")
+    command.actions.addProcessor("Mixer Processor")
 
     #---------------------------------
     # Faders
@@ -70,14 +70,14 @@ def process(command):
 
     # Add did not handle flag if not handled
     if command.handled is False: 
-        internal.actionStr.appendAction("[Did not handle]")
+        command.actions.appendAction("[Did not handle]")
 
 def setVolume(track, value):
     volume = getVolumeSend(value)
     mixer.setTrackVolume(track, volume)
-    internal.actionStr.appendAction("Set Track " + str(track) + " volume to " + getVolumeValue(value))
+    command.actions.appendAction("Set Track " + str(track) + " volume to " + getVolumeValue(value))
     if internal.didSnap(internal.toFloat(value), config.MIXER_VOLUME_SNAP_TO):
-        internal.actionStr.appendAction("[Snapped]")
+        command.actions.appendAction("[Snapped]")
 
 # Returns volume value set to send to FL Studio
 def getVolumeSend(inVal):

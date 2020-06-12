@@ -39,37 +39,13 @@ def newGetTab(string, length = config.TAB_LENGTH):
         string += " "
     return string
 
+def printCommand(command):
+    # Print out event
+    command.printOut()
+    printLineBreak()
+    print("")
 
-class actionPrinter:
-    # String that is output after each event is processed
-    eventActions = [""]
-    eventProcessors = [""]
 
-    # Set event processor
-    def addProcessor(self, string):
-        if self.eventProcessors[0] == "":
-            self.eventProcessors[0] = string
-        else:
-            self.eventProcessors.append(string)
-            self.eventActions.append("")
-
-    # Add to event action
-    def appendAction(self, string):
-        self.eventActions[len(self.eventProcessors) - 1] += string
-        self.eventActions[len(self.eventProcessors) - 1] = newGetTab(self.eventActions[len(self.eventProcessors) - 1])
-
-    def flush(self):
-        for x in range(len(self.eventProcessors)):
-            out = self.eventProcessors[x]
-            out = newGetTab(out)
-            out += self.eventActions[x]
-            print(out)
-            ui.setHintMsg(self.eventActions[x])
-
-        self.eventActions = [""]
-        self.eventProcessors = [""]
-
-actionStr = actionPrinter()
 
 # Queries whether extended mode is active. Only accessible from extended port
 def queryExtendedMode(option = eventconsts.SYSTEM_EXTENDED):
