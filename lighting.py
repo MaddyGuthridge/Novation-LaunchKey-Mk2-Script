@@ -18,12 +18,13 @@ def setPadColour(padNumber, colour):
         internal.sendMidiMessage(0x9F, padNumber, colour)
     else: 
         internal.sendMidiMessage(0x9F, eventprocessor.convertPadMapping(padNumber), colour)
-        
+
+# Set all pads to off      
 def resetPads():
     for x in eventconsts.Pads:
         setPadColour(x, COLOUR_OFF)
 
-
+# OoooOooOOOooO PREETTTTTYYYY!!!!!!
 def lightShow():
     print("Lights: Begin show")
     sleepTime = 0.05
@@ -80,6 +81,17 @@ def lightShow():
 
     resetPads()
     print("Lights: End show")
+
+# Quick update of pads (redrawing bouncers or something)
+def updatePads(event = None):
+    # If event exists: If not button, draw event value
+
+    # If in mixer: redraw bouncer
+    return
+
+# Full refresh of pads
+def refreshPads():
+    return
 
 # Define colour codes
 

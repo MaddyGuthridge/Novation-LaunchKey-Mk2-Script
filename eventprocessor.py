@@ -80,7 +80,7 @@ class processedEvent:
             if self.is_Lift is True:
                 self.is_double_click = isDoubleClickLift(self.id)
             elif self.is_Lift is False and self.isBinary is True: 
-                self.is_double_click = isDoubleClickPress(self.id)
+                self.is_double_click = isDoubleClickPress(self.id)                                                                                                                                
 
         
 

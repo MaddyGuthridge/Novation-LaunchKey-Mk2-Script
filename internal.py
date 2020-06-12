@@ -19,6 +19,8 @@ inControl_Knobs = False
 inControl_Faders = False
 inControl_Pads = False
 
+ActiveWindow = "Nil"
+
 # The previous mesage sent to the MIDI out device
 previous_event_out = 0
 

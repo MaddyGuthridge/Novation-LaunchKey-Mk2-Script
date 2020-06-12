@@ -1,4 +1,4 @@
-#   name=LaunchKey49 Mk2 (Extended)
+#   name=LaunchKey49 Mk2 (Extended )
 # url=
 # version = 0.0.1
 
@@ -40,6 +40,7 @@ import eventprocessor
 
 # Command processors
 import processdefault
+import processmixer
 
 initialisation_flag = False
 initialisation_flag_response = False
@@ -77,7 +78,10 @@ class TGeneric():
         # Process the event into processedEvent format
         command = eventprocessor.processedEvent(event)
         
+        # Get active window
 
+
+        # Use mixer processor if mixer is active window
 
         # If command hasn't been handled by any above uses, use the default controls
         if command.handled is False:
@@ -88,8 +92,16 @@ class TGeneric():
         print("")
         
         event.handled = True
-        
+    
+    lastIdle = -1
     def OnIdle(self):
+        
+        temp = time.perf_counter()
+        self.lastIdle = temp
+        return
+
+    def OnRefresh(self, flags):
+        internal.ActiveWindow = ui.getFocusedFormCaption()
         return
     
     def OnUpdateBeatIndicator(self, beat):
@@ -110,6 +122,9 @@ def OnMidiIn(event):
 
 def OnIdle():
     Generic.OnIdle()
+
+def OnRefresh(flags):
+    Generic.OnRefresh(flags)
 
 def OnUpdateBeatIndicator(beat):
     Generic.OnUpdateBeatIndicator(beat)
