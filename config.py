@@ -5,6 +5,7 @@ It also contains constants which are used to enable featurs such as snapping.
 You can modify those values too, and the script will still work, but it may not operate in ways you would expect.
 
 """
+import eventconsts
 
 #-------------------------------
 # USER VARIABLES
@@ -25,7 +26,7 @@ START_IN_INCONTROL_KNOBS = True
 START_IN_INCONTROL_FADERS = True
 START_IN_INCONTROL_PADS = True
 
-TAB_LENGTH = 12
+TAB_LENGTH = 14 # How much spacing to add in console output
 
 #-------------------------------
 # CONSTANTS

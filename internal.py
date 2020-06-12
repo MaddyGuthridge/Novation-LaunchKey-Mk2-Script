@@ -26,16 +26,9 @@ ActiveWindow = "Nil"
 # The previous mesage sent to the MIDI out device
 previous_event_out = 0
 
-# Return a simulation of the tab character
-'''def getTab(length):
-    while length < 0:
-        length += config.TAB_LENGTH
-    
-    a = ""
-    for x in range(length):
-        a += " "
-    return a
-'''
+# Prints a line break
+def printLineBreak():
+    print("————————————————————————————————————————————————————")
 
 # Returns string with tab characters at the end
 def newGetTab(string, length = config.TAB_LENGTH):
@@ -210,6 +203,11 @@ def snap(value, snapTo):
     if abs(value - snapTo) <= config.SNAP_RANGE:
         return snapTo
     else: return value
+# Returns snap value
+def didSnap(value, snapTo):
+    if abs(value - snapTo) <= config.SNAP_RANGE:
+        return True
+    else: return False
 
 # Converts MIDI event range to float for use in volume, pan, etc functions
 def toFloat(value, min = 0, max = 1):

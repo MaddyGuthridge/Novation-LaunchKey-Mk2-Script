@@ -67,7 +67,8 @@ class TGeneric():
         if config.START_IN_INCONTROL_PADS == False: internal.setExtendedMode(False, eventconsts.INCONTROL_PADS) 
         
         print('Initialisation complete')
-        print("-----------------------")
+        internal.printLineBreak()
+        internal.printLineBreak()
         print("")
         print("")
 
@@ -75,7 +76,8 @@ class TGeneric():
         # Return the device into Basic Mode
         internal.setExtendedMode(False)
         print('Deinitialisation complete')
-        print("-------------------------")
+        internal.printLineBreak()
+        internal.printLineBreak()
         print("")
         print("")
         
@@ -99,7 +101,9 @@ class TGeneric():
         
         # Print out event
         command.printOut()
+        print("")
         internal.actionStr.flush()
+        internal.printLineBreak()
         print("")
         
         event.handled = True
