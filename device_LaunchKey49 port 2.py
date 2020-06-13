@@ -84,7 +84,7 @@ class TGeneric():
 
     def OnMidiIn(self, event):
         event.handled = False
-        
+        internal.eventClock.start()
         # Update active window (ui.onRefresh() isnt working properly)
         internal.ActiveWindow = ui.getFocusedFormCaption()
 
@@ -92,7 +92,13 @@ class TGeneric():
         command = eventprocessor.processedEvent(event)
         # Check for shift button releases (return early)
         if event.handled:
-            internal.printCommand(command)
+            command.printOut()
+            if config.CONSOLE_PRINT_PERFORMANCE_TIMES:
+                print("")
+                print("Processed in: ", round(internal.eventClock.stop(), 4), " seconds")
+                print("Total processing time: ", internal.eventClock.total())
+            internal.printLineBreak()
+            print("")
             return
 
         # Use mixer processor if mixer is active window
@@ -103,8 +109,14 @@ class TGeneric():
         if command.handled is False:
             processdefault.process(command)
         
-        internal.printCommand(command)
-        
+        command.printOut()
+        processTime = internal.eventClock.stop()
+        if config.CONSOLE_PRINT_PERFORMANCE_TIMES:
+            print("")
+            print("Processed in: ", round(processTime, 4), " seconds")
+            print("Total processing time: ", round(internal.eventClock.total(), 4))
+        internal.printLineBreak()
+        print("")
         event.handled = True
     
     lastIdle = -1

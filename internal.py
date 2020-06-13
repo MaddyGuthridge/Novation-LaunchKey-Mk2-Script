@@ -8,6 +8,8 @@ This file contains functions common to  scripts loaded by both files.
 # Edit this file at your own risk. All user-modifyable variables are found in 'config.py'.
 #-------------------------------
 
+import time
+
 import device
 import ui
 
@@ -39,13 +41,27 @@ def newGetTab(string, length = config.TAB_LENGTH):
         string += " "
     return string
 
-def printCommand(command):
-    # Print out event
-    command.printOut()
-    printLineBreak()
-    print("")
+# Counts processing time
+class performanceMonitor:
+    def __init__(self):
+        self.total_time = 0
+        self.startTime = -1
+        self.endTime = -1
+    
+    def start(self):
+        self.startTime = time.perf_counter()
+    
+    def stop(self):
+        self.endTime = time.perf_counter()
+        a = self.endTime - self.startTime
+        self.total_time += a
+        return a
+    
+    def total(self):
+        return self.total_time
 
-
+eventClock = performanceMonitor()
+idleClock = performanceMonitor()
 
 # Queries whether extended mode is active. Only accessible from extended port
 def queryExtendedMode(option = eventconsts.SYSTEM_EXTENDED):
