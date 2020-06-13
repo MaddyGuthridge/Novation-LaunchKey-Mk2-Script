@@ -33,6 +33,8 @@ import config
 import internal
 import eventprocessor
 
+import processdefault
+
 
 class TGeneric():
     def __init__(self):
@@ -41,6 +43,13 @@ class TGeneric():
     def OnInit(self):
         # Set port to basic
         internal.PORT = config.DEVICE_PORT_BASIC
+
+        print('Initialisation complete')
+        internal.printLineBreak()
+        internal.printLineBreak()
+        print("")
+        print("")
+
 
 
     def OnDeInit(self):
@@ -52,9 +61,17 @@ class TGeneric():
         # Process the event into processedEvent format
         command = eventprocessor.processedEvent(event)
 
-        # Print out event
-        command.printOut()
-        print("")
+        # Attempt to process event using custom processors for plugins
+        eventprocessor.run_customProcessors(command)
+
+        # If command hasn't been handled by any above uses, use the default controls
+        if command.handled is False:
+            processdefault.process(command)
+        
+        internal.printCommand(command)
+    
+    def OnIdle(self):
+        internal.idleProcessor()
         
         
 
@@ -69,3 +86,6 @@ def OnDeInit():
 
 def OnMidiIn(event):
     Generic.OnMidiIn(event)
+
+def OnIdle():
+    Generic.OnIdle()

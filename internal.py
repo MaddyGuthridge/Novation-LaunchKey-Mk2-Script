@@ -55,13 +55,42 @@ class performanceMonitor:
         self.endTime = time.perf_counter()
         a = self.endTime - self.startTime
         self.total_time += a
+        if config.CONSOLE_PRINT_PERFORMANCE_TIMES:
+            print("")
+            print("Processed in: ", round(self.endTime, 4), " seconds")
+            print("Total processing time: ", round(self.total(), 4))
         return a
     
     def total(self):
         return self.total_time
-
 eventClock = performanceMonitor()
 idleClock = performanceMonitor()
+
+
+# Manages active window
+class windowMgr:
+    def __init__(self):
+        self.active = ui.getFocusedFormCaption()
+    
+    def update(self):
+        new = ui.getFocusedFormCaption()
+        # If window the same
+        if new == self.active:
+            return False
+        else:
+            self.active = new
+            print("Updated Window: ", self.active)
+            printLineBreak()
+            return True
+window = windowMgr()
+
+
+# Print command results
+def printCommand(command):
+    command.printOut()
+    processTime = eventClock.stop()
+    printLineBreak()
+    print("")
 
 # Queries whether extended mode is active. Only accessible from extended port
 def queryExtendedMode(option = eventconsts.SYSTEM_EXTENDED):
@@ -204,6 +233,15 @@ def didSnap(value, snapTo):
 # Converts MIDI event range to float for use in volume, pan, etc functions
 def toFloat(value, min = 0, max = 1):
     return (value / 127) * (max - min) + min
+
+# Called on idle
+def idleProcessor():
+    # Start performance timer
+    idleClock.start()
+    window.update()
+
+    # Stop performance timer
+    idleClock.stop()
 
 # Print out error message
 def logError(message):

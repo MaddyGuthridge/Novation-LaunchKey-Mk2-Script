@@ -10,6 +10,8 @@ import eventconsts
 import internal
 import config
 
+windowName = "Mixer - "
+
 def process(command):
 
     command.actions.addProcessor("Mixer Processor")
@@ -130,6 +132,8 @@ def process(command):
     # Add did not handle flag if not handled
     if command.handled is False: 
         command.actions.appendAction("[Did not handle]")
+
+# Internal functions
 
 def setVolume(command, track, value):
     volume = getVolumeSend(value)

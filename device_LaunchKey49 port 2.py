@@ -66,6 +66,7 @@ class TGeneric():
         if config.START_IN_INCONTROL_FADERS == False: internal.setExtendedMode(False, eventconsts.INCONTROL_FADERS) 
         if config.START_IN_INCONTROL_PADS == False: internal.setExtendedMode(False, eventconsts.INCONTROL_PADS) 
         
+
         print('Initialisation complete')
         internal.printLineBreak()
         internal.printLineBreak()
@@ -92,14 +93,11 @@ class TGeneric():
         command = eventprocessor.processedEvent(event)
         # Check for shift button releases (return early)
         if event.handled:
-            command.printOut()
-            if config.CONSOLE_PRINT_PERFORMANCE_TIMES:
-                print("")
-                print("Processed in: ", round(internal.eventClock.stop(), 4), " seconds")
-                print("Total processing time: ", internal.eventClock.total())
-            internal.printLineBreak()
-            print("")
+            internal.printCommand(command)
             return
+        
+        # Attempt to process event using custom processors for plugins
+        eventprocessor.run_customProcessors(command)
 
         # Use mixer processor if mixer is active window
         if "Mixer - " in internal.ActiveWindow:
@@ -109,21 +107,11 @@ class TGeneric():
         if command.handled is False:
             processdefault.process(command)
         
-        command.printOut()
-        processTime = internal.eventClock.stop()
-        if config.CONSOLE_PRINT_PERFORMANCE_TIMES:
-            print("")
-            print("Processed in: ", round(processTime, 4), " seconds")
-            print("Total processing time: ", round(internal.eventClock.total(), 4))
-        internal.printLineBreak()
-        print("")
+        internal.printCommand(command)
         event.handled = True
     
-    lastIdle = -1
     def OnIdle(self):
-        internal.ActiveWindow = ui.getFocusedFormCaption()
-        temp = time.perf_counter()
-        self.lastIdle = temp
+        internal.idleProcessor()
         return
 
     def OnRefresh(self, flags):
