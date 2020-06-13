@@ -71,6 +71,59 @@ def process(command):
             setVolume(command, track, command.value)
             command.handled = True
 
+    #---------------------------------
+    # Knobs
+    #---------------------------------
+
+    # Knob 1
+    if command.id == eventconsts.KNOB_1: 
+        setPan(command, 1, command.value)
+        command.handled = True
+    
+    # Knob 2
+    if command.id == eventconsts.KNOB_2: 
+        setPan(command, 2, command.value)
+        command.handled = True
+
+    # Knob 3
+    if command.id == eventconsts.KNOB_3: 
+        setPan(command, 3, command.value)
+        command.handled = True
+    
+    # Knob 4
+    if command.id == eventconsts.KNOB_4: 
+        setPan(command, 4, command.value)
+        command.handled = True
+
+    # Knob 5
+    if command.id == eventconsts.KNOB_5: 
+        setPan(command, 5, command.value)
+        command.handled = True
+    
+    # Knob 6
+    if command.id == eventconsts.KNOB_6: 
+        setPan(command, 6, command.value)
+        command.handled = True
+    
+    # Knob 7
+    if command.id == eventconsts.KNOB_7: 
+        setPan(command, 7, command.value)
+        command.handled = True
+
+    # Knob 8 # Like fader 9: applies to current track or master
+    if command.id == eventconsts.KNOB_8: 
+        # If shift key held, change master track
+        if command.shifted:
+            setPan(command, 0, command.value)
+            command.handled = True
+        # Otherwise change current track
+        else:
+            # Get current track number
+            track = mixer.trackNumber()
+            setPan(command, track, command.value)
+            command.handled = True
+
+
     
     
 
@@ -87,8 +140,33 @@ def setVolume(command, track, value):
 
 # Returns volume value set to send to FL Studio
 def getVolumeSend(inVal):
-    return internal.snap(internal.toFloat(inVal), config.MIXER_VOLUME_SNAP_TO)
+    if config.ENABLE_SNAPPING:
+        return internal.snap(internal.toFloat(inVal), config.MIXER_VOLUME_SNAP_TO)
+    else: return internal.toFloat(inVal)
+
 
 def getVolumeValue(inVal):
     
     return str(round(getVolumeSend(inVal) / config.MIXER_VOLUME_SNAP_TO * 100)) + "%"
+
+def setPan(command, track, value):
+    volume = getPanSend(value)
+    mixer.setTrackPan(track, volume)
+    command.actions.appendAction("Set " + mixer.getTrackName(track) + " pan to " + getPanValue(value))
+    if internal.didSnap(internal.toFloat(value, -1), config.MIXER_PAN_SNAP_TO):
+        command.actions.appendAction("[Snapped]")
+
+# Returns volume value set to send to FL Studio
+def getPanSend(inVal):
+    if config.ENABLE_SNAPPING:
+        return internal.snap(internal.toFloat(inVal, -1), config.MIXER_PAN_SNAP_TO)
+    else: return internal.toFloat(inVal, -1)
+
+
+def getPanValue(inVal):
+    
+    a = round(getPanSend(inVal) * 100)
+    if a < 0: b = str(a) + "% Left"
+    elif a > 0: b = str(a) + "% Right"
+    else: b = "Centred"
+    return b
