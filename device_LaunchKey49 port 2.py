@@ -38,9 +38,7 @@ import lighting
 import eventconsts
 import eventprocessor
 
-# Command processors
-import processdefault
-import processmixer
+
 
 initialisation_flag = False
 initialisation_flag_response = False
@@ -91,21 +89,15 @@ class TGeneric():
 
         # Process the event into processedEvent format
         command = eventprocessor.processedEvent(event)
+
+        eventprocessor.process(command)
+
         # Check for shift button releases (return early)
         if event.handled:
             internal.printCommand(command)
             return
         
-        # Attempt to process event using custom processors for plugins
-        eventprocessor.run_customProcessors(command)
 
-        # Use mixer processor if mixer is active window
-        if "Mixer - " in internal.ActiveWindow:
-            processmixer.process(command)
-
-        # If command hasn't been handled by any above uses, use the default controls
-        if command.handled is False:
-            processdefault.process(command)
         
         internal.printCommand(command)
         event.handled = True

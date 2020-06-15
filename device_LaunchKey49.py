@@ -61,8 +61,7 @@ class TGeneric():
         # Process the event into processedEvent format
         command = eventprocessor.processedEvent(event)
 
-        # Attempt to process event using custom processors for plugins
-        eventprocessor.run_customProcessors(command)
+        eventprocessor.process(command)
 
         # If command hasn't been handled by any above uses, use the default controls
         if command.handled is False:

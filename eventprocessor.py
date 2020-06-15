@@ -12,44 +12,29 @@ import ui
 import eventconsts
 import internal
 import config
+import processdefault
+import WindowProcessors.processwindows as processwindows
+import PluginProcessors.processplugins as processplugins
 
-#
-# Add custom event processors to this list
-#
-imports = ["fpc"]
-#
-#
-#
+
 
 shiftDown = False
 shiftUsed = False
 
-# Import custom processors specified in list above
-customProcessors = []
-for x in range(len(imports)):
-    try:
-        customProcessors.append( __import__("CustomProcessors." + imports[x], fromlist=["a"]) )
-        print ("Successfully imported: ", imports[x])
-    except ImportError:
-        print ("Error importing: ", imports[x])
 
-# Returns true if custom processor at index can handle events in window
-def customProcessor_canHandle(processorNum):
-    for x in range(len(customProcessors[processorNum].plugins)):
-        # Currently searching for plugin name in header (could cause issues if poorly named plugins are used)
-        # Eventually switch to ends with
-        # Or just use a get plugin name function when they add that
-        if "(" + customProcessors[processorNum].plugins[x] + ")" in internal.window.active:
-            return True
 
-    return False
+# Recieve event and forward onto relative processors
+def process(command):
+    # Attempt to process event using custom processors for plugins
+    processplugins.process(command)
 
-# Runs through custom processors
-def run_customProcessors(command):
-    for x in range(len(customProcessors)):
-        if customProcessor_canHandle(x):
-            customProcessors[x].process(command)
-        if command.handled == True: break
+    # Process content from windows
+    processwindows.process(command)
+
+
+    # If command hasn't been handled by any above uses, use the default controls
+    if command.handled is False:
+        processdefault.process(command)
 
 # Stores actions taken by various processor modules
 class actionPrinter:

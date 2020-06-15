@@ -10,7 +10,7 @@ import eventconsts
 import internal
 import config
 
-windowName = "Mixer - "
+
 
 def process(command):
 
