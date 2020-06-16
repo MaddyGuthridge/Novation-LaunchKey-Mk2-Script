@@ -6,10 +6,17 @@ This script is a custom processor module that can process events when the FPC pl
 
 import eventconsts
 import eventprocessor
+import internal
 
 plugins = ["FPC"]
 
+def activeStart():
+    internal.setExtendedMode(False, eventconsts.INCONTROL_PADS)
+    return
 
+def activeEnd():
+    internal.setExtendedMode(True, eventconsts.INCONTROL_PADS)
+    return
 
 def process(command):
     command.actions.addProcessor("FPC Processor")

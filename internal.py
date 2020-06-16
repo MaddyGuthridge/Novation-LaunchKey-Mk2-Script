@@ -15,6 +15,7 @@ import ui
 
 import eventconsts
 import config
+import eventprocessor
 
 PORT = -1 # Set in initialisation function then left constant
 
@@ -70,19 +71,36 @@ idleClock = performanceMonitor()
 # Manages active window - CURRENTLY BROKEN!!!!
 class windowMgr:
     def __init__(self):
-        self.is_focused = False
+        self.plugin_focused = False
         self.active_plugin = ""
         self.active_fl_window = -1
     
+    """
     def update(self):
-
+        self.active_fl_window
         # Update FL Window
-        if   ui.getFocused(config.WINDOW_MIXER):        self.active_fl_window = config.WINDOW_MIXER
-        elif ui.getFocused(config.WINDOW_PIANO_ROLL):   self.active_fl_window = config.WINDOW_PIANO_ROLL
-        elif ui.getFocused(config.WINDOW_CHANNEL_RACK): self.active_fl_window = config.WINDOW_CHANNEL_RACK
-        elif ui.getFocused(config.WINDOW_PLAYLIST):     self.active_fl_window = config.WINDOW_PLAYLIST
-        elif ui.getFocused(config.WINDOW_BROWSER):      self.active_fl_window = config.WINDOW_BROWSER
+        if   ui.getFocused(config.WINDOW_MIXER):        
+            new_fl_window = config.WINDOW_MIXER
 
+        elif ui.getFocused(config.WINDOW_PIANO_ROLL):   
+            new_fl_window = config.WINDOW_PIANO_ROLL
+
+        elif ui.getFocused(config.WINDOW_CHANNEL_RACK): 
+            new_fl_window = config.WINDOW_CHANNEL_RACK
+
+        elif ui.getFocused(config.WINDOW_PLAYLIST):     
+            new_fl_window = config.WINDOW_PLAYLIST
+
+        elif ui.getFocused(config.WINDOW_BROWSER):      
+            new_fl_window = config.WINDOW_BROWSER
+        
+        else: new_fl_window = -1
+
+        # If active window for FL plugin changes
+        if new_fl_window != self.active_fl_window:
+            eventprocessor.activeEnd()
+            self.active_fl_window = new_fl_window
+            eventprocessor.activeStart()
 
         new = ui.getFocusedFormCaption()
         # If window is FL Window
@@ -90,21 +108,97 @@ class windowMgr:
             ui.getFocused(config.WINDOW_CHANNEL_RACK) or ui.getFocused(config.WINDOW_BROWSER):
 
             # If active window not focused
-            if self.is_focused == False: return
-            self.is_focused = False
-            print("Window: ", self.active_plugin, "[Inactive]")
+            if self.plugin_focused == False: return
+            self.plugin_focused = False
+            print("Background: ", self.active_plugin)
             printLineBreak()
         else:
             # If window didn't change
             if new == self.active_plugin:
                 return False
             else:
-                self.is_focused = True
+                self.plugin_focused = True
                 self.active_plugin = new
             print("Window: ", self.active_plugin, "[Active]")
             printLineBreak()
             return True
+    """
+
+    def update(self):
+        self.active_fl_window
+        # Update FL Window
+        if   ui.getFocused(config.WINDOW_MIXER):        
+            new_fl_window = config.WINDOW_MIXER
+
+        elif ui.getFocused(config.WINDOW_PIANO_ROLL):   
+            new_fl_window = config.WINDOW_PIANO_ROLL
+
+        elif ui.getFocused(config.WINDOW_CHANNEL_RACK): 
+            new_fl_window = config.WINDOW_CHANNEL_RACK
+
+        elif ui.getFocused(config.WINDOW_PLAYLIST):     
+            new_fl_window = config.WINDOW_PLAYLIST
+
+        elif ui.getFocused(config.WINDOW_BROWSER):      
+            new_fl_window = config.WINDOW_BROWSER
+        
+        else: new_fl_window = -1
+
+        # Detect change in
+
+        # If active FL window changes
+        if (new_fl_window != self.active_fl_window or self.plugin_focused == True) and new_fl_window != -1:
+            # End active plugin
+            eventprocessor.activeEnd()
+            self.active_fl_window = new_fl_window
+            self.plugin_focused =  False
+            print("Active Window: ", get_fl_window_string(self.active_fl_window))
+            print("[Background: ", self.active_plugin, "]")
+            printLineBreak()
+            # Start new plugin
+            eventprocessor.activeStart()
+            return True
+        else: # Check for changes to Plugin
+            new = ui.getFocusedFormCaption()
+            
+            last = -1
+            length = len(new)
+            for y in range(length):
+                if new[y] is '(':
+                    last = y + 1
+            if last == -1 or last > length: # If no brackets found
+                return False
+            
+            # Trimp string
+            new = new[last: -2]
+
+            # If window didn't change
+            
+            if new != self.active_plugin or self.plugin_focused == False:
+                # End active plugin
+                eventprocessor.activeEnd()
+                self.plugin_focused = True
+                self.active_plugin = new
+
+                print("Active Window: ", self.active_plugin)
+                print("[Background: ", get_fl_window_string(self.active_fl_window), "]")
+                printLineBreak()
+
+                # Start new plugin
+                eventprocessor.activeStart()
+                return True
+            else: return False
+
+
 window = windowMgr()
+
+# Gets string for FL Window
+def get_fl_window_string(index):
+    if index == config.WINDOW_MIXER: return "Mixer"
+    if index == config.WINDOW_PLAYLIST: return "Playlist"
+    if index == config.WINDOW_CHANNEL_RACK: return "Channel Rack"
+    if index == config.WINDOW_PIANO_ROLL: return "Piano Roll"
+    if index == config.WINDOW_BROWSER: return "Browser"
 
 # Print command data
 def printCommand(command):

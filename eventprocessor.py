@@ -36,6 +36,20 @@ def process(command):
     if command.handled is False:
         processdefault.process(command)
 
+# Called after a window is activated
+def activeStart():
+    if internal.window.plugin_focused:
+        processplugins.activeStart()
+    else:
+        processwindows.activeStart()
+
+# Called just before active window is deactivated
+def activeEnd():
+    if internal.window.plugin_focused:
+        processplugins.activeEnd()
+    else:
+        processwindows.activeEnd()
+
 # Stores actions taken by various processor modules
 class actionPrinter:
     
@@ -223,13 +237,6 @@ class processedEvent:
         out += temp
         out = internal.newGetTab(out)
 
-        # Handled
-        if self.handled is False:
-            temp = " [Unhandled]"
-        else: temp = " [Handled]"
-        out += temp
-        out = internal.newGetTab(out)
-
         if self.is_double_click:
             out += "[Double Click]"
             out = internal.newGetTab(out)
@@ -257,6 +264,10 @@ class processedEvent:
 
         print("")
         self.actions.flush()
+        if self.handled:
+            print("[Event was handled]")
+        else: 
+            print("[Event wasn't handled]")
 
     # Returns string with type and ID of event
     def getType(self):

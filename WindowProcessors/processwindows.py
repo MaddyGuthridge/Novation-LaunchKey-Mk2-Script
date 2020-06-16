@@ -18,3 +18,17 @@ def process(command):
         WindowProcessors.processmixer.process(command)
 
     return
+
+def activeStart():
+
+    if internal.window.active_fl_window == config.WINDOW_MIXER:
+        WindowProcessors.processmixer.activeStart()
+
+    return
+
+def activeEnd():
+
+    if internal.window.active_fl_window == config.WINDOW_MIXER:
+        WindowProcessors.processmixer.activeEnd()
+
+    return

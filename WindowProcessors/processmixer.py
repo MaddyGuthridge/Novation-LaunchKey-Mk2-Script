@@ -11,7 +11,7 @@ import internal
 import config
 
 
-
+# Process is called to handle events
 def process(command):
 
     command.actions.addProcessor("Mixer Processor")
@@ -126,14 +126,78 @@ def process(command):
             command.handled = True
 
 
+    #---------------------------------
+    # Mixer Buttons - mute/solo tracks
+    #---------------------------------
     
-    
+    if command.id == eventconsts.FADER_BUTTON_1:
+        processMuteSolo(1, command)
+        command.handled = True
+
+    if command.id == eventconsts.FADER_BUTTON_2:
+        processMuteSolo(2, command)
+        command.handled = True
+
+    if command.id == eventconsts.FADER_BUTTON_3:
+        processMuteSolo(3, command)
+        command.handled = True
+
+    if command.id == eventconsts.FADER_BUTTON_4:
+        processMuteSolo(4, command)
+        command.handled = True
+
+    if command.id == eventconsts.FADER_BUTTON_5:
+        processMuteSolo(5, command)
+        command.handled = True
+
+    if command.id == eventconsts.FADER_BUTTON_6:
+        processMuteSolo(6, command)
+        command.handled = True
+
+    if command.id == eventconsts.FADER_BUTTON_7:
+        processMuteSolo(7, command)
+        command.handled = True
+
+    if command.id == eventconsts.FADER_BUTTON_8:
+        processMuteSolo(8, command)
+        command.handled = True
+
+    if command.id == eventconsts.FADER_BUTTON_9:
+        # If shift key held, change master track
+        if command.shifted:
+            processMuteSolo(0, command)
+            command.handled = True
+        else:
+            processMuteSolo(mixer.trackNumber(), command)
+            command.handled = True
 
     # Add did not handle flag if not handled
     if command.handled is False: 
         command.actions.appendAction("[Did not handle]")
 
+def activeStart():
+    return
+
+def activeEnd():
+    return
+
 # Internal functions
+
+def processMuteSolo(track, command):
+    if command.value == 0: return
+    if mixer.isTrackSolo(track):
+        mixer.soloTrack(track)
+        command.actions.appendAction("Unsolo track " + str(track))
+        return
+    mixer.muteTrack(track)
+    if command.is_double_click:
+        mixer.soloTrack(track)
+        command.actions.appendAction("Solo track " + str(track))
+    else: 
+        if mixer.isTrackMuted(track):
+            command.actions.appendAction("Mute track " + str(track))
+        else: 
+            command.actions.appendAction("Unmute track " + str(track))
 
 def setVolume(command, track, value):
     volume = getVolumeSend(value)
