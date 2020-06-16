@@ -47,4 +47,8 @@ MIXER_STEREO_SEP_SNAP_TO = 0.0 # Snap mixer track stereo separation to Original
 CHANNEL_VOLUME_SNAP_TO = 0.78125 # Snap channel volumes to ~= 78% (FL Default)
 CHANNEL_PAN_SNAP_TO = 0.0 # Snap channel pans to Centred
 
-
+WINDOW_PLAYLIST = 2
+WINDOW_PIANO_ROLL = 3
+WINDOW_CHANNEL_RACK = 1
+WINDOW_MIXER = 0
+WINDOW_BROWSER = 4

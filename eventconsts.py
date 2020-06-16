@@ -21,6 +21,19 @@ TYPE_BASIC_FADER = 14
 TYPE_BASIC_FADER_BUTTON = 15
 TYPE_BASIC_PAD = 16
 
+TYPE_NOTE = 20
+TYPE_BASIC_EVENT = 21
+
+
+NOTE_ON = 0x9 # Shortened as data1 contains note name
+NOTE_OFF = 0x8
+
+Notes = [NOTE_ON, NOTE_OFF]
+
+PEDAL = 0x40B0
+
+BasicEvents = [PEDAL]
+
 # Define System Message
 SYSTEM_EXTENDED = 0x0C9F
 SYSTEM_MISC = 0x109F # I don't actually know what this does but it is called upon pressing and lifting the knobs' InControl button

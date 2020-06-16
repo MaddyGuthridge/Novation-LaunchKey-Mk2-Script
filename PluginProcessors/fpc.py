@@ -4,6 +4,9 @@ This script is a custom processor module that can process events when the FPC pl
 
 """
 
+import eventconsts
+import eventprocessor
+
 plugins = ["FPC"]
 
 
@@ -11,6 +14,12 @@ plugins = ["FPC"]
 def process(command):
     command.actions.addProcessor("FPC Processor")
 
+    # Change pedals to kick:
+    if command.id == eventconsts.PEDAL:
+        if command.value == 0: # Pedal up
+            command.edit(eventprocessor.rawEvent(0x89, eventconsts.BASIC_PAD_BOTTOM_2, command.value))
+        else: # Pedal up
+            command.edit(eventprocessor.rawEvent(0x99, eventconsts.BASIC_PAD_BOTTOM_2, command.value))
 
     # Add did not handle flag if not handled
     if command.handled is False: 

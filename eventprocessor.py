@@ -70,10 +70,18 @@ class actionPrinter:
         self.eventActions.clear()
         self.eventProcessors.clear()
 
+# Stores event in raw form. Used to edit events
+class rawEvent:
+    def __init__(self, status, data1, data2, shift = False):
+        self.status = status
+        self.data1 = data1
+        self.data2 = data2
+        self.shift = shift
+
 # Stores useful data about processed event
 class processedEvent:
     def __init__(self, event):
-
+        self.edited = False
         self.actions = actionPrinter()
 
         self.handled = False
@@ -83,7 +91,7 @@ class processedEvent:
         self.value = event.data2
         
         # Bit-shift status and data bytes to get event ID
-        self.id = (event.status + (event.data1 << 8))
+        self.id = (self.status + (self.note << 8))
 
         self.shifted = False
 
@@ -102,39 +110,61 @@ class processedEvent:
             self.shifted = True
             shiftUsed = True
 
+        self.parse()                                                                                                                               
+
+    def parse(self):
         # Indicates whether to consider as a value or as an on/off
         self.isBinary = False
 
         # Determine type of event | unrecognised by default
         self.type = eventconsts.TYPE_UNRECOGNISED
+
+        # If using basic port, check for notes
+
         if self.id in eventconsts.InControlButtons: 
             self.type = eventconsts.TYPE_INCONTROL
             self.isBinary = True
+
         elif self.id in eventconsts.SystemMessages: 
             self.type = eventconsts.TYPE_SYSTEM_MSG
             self.isBinary = True
+
         elif self.id in eventconsts.TransportControls: 
             self.type = eventconsts.TYPE_TRANSPORT
             self.isBinary = True
+
         elif self.id in eventconsts.Knobs: 
             self.type = eventconsts.TYPE_KNOB
+
         elif self.id in eventconsts.BasicKnobs: 
             self.type = eventconsts.TYPE_BASIC_KNOB
+
         elif self.id in eventconsts.Faders: 
             self.type = eventconsts.TYPE_FADER
+
         elif self.id in eventconsts.BasicFaders: 
             self.type = eventconsts.TYPE_BASIC_FADER
+
         elif self.id in eventconsts.FaderButtons: 
             self.type = eventconsts.TYPE_FADER_BUTTON
             self.isBinary = True
+        
+        elif self.id in eventconsts.BasicEvents:
+            self.type = eventconsts.TYPE_BASIC_EVENT
+            self.isBinary = True
+
         # Pads have different signals for note on and note off
         elif (self.status == 0x9F or self.status == 0x8F) and self.note in eventconsts.Pads:
             self.type = eventconsts.TYPE_PAD
             self.isBinary = True
+
+        # And are different in basic mode
         elif (self.status == 0x99 or self.status == 0x89) and self.note in eventconsts.BasicPads:
             self.type = eventconsts.TYPE_BASIC_PAD
             self.isBinary = True
-        # And also different signals for the buttons in basic mode
+
+        # And also different signals for the mixer buttons in basic mode
+        # TODO: FIX THIS
         elif self.status == 0xB0 and self.note in eventconsts.BasicPads:
             self.type = eventconsts.TYPE_BASIC_PAD
             self.isBinary = True
@@ -155,15 +185,26 @@ class processedEvent:
             if self.is_Lift is True:
                 self.is_double_click = isDoubleClickLift(self.id)
             elif self.is_Lift is False and self.isBinary is True: 
-                self.is_double_click = isDoubleClickPress(self.id)                                                                                                                                
-
+                self.is_double_click = isDoubleClickPress(self.id)
         
+    def edit(self, event):
+        self.edited = True
+        self.status = event.status
+        self.note = event.data1
+        self.value = event.data2
+        self.shifted = event.shift
 
-        
+        # Bit-shift status and data bytes to get event ID
+        self.id = (self.status + (self.note << 8))
+
+        self.parse()
+
+        newEventStr = "Changed event: \n" + self.getInfo()
+
+        self.actions.appendAction(newEventStr)
     
-    # Prints event data
-    def printOut(self):
-
+    # Returns event info as string
+    def getInfo(self):
         out = "Event:"
         out = internal.newGetTab(out)
 
@@ -205,10 +246,15 @@ class processedEvent:
             out += "[Shift Key]"
             out = internal.newGetTab(out)
 
+        return out
 
-        
-        
-        print(out)
+    # Prints event info
+    def printInfo(self):
+        print(self.getInfo())
+    
+    # Prints event output
+    def printOutput(self):
+
         print("")
         self.actions.flush()
 
@@ -239,6 +285,9 @@ class processedEvent:
         elif self.type is eventconsts.TYPE_PAD or self.type is eventconsts.TYPE_BASIC_PAD: 
             a = "Pad"
             b = self.getID_Pads()
+        elif self.type is eventconsts.TYPE_BASIC_EVENT:
+            a = "Basic Event"
+            b = "Pedal" # Currently pedal is only basic event
         else: 
             internal.logError("Bad event type")
             a = "ERROR!!!"
@@ -308,7 +357,7 @@ class processedEvent:
         elif self.id == eventconsts.FADER_9 or self.id == eventconsts.BASIC_FADER_9: return "9 / Master"
         else: return "ERROR"
 
-        # Returns string eventID for fader events
+    # Returns string eventID for fader events
     def getID_FaderButton(self):
         if   self.id == eventconsts.FADER_BUTTON_1 or self.id == eventconsts.BASIC_FADER_BUTTON_1: return "1"
         elif self.id == eventconsts.FADER_BUTTON_2 or self.id == eventconsts.BASIC_FADER_BUTTON_2: return "2"

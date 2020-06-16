@@ -67,27 +67,53 @@ eventClock = performanceMonitor()
 idleClock = performanceMonitor()
 
 
-# Manages active window
+# Manages active window - CURRENTLY BROKEN!!!!
 class windowMgr:
     def __init__(self):
-        self.active = ui.getFocusedFormCaption()
+        self.is_focused = False
+        self.active_plugin = ""
+        self.active_fl_window = -1
     
     def update(self):
+
+        # Update FL Window
+        if   ui.getFocused(config.WINDOW_MIXER):        self.active_fl_window = config.WINDOW_MIXER
+        elif ui.getFocused(config.WINDOW_PIANO_ROLL):   self.active_fl_window = config.WINDOW_PIANO_ROLL
+        elif ui.getFocused(config.WINDOW_CHANNEL_RACK): self.active_fl_window = config.WINDOW_CHANNEL_RACK
+        elif ui.getFocused(config.WINDOW_PLAYLIST):     self.active_fl_window = config.WINDOW_PLAYLIST
+        elif ui.getFocused(config.WINDOW_BROWSER):      self.active_fl_window = config.WINDOW_BROWSER
+
+
         new = ui.getFocusedFormCaption()
-        # If window the same
-        if new == self.active:
-            return False
+        # If window is FL Window
+        if ui.getFocused(config.WINDOW_MIXER) or ui.getFocused(config.WINDOW_PIANO_ROLL) or ui.getFocused(config.WINDOW_PLAYLIST) or \
+            ui.getFocused(config.WINDOW_CHANNEL_RACK) or ui.getFocused(config.WINDOW_BROWSER):
+
+            # If active window not focused
+            if self.is_focused == False: return
+            self.is_focused = False
+            print("Window: ", self.active_plugin, "[Inactive]")
+            printLineBreak()
         else:
-            self.active = new
-            print("Updated Window: ", self.active)
+            # If window didn't change
+            if new == self.active_plugin:
+                return False
+            else:
+                self.is_focused = True
+                self.active_plugin = new
+            print("Window: ", self.active_plugin, "[Active]")
             printLineBreak()
             return True
 window = windowMgr()
 
+# Print command data
+def printCommand(command):
+    command.printInfo()
+    return
 
 # Print command results
-def printCommand(command):
-    command.printOut()
+def printCommandOutput(command):
+    command.printOutput()
     processTime = eventClock.stop()
     printLineBreak()
     print("")

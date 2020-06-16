@@ -60,14 +60,21 @@ class TGeneric():
         
         # Process the event into processedEvent format
         command = eventprocessor.processedEvent(event)
-
-        eventprocessor.process(command)
-
-        # If command hasn't been handled by any above uses, use the default controls
-        if command.handled is False:
-            processdefault.process(command)
         
+        # Print event before processing
         internal.printCommand(command)
+
+        # Process event
+        eventprocessor.process(command)
+        
+        # If command was edited, update event object
+        if command.edited:
+            event.status = command.status
+            event.data1 = command.note
+            event.data2 = command.value
+
+        # Print output
+        internal.printCommandOutput(command)
     
     def OnIdle(self):
         internal.idleProcessor()
