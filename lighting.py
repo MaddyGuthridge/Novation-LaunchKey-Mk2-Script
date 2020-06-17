@@ -7,10 +7,9 @@ This file contains functions and constants related to controlling lights on the 
 
 import time
 
-
+import internal
 import eventconsts
 import eventprocessor
-import internal
 
 # LightMap is sent around to collect colours on UI redraws
 class LightMap:
@@ -73,12 +72,6 @@ class LightMap:
 class Lights:
     def __init__(self):
         # 0 = off, 1-127 = colour
-        self.reset()
-
-    # Set all pads to off      
-    def reset(self):
-        
-        internal.sendMidiMessage(0xBF, 0x00, 0x00)
         self.PadMap = [
             [0, 0],
             [0, 0],
@@ -91,6 +84,12 @@ class Lights:
             [0, 0]
             ]
 
+    # Set all pads to off      
+    def reset(self):
+        
+        internal.sendMidiMessage(0xBF, 0x00, 0x00)
+        self.__init__()
+
     # Set the colour of a pad
     def setPadColour(self, x, y, colour):
         if internal.queryExtendedMode(): 
@@ -102,7 +101,7 @@ class Lights:
     
     # Sets colours based on state of LightMap object
     def setFromMap(self, map):
-        map.solidify()
+        map.solidifyAll()
         for x in range(len(self.PadMap)):
             for y in range(len(self.PadMap[x])):
                 if self.PadMap[x][y] != map.PadMap[x][y]:
