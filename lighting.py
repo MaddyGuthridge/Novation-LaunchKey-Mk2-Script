@@ -21,8 +21,7 @@ def setPadColour(padNumber, colour):
 
 # Set all pads to off      
 def resetPads():
-    for x in eventconsts.Pads:
-        setPadColour(x, COLOUR_OFF)
+    internal.sendMidiMessage(0xBF, 0x00, 0x00)
 
 # OoooOooOOOooO PREETTTTTYYYY!!!!!!
 def lightShow():
@@ -31,47 +30,47 @@ def lightShow():
     while True:
         # Group 1
         if (x >= 0) and (x < len(rainbowColours)):
-            setPadColour(eventconsts.PAD_BOTTOM_1, rainbowColours[x])
+            setPadColour(eventconsts.Pads[1][0], rainbowColours[x])
         
          # Group 2
         if (x >= 1) and (x < len(rainbowColours) + 1):
-            setPadColour(eventconsts.PAD_BOTTOM_2, rainbowColours[x - 1])
-            setPadColour(eventconsts.PAD_TOP_1, rainbowColours[x - 1])
+            setPadColour(eventconsts.Pads[1][1], rainbowColours[x - 1])
+            setPadColour(eventconsts.Pads[0][0], rainbowColours[x - 1])
         
         # Group 3
         if (x >= 2) and (x < len(rainbowColours) + 2):
-            setPadColour(eventconsts.PAD_BOTTOM_3, rainbowColours[x - 2])
-            setPadColour(eventconsts.PAD_TOP_2, rainbowColours[x - 2])
+            setPadColour(eventconsts.Pads[1][2], rainbowColours[x - 2])
+            setPadColour(eventconsts.Pads[0][1], rainbowColours[x - 2])
         
         # Group 4
         if (x >= 3) and (x < len(rainbowColours) + 3):
-            setPadColour(eventconsts.PAD_BOTTOM_4, rainbowColours[x - 3])
-            setPadColour(eventconsts.PAD_TOP_3, rainbowColours[x - 3])
+            setPadColour(eventconsts.Pads[1][3], rainbowColours[x - 3])
+            setPadColour(eventconsts.Pads[0][2], rainbowColours[x - 3])
         
         # Group 5
         if (x >= 4) and (x < len(rainbowColours) + 4):
-            setPadColour(eventconsts.PAD_BOTTOM_5, rainbowColours[x - 4])
-            setPadColour(eventconsts.PAD_TOP_4, rainbowColours[x - 4])
+            setPadColour(eventconsts.Pads[1][4], rainbowColours[x - 4])
+            setPadColour(eventconsts.Pads[0][3], rainbowColours[x - 4])
         
     
         # Group 6
         if (x >= 5) and (x < len(rainbowColours) + 5):
-            setPadColour(eventconsts.PAD_BOTTOM_6, rainbowColours[x - 5])
-            setPadColour(eventconsts.PAD_TOP_5, rainbowColours[x - 5])
+            setPadColour(eventconsts.Pads[1][5], rainbowColours[x - 5])
+            setPadColour(eventconsts.Pads[0][4], rainbowColours[x - 5])
         
         # Group 7
         if (x >= 6) and (x < len(rainbowColours) + 6):
-            setPadColour(eventconsts.PAD_BOTTOM_7, rainbowColours[x - 6])
-            setPadColour(eventconsts.PAD_TOP_6, rainbowColours[x - 6])
+            setPadColour(eventconsts.Pads[1][6], rainbowColours[x - 6])
+            setPadColour(eventconsts.Pads[0][5], rainbowColours[x - 6])
         
         # Group 8
         if (x >= 7) and (x < len(rainbowColours) + 7):
-            setPadColour(eventconsts.PAD_BOTTOM_8, rainbowColours[x - 7])
-            setPadColour(eventconsts.PAD_TOP_7, rainbowColours[x - 7])
+            setPadColour(eventconsts.Pads[1][7], rainbowColours[x - 7])
+            setPadColour(eventconsts.Pads[0][6], rainbowColours[x - 7])
         
         # Group 9
         if (x >= 8) and (x < len(rainbowColours) + 8):
-            setPadColour(eventconsts.PAD_TOP_8, rainbowColours[x - 8])
+            setPadColour(eventconsts.Pads[0][7], rainbowColours[x - 8])
         
         x += 1
         time.sleep(sleepTime)

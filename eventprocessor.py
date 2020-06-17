@@ -167,13 +167,13 @@ class processedEvent:
             self.type = eventconsts.TYPE_BASIC_EVENT
             self.isBinary = True
 
-        # Pads have different signals for note on and note off
-        elif (self.status == 0x9F or self.status == 0x8F) and self.note in eventconsts.Pads:
+        # Pads have different signals for note on and note off, also account for matrix
+        elif (self.status == 0x9F or self.status == 0x8F) and (self.note in eventconsts.Pads[0] or self.note in eventconsts.Pads[1]):
             self.type = eventconsts.TYPE_PAD
             self.isBinary = True
 
         # And are different in basic mode
-        elif (self.status == 0x99 or self.status == 0x89) and self.note in eventconsts.BasicPads:
+        elif (self.status == 0x99 or self.status == 0x89) and (self.note in eventconsts.BasicPads[0] or self.note in eventconsts.BasicPads[1]):
             self.type = eventconsts.TYPE_BASIC_PAD
             self.isBinary = True
 
@@ -332,28 +332,29 @@ class processedEvent:
     
     # Returns string eventID for knob events
     def getID_Pads(self):
-        if   self.note == eventconsts.PAD_TOP_1 or self.note == eventconsts.BASIC_PAD_TOP_1: return "Top 1"
-        elif self.note == eventconsts.PAD_TOP_2 or self.note == eventconsts.BASIC_PAD_TOP_2: return "Top 2"
-        elif self.note == eventconsts.PAD_TOP_3 or self.note == eventconsts.BASIC_PAD_TOP_3: return "Top 3"
-        elif self.note == eventconsts.PAD_TOP_4 or self.note == eventconsts.BASIC_PAD_TOP_4: return "Top 4"
-        elif self.note == eventconsts.PAD_TOP_5 or self.note == eventconsts.BASIC_PAD_TOP_5: return "Top 5"
-        elif self.note == eventconsts.PAD_TOP_6 or self.note == eventconsts.BASIC_PAD_TOP_6: return "Top 6"
-        elif self.note == eventconsts.PAD_TOP_7 or self.note == eventconsts.BASIC_PAD_TOP_7: return "Top 7"
-        elif self.note == eventconsts.PAD_TOP_8 or self.note == eventconsts.BASIC_PAD_TOP_8: return "Top 8"
+        y_map = -1
+        x_map = -1
+        done_flag = False
+        for y in range(len(eventconsts.Pads)):
+            for x in range(len(eventconsts.Pads[y])):
+                if self.note == eventconsts.Pads[y][x] or self.note == eventconsts.BasicPads[y][x]:
+                    y_map = y
+                    x_map = x
+                    done_flag = True
+                    break
+            if done_flag: break
+        
+        ret_str = ""
 
-        elif self.note == eventconsts.PAD_BOTTOM_1 or self.note == eventconsts.BASIC_PAD_BOTTOM_1: return "Bottom 1"
-        elif self.note == eventconsts.PAD_BOTTOM_2 or self.note == eventconsts.BASIC_PAD_BOTTOM_2: return "Bottom 2"
-        elif self.note == eventconsts.PAD_BOTTOM_3 or self.note == eventconsts.BASIC_PAD_BOTTOM_3: return "Bottom 3"
-        elif self.note == eventconsts.PAD_BOTTOM_4 or self.note == eventconsts.BASIC_PAD_BOTTOM_4: return "Bottom 4"
-        elif self.note == eventconsts.PAD_BOTTOM_5 or self.note == eventconsts.BASIC_PAD_BOTTOM_5: return "Bottom 5"
-        elif self.note == eventconsts.PAD_BOTTOM_6 or self.note == eventconsts.BASIC_PAD_BOTTOM_6: return "Bottom 6"
-        elif self.note == eventconsts.PAD_BOTTOM_7 or self.note == eventconsts.BASIC_PAD_BOTTOM_7: return "Bottom 7"
-        elif self.note == eventconsts.PAD_BOTTOM_8 or self.note == eventconsts.BASIC_PAD_BOTTOM_8: return "Bottom 8"
-
-        elif self.note == eventconsts.PAD_TOP_BUTTON or self.note == eventconsts.BASIC_PAD_TOP_BUTTON: return "Top Button"
-        elif self.note == eventconsts.PAD_BOTTOM_BUTTON or self.note == eventconsts.BASIC_PAD_BOTTOM_BUTTON: return "Bottom Button"
-
+        if y_map == 0:   ret_str += "Top "
+        elif y_map == 1: ret_str += "Bottom "
         else: return "ERROR"
+        if x_map == 8:
+            ret_str += "Button"
+            return ret_str
+        ret_str += str(x_map + 1)
+
+        return ret_str
     
     # Returns string eventID for fader events
     def getID_Fader(self):
@@ -429,25 +430,11 @@ class processedEvent:
 
 # Convert between Extended Mode pad mappings and Basic Mode pad mappings
 def convertPadMapping(padNumber):
-    if padNumber is eventconsts.PAD_TOP_1: return eventconsts.BASIC_PAD_TOP_1
-    elif padNumber is eventconsts.PAD_TOP_2: return eventconsts.BASIC_PAD_TOP_2
-    elif padNumber is eventconsts.PAD_TOP_3: return eventconsts.BASIC_PAD_TOP_3
-    elif padNumber is eventconsts.PAD_TOP_4: return eventconsts.BASIC_PAD_TOP_4
-    elif padNumber is eventconsts.PAD_TOP_5: return eventconsts.BASIC_PAD_TOP_5
-    elif padNumber is eventconsts.PAD_TOP_6: return eventconsts.BASIC_PAD_TOP_6
-    elif padNumber is eventconsts.PAD_TOP_7: return eventconsts.BASIC_PAD_TOP_7
-    elif padNumber is eventconsts.PAD_TOP_8: return eventconsts.BASIC_PAD_TOP_8
-    elif padNumber is eventconsts.PAD_BOTTOM_1: return eventconsts.BASIC_PAD_BOTTOM_1
-    elif padNumber is eventconsts.PAD_BOTTOM_2: return eventconsts.BASIC_PAD_BOTTOM_2
-    elif padNumber is eventconsts.PAD_BOTTOM_3: return eventconsts.BASIC_PAD_BOTTOM_3
-    elif padNumber is eventconsts.PAD_BOTTOM_4: return eventconsts.BASIC_PAD_BOTTOM_4
-    elif padNumber is eventconsts.PAD_BOTTOM_5: return eventconsts.BASIC_PAD_BOTTOM_5
-    elif padNumber is eventconsts.PAD_BOTTOM_6: return eventconsts.BASIC_PAD_BOTTOM_6
-    elif padNumber is eventconsts.PAD_BOTTOM_7: return eventconsts.BASIC_PAD_BOTTOM_7
-    elif padNumber is eventconsts.PAD_BOTTOM_8: return eventconsts.BASIC_PAD_BOTTOM_8
-    elif padNumber is eventconsts.PAD_TOP_BUTTON: return eventconsts.BASIC_PAD_TOP_BUTTON
-    elif padNumber is eventconsts.PAD_BOTTOM_BUTTON: return eventconsts.BASIC_PAD_BOTTOM_BUTTON
-    internal.logError("Pad number not defined")
+    for y in range(len(eventconsts.Pads)):
+        for x in range(len(eventconsts.Pads[y])):
+            if padNumber == eventconsts.Pads[y][x]:
+                return eventconsts.BasicPads[y][x]
+    internal.logError("Pad number note defined")
 
 # Returns true if is a double click for a press
 lastPressID = -1

@@ -44,9 +44,9 @@ def process(command):
     # Change pedals to kick:
     if command.id == eventconsts.PEDAL:
         if command.value == 0: # Pedal up
-            command.edit(eventprocessor.rawEvent(0x89, eventconsts.BASIC_PAD_BOTTOM_2, command.value))
+            command.edit(eventprocessor.rawEvent(0x89, eventconsts.BasicPads[1][1], command.value))
         else: # Pedal up
-            command.edit(eventprocessor.rawEvent(0x99, eventconsts.BASIC_PAD_BOTTOM_2, command.value))
+            command.edit(eventprocessor.rawEvent(0x99, eventconsts.BasicPads[1][1], command.value))
 
     # Map drums to match FPC defaults
     change_pads(command)
@@ -61,67 +61,67 @@ def process(command):
 # Change pads to default note layout for FPC
 def change_pads(command):
     if REMAP_DRUMS:
-        if command.note is eventconsts.BASIC_PAD_BOTTOM_1:
+        if command.note is eventconsts.BasicPads[1][0]:
             command.edit(eventprocessor.rawEvent(command.status, FPC_DRUM_CONSTS[3][0], command.value))
             return
 
-        if command.note is eventconsts.BASIC_PAD_BOTTOM_2:
+        if command.note is eventconsts.BasicPads[1][1]:
             command.edit(eventprocessor.rawEvent(command.status, FPC_DRUM_CONSTS[3][1], command.value))
             return
 
-        if command.note is eventconsts.BASIC_PAD_BOTTOM_3:
+        if command.note is eventconsts.BasicPads[1][2]:
             command.edit(eventprocessor.rawEvent(command.status, FPC_DRUM_CONSTS[3][2], command.value))
             return
 
-        if command.note is eventconsts.BASIC_PAD_BOTTOM_4:
+        if command.note is eventconsts.BasicPads[1][3]:
             command.edit(eventprocessor.rawEvent(command.status, FPC_DRUM_CONSTS[3][3], command.value))
             return
 
-        if command.note is eventconsts.BASIC_PAD_BOTTOM_5:
+        if command.note is eventconsts.BasicPads[1][4]:
             command.edit(eventprocessor.rawEvent(command.status, FPC_DRUM_CONSTS[1][0], command.value))
             return
 
-        if command.note is eventconsts.BASIC_PAD_BOTTOM_6:
+        if command.note is eventconsts.BasicPads[1][5]:
             command.edit(eventprocessor.rawEvent(command.status, FPC_DRUM_CONSTS[1][1], command.value))
             return
 
-        if command.note is eventconsts.BASIC_PAD_BOTTOM_7:
+        if command.note is eventconsts.BasicPads[1][6]:
             command.edit(eventprocessor.rawEvent(command.status, FPC_DRUM_CONSTS[1][2], command.value))
             return
 
-        if command.note is eventconsts.BASIC_PAD_BOTTOM_8:
+        if command.note is eventconsts.BasicPads[1][7]:
             command.edit(eventprocessor.rawEvent(command.status, FPC_DRUM_CONSTS[1][3], command.value))
             return
 
-        if command.note is eventconsts.BASIC_PAD_TOP_1:
+        if command.note is eventconsts.BasicPads[0][0]:
             command.edit(eventprocessor.rawEvent(command.status, FPC_DRUM_CONSTS[2][0], command.value))
             return
 
-        if command.note is eventconsts.BASIC_PAD_TOP_2:
+        if command.note is eventconsts.BasicPads[0][1]:
             command.edit(eventprocessor.rawEvent(command.status, FPC_DRUM_CONSTS[2][1], command.value))
             return
 
-        if command.note is eventconsts.BASIC_PAD_TOP_3:
+        if command.note is eventconsts.BasicPads[0][2]:
             command.edit(eventprocessor.rawEvent(command.status, FPC_DRUM_CONSTS[2][2], command.value))
             return
             
-        if command.note is eventconsts.BASIC_PAD_TOP_4:
+        if command.note is eventconsts.BasicPads[0][3]:
             command.edit(eventprocessor.rawEvent(command.status, FPC_DRUM_CONSTS[2][3], command.value))
             return
 
-        if command.note is eventconsts.BASIC_PAD_TOP_5:
+        if command.note is eventconsts.BasicPads[0][4]:
             command.edit(eventprocessor.rawEvent(command.status, FPC_DRUM_CONSTS[0][0], command.value))
             return
 
-        if command.note is eventconsts.BASIC_PAD_TOP_6:
+        if command.note is eventconsts.BasicPads[0][5]:
             command.edit(eventprocessor.rawEvent(command.status, FPC_DRUM_CONSTS[0][1], command.value))
             return
 
-        if command.note is eventconsts.BASIC_PAD_TOP_7:
+        if command.note is eventconsts.BasicPads[0][6]:
             command.edit(eventprocessor.rawEvent(command.status, FPC_DRUM_CONSTS[0][2], command.value))
             return
 
-        if command.note is eventconsts.BASIC_PAD_TOP_8:
+        if command.note is eventconsts.BasicPads[0][7]:
             command.edit(eventprocessor.rawEvent(command.status, FPC_DRUM_CONSTS[0][3], command.value))
             return
 
