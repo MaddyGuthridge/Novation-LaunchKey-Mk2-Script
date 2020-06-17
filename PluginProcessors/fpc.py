@@ -10,12 +10,21 @@ import internal
 
 plugins = ["FPC"]
 
-def activeStart():
+def topPluginStart():
     internal.setExtendedMode(False, eventconsts.INCONTROL_PADS)
     return
 
-def activeEnd():
+def topPluginEnd():
     internal.setExtendedMode(True, eventconsts.INCONTROL_PADS)
+    return
+
+def activeStart():
+    return
+
+def activeEnd():
+    return
+
+def drawUI(ui):
     return
 
 def process(command):

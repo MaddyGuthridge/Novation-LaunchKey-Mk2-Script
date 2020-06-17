@@ -24,10 +24,26 @@ for x in range(len(imports)):
     try:
         customProcessors.append( __import__("PluginProcessors." + imports[x]) )
         print ("Successfully imported: ", imports[x])
-        print(customProcessors)
     except ImportError:
         print ("Error importing: ", imports[x])
 
+# Called when plugin is top plugin
+def topPluginStart():
+    for x in imports:
+        object_to_call = getattr(PluginProcessors, x)
+        if can_handle(object_to_call):
+            object_to_call.topPluginStart()
+    return
+
+# Called when plugin is no longer top plugin
+def topPluginEnd():
+    for x in imports:
+        object_to_call = getattr(PluginProcessors, x)
+        if can_handle(object_to_call):
+            object_to_call.topPluginEnd()
+    return
+
+# Called when plugin brought to foreground
 def activeStart():
     for x in imports:
         object_to_call = getattr(PluginProcessors, x)
@@ -35,6 +51,7 @@ def activeStart():
             object_to_call.activeStart()
     return
 
+# Called when plugin no longer in foreground
 def activeEnd():
     for x in imports:
         object_to_call = getattr(PluginProcessors, x)

@@ -10,7 +10,17 @@ import eventconsts
 import internal
 import config
 
+def activeStart():
+    return
 
+def activeEnd():
+    return
+
+def topWindowStart():
+    return
+
+def topWindowEnd():
+    return
 
 def process(command):
 

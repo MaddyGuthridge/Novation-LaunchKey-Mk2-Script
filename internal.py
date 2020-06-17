@@ -17,6 +17,9 @@ import eventconsts
 import config
 import eventprocessor
 
+import WindowProcessors.processwindows as processwindows
+import PluginProcessors.processplugins as processplugins
+
 PORT = -1 # Set in initialisation function then left constant
 
 extendedMode = False
@@ -125,7 +128,7 @@ class windowMgr:
     """
 
     def update(self):
-        self.active_fl_window
+        old_window = self.active_fl_window
         # Update FL Window
         if   ui.getFocused(config.WINDOW_MIXER):        
             new_fl_window = config.WINDOW_MIXER
@@ -148,43 +151,68 @@ class windowMgr:
 
         # If active FL window changes
         if (new_fl_window != self.active_fl_window or self.plugin_focused == True) and new_fl_window != -1:
-            # End active plugin
+
+            # End active window
             eventprocessor.activeEnd()
+
+            # End old window
+            if new_fl_window != self.active_fl_window:
+                processwindows.topWindowEnd()
+
+            # Set active window
             self.active_fl_window = new_fl_window
             self.plugin_focused =  False
+
             print("Active Window: ", get_fl_window_string(self.active_fl_window))
             print("[Background: ", self.active_plugin, "]")
             printLineBreak()
-            # Start new plugin
+
+            # Start new window
+            if new_fl_window != old_window:
+                processwindows.topWindowStart()
+
+            # Start new window active
             eventprocessor.activeStart()
             return True
         else: # Check for changes to Plugin
-            new = ui.getFocusedFormCaption()
+            new_plugin = ui.getFocusedFormCaption()
+            old_plugin = self.active_plugin
             
             last = -1
-            length = len(new)
+            length = len(new_plugin)
             for y in range(length):
-                if new[y] is '(':
+                if new_plugin[y] is '(':
                     last = y + 1
             if last == -1 or last > length: # If no brackets found
                 return False
             
-            # Trimp string
-            new = new[last: -2]
+            # Trim string
+            new_plugin = new_plugin[last: -2]
 
             # If window didn't change
             
-            if new != self.active_plugin or self.plugin_focused == False:
+            if new_plugin != self.active_plugin or self.plugin_focused == False:
+
                 # End active plugin
                 eventprocessor.activeEnd()
+
+                # End replaced plugin
+                if new_plugin != self.active_plugin:
+                    processplugins.topPluginEnd()
+
+                # Set new plugin
                 self.plugin_focused = True
-                self.active_plugin = new
+                self.active_plugin = new_plugin
 
                 print("Active Window: ", self.active_plugin)
                 print("[Background: ", get_fl_window_string(self.active_fl_window), "]")
                 printLineBreak()
 
                 # Start new plugin
+                if new_plugin != old_plugin:
+                    processplugins.topPluginStart()
+
+                # Start new plugin active
                 eventprocessor.activeStart()
                 return True
             else: return False
@@ -194,6 +222,7 @@ window = windowMgr()
 
 # Gets string for FL Window
 def get_fl_window_string(index):
+    if index == -1: return "NONE"
     if index == config.WINDOW_MIXER: return "Mixer"
     if index == config.WINDOW_PLAYLIST: return "Playlist"
     if index == config.WINDOW_CHANNEL_RACK: return "Channel Rack"

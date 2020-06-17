@@ -4,7 +4,6 @@ This script forwards events to event processors for FL Studio Windows
 
 """
 
-import ui
 
 import config
 import internal
@@ -30,5 +29,19 @@ def activeEnd():
 
     if internal.window.active_fl_window == config.WINDOW_MIXER:
         WindowProcessors.processmixer.activeEnd()
+
+    return
+
+def topWindowStart():
+
+    if internal.window.active_fl_window == config.WINDOW_MIXER:
+        WindowProcessors.processmixer.topWindowStart()
+
+    return
+
+def topWindowEnd():
+
+    if internal.window.active_fl_window == config.WINDOW_MIXER:
+        WindowProcessors.processmixer.topWindowEnd()
 
     return

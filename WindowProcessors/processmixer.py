@@ -181,6 +181,12 @@ def activeStart():
 def activeEnd():
     return
 
+def topWindowStart():
+    return
+
+def topWindowEnd():
+    return
+
 # Internal functions
 
 def processMuteSolo(track, command):
