@@ -10,18 +10,39 @@ import time
 import eventconsts
 import eventprocessor
 
-# Front-facing functions
+# LightMap is sent around to collect colours on UI redraws
+class LightMap:
+    def __init__(self):
+        # -1 = unset, 0 = off, 1-127 = colour
+        self.PadMap = [
+            [-1, -1, -1, -1, -1, -1, -1, -1, -1],
+            [-1, -1, -1, -1, -1, -1, -1, -1, -1]
+            ]
 
-# Set the colour of a pad
-def setPadColour(padNumber, colour):
-    if internal.queryExtendedMode(): 
-        internal.sendMidiMessage(0x9F, padNumber, colour)
-    else: 
-        internal.sendMidiMessage(0x9F, eventprocessor.convertPadMapping(padNumber), colour)
+# Lights manages state of lights
+class Lights:
+    def __init__(self):
+        # 0 = off, 1-127 = colour
+        self.PadMap = [
+            [0, 0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0, 0]
+            ]
 
-# Set all pads to off      
-def resetPads():
-    internal.sendMidiMessage(0xBF, 0x00, 0x00)
+    # Set the colour of a pad
+    def setPadColour(self, x, y, colour):
+        if internal.queryExtendedMode(): 
+            internal.sendMidiMessage(0x9F, eventconsts.Pads[x][y], colour)
+        else: 
+            internal.sendMidiMessage(0x9F, eventprocessor.convertPadMapping(eventconsts.Pads[x][y]), colour)
+
+    # Set all pads to off      
+    def reset(self):
+        internal.sendMidiMessage(0xBF, 0x00, 0x00)
+        self.PadMap = [
+            [0, 0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0, 0]
+            ]
+state = Lights()
 
 # OoooOooOOOooO PREETTTTTYYYY!!!!!!
 def lightShow():
@@ -30,54 +51,54 @@ def lightShow():
     while True:
         # Group 1
         if (x >= 0) and (x < len(rainbowColours)):
-            setPadColour(eventconsts.Pads[1][0], rainbowColours[x])
+            state.setPadColour(0, 1, rainbowColours[x])
         
          # Group 2
         if (x >= 1) and (x < len(rainbowColours) + 1):
-            setPadColour(eventconsts.Pads[1][1], rainbowColours[x - 1])
-            setPadColour(eventconsts.Pads[0][0], rainbowColours[x - 1])
+            state.setPadColour(1, 1, rainbowColours[x - 1])
+            state.setPadColour(0, 0, rainbowColours[x - 1])
         
         # Group 3
         if (x >= 2) and (x < len(rainbowColours) + 2):
-            setPadColour(eventconsts.Pads[1][2], rainbowColours[x - 2])
-            setPadColour(eventconsts.Pads[0][1], rainbowColours[x - 2])
+            state.setPadColour(2, 1, rainbowColours[x - 2])
+            state.setPadColour(1, 0, rainbowColours[x - 2])
         
         # Group 4
         if (x >= 3) and (x < len(rainbowColours) + 3):
-            setPadColour(eventconsts.Pads[1][3], rainbowColours[x - 3])
-            setPadColour(eventconsts.Pads[0][2], rainbowColours[x - 3])
+            state.setPadColour(3, 1, rainbowColours[x - 3])
+            state.setPadColour(2, 0, rainbowColours[x - 3])
         
         # Group 5
         if (x >= 4) and (x < len(rainbowColours) + 4):
-            setPadColour(eventconsts.Pads[1][4], rainbowColours[x - 4])
-            setPadColour(eventconsts.Pads[0][3], rainbowColours[x - 4])
+            state.setPadColour(4, 1, rainbowColours[x - 4])
+            state.setPadColour(3, 0, rainbowColours[x - 4])
         
     
         # Group 6
         if (x >= 5) and (x < len(rainbowColours) + 5):
-            setPadColour(eventconsts.Pads[1][5], rainbowColours[x - 5])
-            setPadColour(eventconsts.Pads[0][4], rainbowColours[x - 5])
+            state.setPadColour(5, 1, rainbowColours[x - 5])
+            state.setPadColour(4, 0, rainbowColours[x - 5])
         
         # Group 7
         if (x >= 6) and (x < len(rainbowColours) + 6):
-            setPadColour(eventconsts.Pads[1][6], rainbowColours[x - 6])
-            setPadColour(eventconsts.Pads[0][5], rainbowColours[x - 6])
+            state.setPadColour(6, 1, rainbowColours[x - 6])
+            state.setPadColour(5, 0, rainbowColours[x - 6])
         
         # Group 8
         if (x >= 7) and (x < len(rainbowColours) + 7):
-            setPadColour(eventconsts.Pads[1][7], rainbowColours[x - 7])
-            setPadColour(eventconsts.Pads[0][6], rainbowColours[x - 7])
+            state.setPadColour(7, 1, rainbowColours[x - 7])
+            state.setPadColour(6, 0, rainbowColours[x - 7])
         
         # Group 9
         if (x >= 8) and (x < len(rainbowColours) + 8):
-            setPadColour(eventconsts.Pads[0][7], rainbowColours[x - 8])
+            state.setPadColour(7, 0, rainbowColours[x - 8])
         
         x += 1
         time.sleep(sleepTime)
         
         if x > len(rainbowColours) + 8: break
 
-    resetPads()
+    state.reset()
 
 # Quick update of pads (redrawing bouncers or something)
 def updatePads(event = None):

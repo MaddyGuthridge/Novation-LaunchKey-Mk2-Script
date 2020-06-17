@@ -6,7 +6,7 @@ This script is a custom processor module that can process events when the FPC pl
 
 REMAP_DRUMS = True
 
-# Matrix of FPC Drums [Row][Column]
+# Matrix of FPC Drums [y][x] (I should probs fix this some time for the sake of consistency But I can't be bothered)
 FPC_DRUM_CONSTS = [
     [49, 55, 51, 53],
     [48, 47, 45, 43],
@@ -61,7 +61,7 @@ def process(command):
 # Change pads to default note layout for FPC
 def change_pads(command):
     if REMAP_DRUMS:
-        if command.note is eventconsts.BasicPads[1][0]:
+        if command.note is eventconsts.BasicPads[0][1]:
             command.edit(eventprocessor.rawEvent(command.status, FPC_DRUM_CONSTS[3][0], command.value))
             return
 
@@ -69,27 +69,27 @@ def change_pads(command):
             command.edit(eventprocessor.rawEvent(command.status, FPC_DRUM_CONSTS[3][1], command.value))
             return
 
-        if command.note is eventconsts.BasicPads[1][2]:
+        if command.note is eventconsts.BasicPads[2][1]:
             command.edit(eventprocessor.rawEvent(command.status, FPC_DRUM_CONSTS[3][2], command.value))
             return
 
-        if command.note is eventconsts.BasicPads[1][3]:
+        if command.note is eventconsts.BasicPads[3][1]:
             command.edit(eventprocessor.rawEvent(command.status, FPC_DRUM_CONSTS[3][3], command.value))
             return
 
-        if command.note is eventconsts.BasicPads[1][4]:
+        if command.note is eventconsts.BasicPads[4][1]:
             command.edit(eventprocessor.rawEvent(command.status, FPC_DRUM_CONSTS[1][0], command.value))
             return
 
-        if command.note is eventconsts.BasicPads[1][5]:
+        if command.note is eventconsts.BasicPads[5][1]:
             command.edit(eventprocessor.rawEvent(command.status, FPC_DRUM_CONSTS[1][1], command.value))
             return
 
-        if command.note is eventconsts.BasicPads[1][6]:
+        if command.note is eventconsts.BasicPads[6][1]:
             command.edit(eventprocessor.rawEvent(command.status, FPC_DRUM_CONSTS[1][2], command.value))
             return
 
-        if command.note is eventconsts.BasicPads[1][7]:
+        if command.note is eventconsts.BasicPads[7][1]:
             command.edit(eventprocessor.rawEvent(command.status, FPC_DRUM_CONSTS[1][3], command.value))
             return
 
@@ -97,31 +97,31 @@ def change_pads(command):
             command.edit(eventprocessor.rawEvent(command.status, FPC_DRUM_CONSTS[2][0], command.value))
             return
 
-        if command.note is eventconsts.BasicPads[0][1]:
+        if command.note is eventconsts.BasicPads[1][0]:
             command.edit(eventprocessor.rawEvent(command.status, FPC_DRUM_CONSTS[2][1], command.value))
             return
 
-        if command.note is eventconsts.BasicPads[0][2]:
+        if command.note is eventconsts.BasicPads[2][0]:
             command.edit(eventprocessor.rawEvent(command.status, FPC_DRUM_CONSTS[2][2], command.value))
             return
             
-        if command.note is eventconsts.BasicPads[0][3]:
+        if command.note is eventconsts.BasicPads[3][0]:
             command.edit(eventprocessor.rawEvent(command.status, FPC_DRUM_CONSTS[2][3], command.value))
             return
 
-        if command.note is eventconsts.BasicPads[0][4]:
+        if command.note is eventconsts.BasicPads[4][0]:
             command.edit(eventprocessor.rawEvent(command.status, FPC_DRUM_CONSTS[0][0], command.value))
             return
 
-        if command.note is eventconsts.BasicPads[0][5]:
+        if command.note is eventconsts.BasicPads[5][0]:
             command.edit(eventprocessor.rawEvent(command.status, FPC_DRUM_CONSTS[0][1], command.value))
             return
 
-        if command.note is eventconsts.BasicPads[0][6]:
+        if command.note is eventconsts.BasicPads[6][0]:
             command.edit(eventprocessor.rawEvent(command.status, FPC_DRUM_CONSTS[0][2], command.value))
             return
 
-        if command.note is eventconsts.BasicPads[0][7]:
+        if command.note is eventconsts.BasicPads[7][0]:
             command.edit(eventprocessor.rawEvent(command.status, FPC_DRUM_CONSTS[0][3], command.value))
             return
 

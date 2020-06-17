@@ -167,15 +167,19 @@ class processedEvent:
             self.type = eventconsts.TYPE_BASIC_EVENT
             self.isBinary = True
 
-        # Pads have different signals for note on and note off, also account for matrix
-        elif (self.status == 0x9F or self.status == 0x8F) and (self.note in eventconsts.Pads[0] or self.note in eventconsts.Pads[1]):
-            self.type = eventconsts.TYPE_PAD
-            self.isBinary = True
+        # If coordinates are returned, it is a pad
+        elif (self.status == 0x9F or self.status == 0x8F) or ((self.status == 0x99 or self.status == 0x89)):
+            x, y = self.getPadCoord()
+            if x != -1 and y != -1:
+                # Is a pad
+                self.padX = x
+                self.padY = y
+                self.isBinary = True
+                if self.isPadExtendedMode():
+                    self.type = eventconsts.TYPE_PAD
+                else:
+                    self.type = eventconsts.TYPE_BASIC_PAD
 
-        # And are different in basic mode
-        elif (self.status == 0x99 or self.status == 0x89) and (self.note in eventconsts.BasicPads[0] or self.note in eventconsts.BasicPads[1]):
-            self.type = eventconsts.TYPE_BASIC_PAD
-            self.isBinary = True
 
         # And also different signals for the mixer buttons in basic mode
         # TODO: FIX THIS
@@ -332,17 +336,7 @@ class processedEvent:
     
     # Returns string eventID for knob events
     def getID_Pads(self):
-        y_map = -1
-        x_map = -1
-        done_flag = False
-        for y in range(len(eventconsts.Pads)):
-            for x in range(len(eventconsts.Pads[y])):
-                if self.note == eventconsts.Pads[y][x] or self.note == eventconsts.BasicPads[y][x]:
-                    y_map = y
-                    x_map = x
-                    done_flag = True
-                    break
-            if done_flag: break
+        x_map, y_map = self.getPadCoord()
         
         ret_str = ""
 
@@ -392,6 +386,27 @@ class processedEvent:
         elif self.id == eventconsts.KNOB_7 or self.id == eventconsts.BASIC_KNOB_7: return "7"
         elif self.id == eventconsts.KNOB_8 or self.id == eventconsts.BASIC_KNOB_8: return "8"
     
+    # Returns X and Y tuple for pads
+    def getPadCoord(self):
+        y_map = -1
+        x_map = -1
+        done_flag = False
+        for x in range(len(eventconsts.Pads)):
+            for y in range(len(eventconsts.Pads[x])):
+                if self.note == eventconsts.Pads[x][y] or self.note == eventconsts.BasicPads[x][y]:
+                    y_map = y
+                    x_map = x
+                    done_flag = True
+                    break
+            if done_flag: break
+        return x_map, y_map
+
+    # Returns True if Pad is Extended
+    def isPadExtendedMode(self):
+        if self.note == eventconsts.Pads[self.padX][self.padY]: return True
+        elif self.note == eventconsts.BasicPads[self.padX][self.padY]: return False
+        else: print("ERROR!!?")
+
     # Returns (formatted) value
     def getValue(self):
         a = str(self.value)

@@ -22,6 +22,9 @@ def topWindowStart():
 def topWindowEnd():
     return
 
+def redraw():
+    return
+
 def process(command):
 
     command.actions.addProcessor("Browser Processor")
