@@ -52,13 +52,13 @@ def activeEnd():
         processwindows.activeEnd()
 
 def redraw():
-    lights = lighting.LightMap
+    lights = lighting.LightMap()
 
     # Get UI drawn from plugins
-    processplugins.process(lights)
+    processplugins.redraw(lights)
 
     # Get UI drawn from windows
-    processwindows.process(lights)
+    processwindows.redraw(lights)
 
     # Call pads refresh function
     lighting.state.setFromMap(lights)

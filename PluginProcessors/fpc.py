@@ -39,7 +39,7 @@ plugins = ["FPC"]
 
 def redraw(lights):
     if not internal.queryExtendedMode(eventconsts.INCONTROL_PADS):
-        lights.setFromMap(COLOUR_MAP)
+        lights.setFromMatrix(COLOUR_MAP)
 
 
 def topPluginStart():

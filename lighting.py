@@ -92,7 +92,7 @@ class Lights:
 
     # Set the colour of a pad
     def setPadColour(self, x, y, colour):
-        if internal.queryExtendedMode(): 
+        if internal.queryExtendedMode(eventconsts.INCONTROL_PADS): 
             internal.sendMidiMessage(0x9F, eventconsts.Pads[x][y], colour)
         else: 
             internal.sendMidiMessage(0x9F, eventprocessor.convertPadMapping(eventconsts.Pads[x][y]), colour)
@@ -106,7 +106,6 @@ class Lights:
             for y in range(len(self.PadMap[x])):
                 if self.PadMap[x][y] != map.PadMap[x][y]:
                     self.setPadColour(x, y, map.PadMap[x][y])
-
         return
 
 state = Lights()
