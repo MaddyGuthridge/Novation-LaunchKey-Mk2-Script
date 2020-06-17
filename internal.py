@@ -16,6 +16,7 @@ import ui
 import eventconsts
 import config
 import eventprocessor
+import lighting
 
 import WindowProcessors.processwindows as processwindows
 import PluginProcessors.processplugins as processplugins

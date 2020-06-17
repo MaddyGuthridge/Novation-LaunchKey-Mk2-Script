@@ -18,6 +18,13 @@ def process(command):
 
     return
 
+def redraw(lights):
+
+    if internal.window.active_fl_window == config.WINDOW_MIXER:
+        WindowProcessors.processmixer.redraw(lights)
+
+    return
+
 def activeStart():
 
     if internal.window.active_fl_window == config.WINDOW_MIXER:

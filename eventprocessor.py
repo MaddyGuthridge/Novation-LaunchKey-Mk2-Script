@@ -13,6 +13,7 @@ import eventconsts
 import internal
 import config
 import processdefault
+import lighting
 import WindowProcessors.processwindows as processwindows
 import PluginProcessors.processplugins as processplugins
 
@@ -49,6 +50,18 @@ def activeEnd():
         processplugins.activeEnd()
     else:
         processwindows.activeEnd()
+
+def redraw():
+    lights = lighting.LightMap
+
+    # Get UI drawn from plugins
+    processplugins.process(lights)
+
+    # Get UI drawn from windows
+    processwindows.process(lights)
+
+    # Call pads refresh function
+    lighting.state.setFromMap(lights)
 
 # Stores actions taken by various processor modules
 class actionPrinter:

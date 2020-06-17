@@ -14,12 +14,33 @@ FPC_DRUM_CONSTS = [
     [37, 36, 42, 82]
 ]
 
+
+
 import eventconsts
 import eventprocessor
 import internal
+import eventconsts
 import config
+import lighting
+
+COLOUR_MAP = [
+    [lighting.COLOUR_BLUE, lighting.COLOUR_BLUE],
+    [lighting.COLOUR_BLUE, lighting.COLOUR_RED],
+    [lighting.COLOUR_GREEN, lighting.COLOUR_GREEN],
+    [lighting.COLOUR_GREEN, lighting.COLOUR_ORANGE],
+    [lighting.COLOUR_YELLOW, lighting.COLOUR_ORANGE],
+    [lighting.COLOUR_YELLOW, lighting.COLOUR_ORANGE],
+    [lighting.COLOUR_LIGHT_BLUE, lighting.COLOUR_ORANGE],
+    [lighting.COLOUR_LIGHT_BLUE, lighting.COLOUR_ORANGE],
+    [-1, -1]
+]
 
 plugins = ["FPC"]
+
+def redraw(lights):
+    if not internal.queryExtendedMode(eventconsts.INCONTROL_PADS):
+        lights.setFromMap(COLOUR_MAP)
+
 
 def topPluginStart():
     internal.setExtendedMode(False, eventconsts.INCONTROL_PADS)
@@ -33,9 +54,6 @@ def activeStart():
     return
 
 def activeEnd():
-    return
-
-def drawUI(ui):
     return
 
 def process(command):

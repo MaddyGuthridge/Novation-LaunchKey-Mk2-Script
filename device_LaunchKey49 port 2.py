@@ -113,6 +113,7 @@ class TGeneric():
     
     def OnIdle(self):
         internal.idleProcessor()
+        eventprocessor.redraw()
         return
 
     def OnRefresh(self, flags):

@@ -59,6 +59,12 @@ def activeEnd():
             object_to_call.activeEnd()
     return
 
+def redraw(lights):
+    for x in imports:
+        object_to_call = getattr(PluginProcessors, x)
+        if can_handle(object_to_call):
+            object_to_call.redraw(lights)
+
 def process(command):
     for x in imports:
         object_to_call = getattr(PluginProcessors, x)
