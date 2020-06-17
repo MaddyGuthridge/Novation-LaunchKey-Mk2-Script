@@ -4,9 +4,20 @@ This script is a custom processor module that can process events when the FPC pl
 
 """
 
+REMAP_DRUMS = True
+
+# Matrix of FPC Drums [Row][Column]
+FPC_DRUM_CONSTS = [
+    [49, 55, 51, 53],
+    [48, 47, 45, 43],
+    [40, 38, 46, 44],
+    [37, 36, 42, 82]
+]
+
 import eventconsts
 import eventprocessor
 import internal
+import config
 
 plugins = ["FPC"]
 
@@ -37,7 +48,80 @@ def process(command):
         else: # Pedal up
             command.edit(eventprocessor.rawEvent(0x99, eventconsts.BASIC_PAD_BOTTOM_2, command.value))
 
+    # Map drums to match FPC defaults
+    change_pads(command)
+
     # Add did not handle flag if not handled
     if command.handled is False: 
         command.actions.appendAction("[Did not handle]")
     return
+
+
+
+# Change pads to default note layout for FPC
+def change_pads(command):
+    if REMAP_DRUMS:
+        if command.note is eventconsts.BASIC_PAD_BOTTOM_1:
+            command.edit(eventprocessor.rawEvent(command.status, FPC_DRUM_CONSTS[3][0], command.value))
+            return
+
+        if command.note is eventconsts.BASIC_PAD_BOTTOM_2:
+            command.edit(eventprocessor.rawEvent(command.status, FPC_DRUM_CONSTS[3][1], command.value))
+            return
+
+        if command.note is eventconsts.BASIC_PAD_BOTTOM_3:
+            command.edit(eventprocessor.rawEvent(command.status, FPC_DRUM_CONSTS[3][2], command.value))
+            return
+
+        if command.note is eventconsts.BASIC_PAD_BOTTOM_4:
+            command.edit(eventprocessor.rawEvent(command.status, FPC_DRUM_CONSTS[3][3], command.value))
+            return
+
+        if command.note is eventconsts.BASIC_PAD_BOTTOM_5:
+            command.edit(eventprocessor.rawEvent(command.status, FPC_DRUM_CONSTS[1][0], command.value))
+            return
+
+        if command.note is eventconsts.BASIC_PAD_BOTTOM_6:
+            command.edit(eventprocessor.rawEvent(command.status, FPC_DRUM_CONSTS[1][1], command.value))
+            return
+
+        if command.note is eventconsts.BASIC_PAD_BOTTOM_7:
+            command.edit(eventprocessor.rawEvent(command.status, FPC_DRUM_CONSTS[1][2], command.value))
+            return
+
+        if command.note is eventconsts.BASIC_PAD_BOTTOM_8:
+            command.edit(eventprocessor.rawEvent(command.status, FPC_DRUM_CONSTS[1][3], command.value))
+            return
+
+        if command.note is eventconsts.BASIC_PAD_TOP_1:
+            command.edit(eventprocessor.rawEvent(command.status, FPC_DRUM_CONSTS[2][0], command.value))
+            return
+
+        if command.note is eventconsts.BASIC_PAD_TOP_2:
+            command.edit(eventprocessor.rawEvent(command.status, FPC_DRUM_CONSTS[2][1], command.value))
+            return
+
+        if command.note is eventconsts.BASIC_PAD_TOP_3:
+            command.edit(eventprocessor.rawEvent(command.status, FPC_DRUM_CONSTS[2][2], command.value))
+            return
+            
+        if command.note is eventconsts.BASIC_PAD_TOP_4:
+            command.edit(eventprocessor.rawEvent(command.status, FPC_DRUM_CONSTS[2][3], command.value))
+            return
+
+        if command.note is eventconsts.BASIC_PAD_TOP_5:
+            command.edit(eventprocessor.rawEvent(command.status, FPC_DRUM_CONSTS[0][0], command.value))
+            return
+
+        if command.note is eventconsts.BASIC_PAD_TOP_6:
+            command.edit(eventprocessor.rawEvent(command.status, FPC_DRUM_CONSTS[0][1], command.value))
+            return
+
+        if command.note is eventconsts.BASIC_PAD_TOP_7:
+            command.edit(eventprocessor.rawEvent(command.status, FPC_DRUM_CONSTS[0][2], command.value))
+            return
+
+        if command.note is eventconsts.BASIC_PAD_TOP_8:
+            command.edit(eventprocessor.rawEvent(command.status, FPC_DRUM_CONSTS[0][3], command.value))
+            return
+

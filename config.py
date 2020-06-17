@@ -32,7 +32,8 @@ START_IN_INCONTROL_PADS = True
 
 TAB_LENGTH = 16 # How much spacing to add in console output
 
-CONSOLE_PRINT_PERFORMANCE_TIMES = False # Indicates whether processing times will be printed to the console. Enable if debugging
+CONSOLE_PRINT_PERFORMANCE_TIMES = False # Indicates whether processing times will be printed to the console. 
+                                        # Enable if debugging (although it kinda clogs up the console a LOT)
 
 #-------------------------------
 # CONSTANTS
