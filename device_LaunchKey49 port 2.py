@@ -1,6 +1,6 @@
-#   name=LaunchKey49 Mk2 (Extended )
-# url=
-# version = 0.0.1
+# name=LaunchKey Mk2 Extension
+# url=https://github.com/MiguelGuthridge/Novation-LaunchKey49-Mk2-Script
+# receiveFrom=LaunchKey Mk2
 
 """
 device_LaunchKey49 port 2.py

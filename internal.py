@@ -76,55 +76,6 @@ class windowMgr:
         self.active_plugin = ""
         self.active_fl_window = -1
     
-    """
-    def update(self):
-        self.active_fl_window
-        # Update FL Window
-        if   ui.getFocused(config.WINDOW_MIXER):        
-            new_fl_window = config.WINDOW_MIXER
-
-        elif ui.getFocused(config.WINDOW_PIANO_ROLL):   
-            new_fl_window = config.WINDOW_PIANO_ROLL
-
-        elif ui.getFocused(config.WINDOW_CHANNEL_RACK): 
-            new_fl_window = config.WINDOW_CHANNEL_RACK
-
-        elif ui.getFocused(config.WINDOW_PLAYLIST):     
-            new_fl_window = config.WINDOW_PLAYLIST
-
-        elif ui.getFocused(config.WINDOW_BROWSER):      
-            new_fl_window = config.WINDOW_BROWSER
-        
-        else: new_fl_window = -1
-
-        # If active window for FL plugin changes
-        if new_fl_window != self.active_fl_window:
-            eventprocessor.activeEnd()
-            self.active_fl_window = new_fl_window
-            eventprocessor.activeStart()
-
-        new = ui.getFocusedFormCaption()
-        # If window is FL Window
-        if ui.getFocused(config.WINDOW_MIXER) or ui.getFocused(config.WINDOW_PIANO_ROLL) or ui.getFocused(config.WINDOW_PLAYLIST) or \
-            ui.getFocused(config.WINDOW_CHANNEL_RACK) or ui.getFocused(config.WINDOW_BROWSER):
-
-            # If active window not focused
-            if self.plugin_focused == False: return
-            self.plugin_focused = False
-            print("Background: ", self.active_plugin)
-            printLineBreak()
-        else:
-            # If window didn't change
-            if new == self.active_plugin:
-                return False
-            else:
-                self.plugin_focused = True
-                self.active_plugin = new
-            print("Window: ", self.active_plugin, "[Active]")
-            printLineBreak()
-            return True
-    """
-
     def update(self):
         old_window = self.active_fl_window
         # Update FL Window
@@ -430,7 +381,10 @@ EventNameT = ['Note Off', 'Note On ', 'Key Aftertouch', 'Control Change','Progra
 def sendMidiMessage(status, data1, data2):
     global previous_event_out
     previous_event_out  = toMidiMessage(status, data1, data2)
-    device.midiOutMsg(previous_event_out)
+    if PORT == config.DEVICE_PORT_EXTENDED:
+        device.midiOutMsg(previous_event_out)
+    else:
+        device.dispatch(0, previous_event_out)
 
 # Generates a MIDI message given arguments
 def toMidiMessage(status, data1, data2):
@@ -463,4 +417,30 @@ def idleProcessor():
 # Print out error message
 def logError(message):
     print("Error: ", message)
+
+class padMgr:
+    # Contains whether or not a pad is down (for use in extended mode)
+    padsDown = [
+        [False, False],
+        [False, False],
+        [False, False],
+        [False, False],
+        [False, False],
+        [False, False],
+        [False, False],
+        [False, False],
+        [False, False]
+    ]
+
+    def press(self, x, y):
+        self.padsDown[x][y] = True
+    
+    def lift(self, x, y):
+        self.padsDown[x][y] = False
+
+    def getVal(self, x, y):
+        return self.padsDown[x][y]
+
+pads = padMgr()
+
 

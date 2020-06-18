@@ -32,8 +32,8 @@ class LightMap:
             ]
 
     # Set the colour of a pad
-    def setPadColour(self, x, y, colour):
-        if self.PadMap[x][y] == -1: # If pad available to map
+    def setPadColour(self, x, y, colour, override = False):
+        if self.PadMap[x][y] == -1 or override: # If pad available to map
             self.PadMap[x][y] = colour
     
     # Sets colours based on state of LightMap object
@@ -94,6 +94,7 @@ class Lights:
     def setPadColour(self, x, y, colour):
         if internal.extendedMode.query(eventconsts.INCONTROL_PADS): 
             internal.sendMidiMessage(0x9F, eventconsts.Pads[x][y], colour)
+            
         else: 
             internal.sendMidiMessage(0x9F, eventprocessor.convertPadMapping(eventconsts.Pads[x][y]), colour)
         self.PadMap[x][y] = colour
@@ -107,6 +108,11 @@ class Lights:
                 if self.PadMap[x][y] != map.PadMap[x][y]:
                     self.setPadColour(x, y, map.PadMap[x][y])
         return
+    
+    def redraw(self):
+        for x in range(len(self.PadMap)):
+            for y in range(len(self.PadMap[x])):
+                self.setPadColour(x, y, self.PadMap[x][y])
 
 state = Lights()
 

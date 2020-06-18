@@ -51,15 +51,17 @@ def activeEnd():
     return
 
 def topWindowStart():
-
-    current_window = getWindowObject()
-    current_window.topWindowStart()
+    # Only in extended mode:
+    if internal.PORT == config.DEVICE_PORT_EXTENDED:
+        current_window = getWindowObject()
+        current_window.topWindowStart()
 
     return
 
 def topWindowEnd():
-
-    current_window = getWindowObject()
-    current_window.topWindowEnd()
+    # Only in extended mode:
+    if internal.PORT == config.DEVICE_PORT_EXTENDED:
+        current_window = getWindowObject()
+        current_window.topWindowEnd()
 
     return

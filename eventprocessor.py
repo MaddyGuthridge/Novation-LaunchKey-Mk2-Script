@@ -13,6 +13,7 @@ import eventconsts
 import internal
 import config
 import processdefault
+import processfirst
 import lighting
 import WindowProcessors.processwindows as processwindows
 import PluginProcessors.processplugins as processplugins
@@ -26,6 +27,12 @@ shiftUsed = False
 
 # Recieve event and forward onto relative processors
 def process(command):
+
+    # Call primary processor
+    processfirst.process(command)
+    if command.handled:
+        return
+
     # Attempt to process event using custom processors for plugins
     processplugins.process(command)
 
@@ -39,29 +46,39 @@ def process(command):
 
 # Called after a window is activated
 def activeStart():
-    if internal.window.plugin_focused:
-        processplugins.activeStart()
-    else:
-        processwindows.activeStart()
+    # Only in extended mode:
+    if internal.PORT == config.DEVICE_PORT_EXTENDED:
+        if internal.window.plugin_focused:
+            processplugins.activeStart()
+        else:
+            processwindows.activeStart()
 
 # Called just before active window is deactivated
 def activeEnd():
-    if internal.window.plugin_focused:
-        processplugins.activeEnd()
-    else:
-        processwindows.activeEnd()
+    # Only in extended mode:
+    if internal.PORT == config.DEVICE_PORT_EXTENDED:
+        if internal.window.plugin_focused:
+            processplugins.activeEnd()
+        else:
+            processwindows.activeEnd()
 
 def redraw():
-    lights = lighting.LightMap()
+    # Only in extended mode:
+    if internal.PORT == config.DEVICE_PORT_EXTENDED:
 
-    # Get UI drawn from plugins
-    processplugins.redraw(lights)
+        lights = lighting.LightMap()
 
-    # Get UI drawn from windows
-    processwindows.redraw(lights)
+        # Get UI drawn from plugins
+        processplugins.redraw(lights)
 
-    # Call pads refresh function
-    lighting.state.setFromMap(lights)
+        # Get UI drawn from windows
+        processwindows.redraw(lights)
+
+        # Get UI drawn from default processor
+        processdefault.redraw(lights)
+
+        # Call pads refresh function
+        lighting.state.setFromMap(lights)
 
 # Stores actions taken by various processor modules
 class actionPrinter:

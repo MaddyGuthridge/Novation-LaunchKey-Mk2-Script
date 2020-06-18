@@ -35,6 +35,8 @@ COLOUR_MAP = [
     [-1, -1]
 ]
 
+
+
 plugins = ["FPC"]
 
 def redraw(lights):
@@ -59,15 +61,21 @@ def activeEnd():
 def process(command):
     command.actions.addProcessor("FPC Processor")
 
-    # Change pedals to kick:
-    if command.id == eventconsts.PEDAL:
-        if command.value == 0: # Pedal up
-            command.edit(eventprocessor.rawEvent(0x89, eventconsts.BasicPads[1][1], command.value))
-        else: # Pedal up
-            command.edit(eventprocessor.rawEvent(0x99, eventconsts.BasicPads[1][1], command.value))
+    # Basic Mode Processing:
+    if internal.PORT == config.DEVICE_PORT_BASIC:
+        # Change pedals to kick:
+        if command.id == eventconsts.PEDAL:
+            if command.value == 0: # Pedal up
+                command.edit(eventprocessor.rawEvent(0x89, eventconsts.BasicPads[1][1], command.value))
+            else: # Pedal up
+                command.edit(eventprocessor.rawEvent(0x99, eventconsts.BasicPads[1][1], command.value))
 
-    # Map drums to match FPC defaults
-    change_pads(command)
+        # Dispatch event to extended mode
+        internal.sendMidiMessage(command.status, command.note, command.value)
+
+        # Map drums to match FPC default layout
+        change_pads(command)
+
 
     # Add did not handle flag if not handled
     if command.handled is False: 
