@@ -15,6 +15,16 @@ import lighting
 
 def redraw(lights):
 
+    # In Popup Menu
+    if ui.isInPopupMenu():
+        lights.setPadColour(1, 0, lighting.COLOUR_LIGHT_BLUE)   # Up
+        lights.setPadColour(1, 1, lighting.COLOUR_LIGHT_BLUE)   # Down
+        lights.setPadColour(0, 1, lighting.COLOUR_PURPLE)       # Left
+        lights.setPadColour(2, 1, lighting.COLOUR_PURPLE)       # Right
+        lights.setPadColour(3, 1, lighting.COLOUR_RED)          # No
+        lights.setPadColour(4, 1, lighting.COLOUR_GREEN)        # Yes
+        lights.solidifyAll()
+
     # Shift key triggers window switcher
     if internal.shift.getDown():
         lights.setPadColour(0, 1, lighting.COLOUR_GREEN)        # Playlist
@@ -38,7 +48,7 @@ def process(command):
     # If in extended mode
     if internal.PORT == config.DEVICE_PORT_EXTENDED:
 
-        # Pads down
+        # Pads down (white light)
         if command.type == eventconsts.TYPE_BASIC_PAD or command.type == eventconsts.TYPE_PAD:
             if command.value: # Press down
                 internal.pads.press(command.padX, command.padY)
@@ -82,7 +92,42 @@ def process(command):
                 command.actions.appendAction("Next window")
                 command.handled = True
 
-        # Extended Mode
+        if ui.isInPopupMenu() and command.type == eventconsts.TYPE_PAD and command.is_Lift:
+            if command.note == eventconsts.Pads[1][0]:
+                ui.up()
+                command.handled = True
+                command.actions.appendAction("UI Up")
+
+            if command.note == eventconsts.Pads[1][1]:
+                ui.down()
+                command.handled = True
+                command.actions.appendAction("UI Down")
+
+            if command.note == eventconsts.Pads[0][1]:
+                ui.left()
+                command.handled = True
+                command.actions.appendAction("UI Left")
+            
+            if command.note == eventconsts.Pads[2][1]:
+                ui.right()
+                command.handled = True
+                command.actions.appendAction("UI Right")
+
+            if command.note == eventconsts.Pads[3][1]:
+                ui.escape()
+                command.handled = True
+                command.actions.appendAction("UI Escape")
+
+            if command.note == eventconsts.Pads[4][1]:
+                ui.enter()
+                command.handled = True
+                command.actions.appendAction("UI Enter")
+
+        #
+        # Extended Mode signals
+        #
+
+        # All
         if command.id == eventconsts.SYSTEM_EXTENDED:
             internal.extendedMode.recieve(not command.is_Lift)
             command.actions.appendAction("Set Extended Mode to " + str(not command.is_Lift))
