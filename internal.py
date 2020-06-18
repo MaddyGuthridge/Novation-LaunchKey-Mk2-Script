@@ -123,20 +123,28 @@ class windowMgr:
             # Start new window active
             eventprocessor.activeStart()
             return True
+        
         else: # Check for changes to Plugin
             new_plugin = ui.getFocusedFormCaption()
             old_plugin = self.active_plugin
             
-            last = -1
-            length = len(new_plugin)
-            for y in range(length):
-                if new_plugin[y] is '(':
-                    last = y + 1
-            if last == -1 or last > length: # If no brackets found
-                return False
-            
-            # Trim string
-            new_plugin = new_plugin[last: -2]
+            special_flag = False
+
+            # Check for special windows
+            if new_plugin == "Color selector" or new_plugin == "Script output":
+                special_flag = True
+
+            if not special_flag:
+                last = -1
+                length = len(new_plugin)
+                for y in range(length):
+                    if new_plugin[y] is '(':
+                        last = y + 1
+                if last == -1 or last > length: # If no brackets found
+                    return False
+                
+                # Trim string
+                new_plugin = new_plugin[last: -2]
 
             # If window didn't change
             
