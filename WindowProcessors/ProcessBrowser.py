@@ -1,19 +1,22 @@
 """
-processmixer.py
+processbrowser.py
 This script processes events when the browser window is active
 
 """
 
-import mixer
+
 
 import eventconsts
 import internal
 import config
+import lighting
 
 def activeStart():
+    internal.extendedMode.setVal(True, eventconsts.INCONTROL_PADS)
     return
 
 def activeEnd():
+    internal.extendedMode.revert(eventconsts.INCONTROL_PADS)
     return
 
 def topWindowStart():
@@ -22,7 +25,8 @@ def topWindowStart():
 def topWindowEnd():
     return
 
-def redraw():
+def redraw(lights):
+    #lights.
     return
 
 def process(command):

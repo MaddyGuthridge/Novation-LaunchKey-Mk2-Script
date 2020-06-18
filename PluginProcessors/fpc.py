@@ -11,7 +11,7 @@ FPC_DRUM_CONSTS = [
     [49, 55, 51, 53],
     [48, 47, 45, 43],
     [40, 38, 46, 44],
-    [37, 36, 42, 82]
+    [37, 36, 42, 54]
 ]
 
 
@@ -38,16 +38,16 @@ COLOUR_MAP = [
 plugins = ["FPC"]
 
 def redraw(lights):
-    if not internal.queryExtendedMode(eventconsts.INCONTROL_PADS):
+    if not internal.extendedMode.query(eventconsts.INCONTROL_PADS):
         lights.setFromMatrix(COLOUR_MAP)
 
 
 def topPluginStart():
-    internal.setExtendedMode(False, eventconsts.INCONTROL_PADS)
+    internal.extendedMode.setVal(False, eventconsts.INCONTROL_PADS)
     return
 
 def topPluginEnd():
-    internal.setExtendedMode(True, eventconsts.INCONTROL_PADS)
+    internal.extendedMode.setVal(True, eventconsts.INCONTROL_PADS)
     return
 
 def activeStart():

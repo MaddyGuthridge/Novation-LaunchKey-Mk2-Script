@@ -175,6 +175,9 @@ def process(command):
     if command.handled is False: 
         command.actions.appendAction("[Did not handle]")
 
+def redraw(lights):
+    return
+
 def activeStart():
     return
 
