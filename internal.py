@@ -216,31 +216,9 @@ class extended:
         if option == eventconsts.SYSTEM_EXTENDED:
             
             if self.prev_extendedMode is True:
-                sendMidiMessage(0x9F, 0x0C, 0x7F)
-
-                # Process variables for previous states
-                self.prev_extendedMode = self.extendedMode
-                self.prev_inControl_Knobs = self.inControl_Knobs
-                self.prev_inControl_Faders = self.inControl_Faders
-                self.prev_inControl_Pads = self.inControl_Pads
-
-                self.extendedMode = True
-                self.inControl_Knobs = True
-                self.inControl_Faders = True
-                self.inControl_Pads = True
+                self.setVal(True)
             elif self.prev_extendedMode is False:
-                sendMidiMessage(0x9F, 0x0C, 0x00)
-
-                # Process variables for previous states
-                self.prev_extendedMode = self.extendedMode
-                self.prev_inControl_Knobs = self.inControl_Knobs
-                self.prev_inControl_Faders = self.inControl_Faders
-                self.prev_inControl_Pads = self.inControl_Pads
-
-                self.extendedMode = False
-                self.inControl_Knobs = False
-                self.inControl_Faders = False
-                self.inControl_Pads = False
+                self.setVal(False)
             else: logError("New mode mode not boolean")
 
             
@@ -249,38 +227,26 @@ class extended:
         elif option == eventconsts.INCONTROL_KNOBS:
             
             if self.prev_inControl_Knobs is True:
-                sendMidiMessage(0x9F, 0x0D, 0x7F)
-                self.prev_inControl_Knobs = self.inControl_Knobs
-                self.inControl_Knobs = True
+                self.setVal(True, eventconsts.INCONTROL_KNOBS)
             elif self.prev_inControl_Knobs is False:
-                sendMidiMessage(0x9F, 0x0D, 0x00)
-                self.prev_inControl_Knobs = self.inControl_Knobs
-                self.inControl_Knobs = False
+                self.setVal(False, eventconsts.INCONTROL_KNOBS)
             else: logError("New mode mode not boolean")
         
         # Set faders
         elif option == eventconsts.INCONTROL_FADERS:
             if self.prev_inControl_Faders is True:
-                sendMidiMessage(0x9F, 0x0E, 0x7F)
-                self.prev_inControl_Faders = self.inControl_Faders
-                self.inControl_Faders = True
+                self.setVal(True, eventconsts.INCONTROL_FADERS)
             elif self.prev_inControl_Faders is False:
-                sendMidiMessage(0x9F, 0x0E, 0x00)
-                self.prev_inControl_Faders = self.inControl_Faders
-                self.inControl_Faders = False
+                self.setVal(False, eventconsts.INCONTROL_FADERS)
             else: logError("New mode mode not boolean")
         
         # Set pads
         elif option == eventconsts.INCONTROL_PADS:
            
             if self.prev_inControl_Pads is True:
-                sendMidiMessage(0x9F, 0x0F, 0x7F)
-                self.prev_inControl_Pads = self.inControl_Pads
-                self.inControl_Pads = True
+                self.setVal(True, eventconsts.INCONTROL_PADS)
             elif self.prev_inControl_Pads is False:
-                sendMidiMessage(0x9F, 0x0F, 0x00)
-                self.prev_inControl_Pads = self.inControl_Pads
-                self.inControl_Pads = False
+                self.setVal(False, eventconsts.INCONTROL_PADS)
             else: logError("New mode mode not boolean")
 
 
@@ -288,33 +254,33 @@ class extended:
     def setVal(self, newMode, option = eventconsts.SYSTEM_EXTENDED):
         # Set all
         if option == eventconsts.SYSTEM_EXTENDED:
-            if newMode is True:
+            if newMode is True and self.extendedMode is False:
                 sendMidiMessage(0x9F, 0x0C, 0x7F)
-            elif newMode is False:
+            elif newMode is False and self.extendedMode is True:
                 sendMidiMessage(0x9F, 0x0C, 0x00)
             else: logError("New mode mode not boolean")
         
         # Set knobs
         elif option == eventconsts.INCONTROL_KNOBS:
-            if newMode is True:
+            if newMode is True and self.inControl_Knobs is False:
                 sendMidiMessage(0x9F, 0x0D, 0x7F)
-            elif newMode is False:
+            elif newMode is False and self.inControl_Knobs is True:
                 sendMidiMessage(0x9F, 0x0D, 0x00)
             else: logError("New mode mode not boolean")
         
         # Set faders
         elif option == eventconsts.INCONTROL_FADERS:
-            if newMode is True:
+            if newMode is True and self.inControl_Faders is False:
                 sendMidiMessage(0x9F, 0x0E, 0x7F)
-            elif newMode is False:
+            elif newMode is False and self.inControl_Faders is True:
                 sendMidiMessage(0x9F, 0x0E, 0x00)
             else: logError("New mode mode not boolean")
         
         # Set pads
         elif option == eventconsts.INCONTROL_PADS:
-            if newMode is True:
+            if newMode is True and self.inControl_Pads is False:
                 sendMidiMessage(0x9F, 0x0F, 0x7F)
-            elif newMode is False:
+            elif newMode is False and self.inControl_Pads is True:
                 sendMidiMessage(0x9F, 0x0F, 0x00)
             else: logError("New mode mode not boolean")
 
@@ -325,9 +291,9 @@ class extended:
         if option == eventconsts.SYSTEM_EXTENDED:
             # Process variables for previous states
             self.prev_extendedMode = self.extendedMode
-            self.prev_inControl_Knobs = self.inControl_Knobs
-            self.prev_inControl_Faders = self.inControl_Faders
-            self.prev_inControl_Pads = self.inControl_Pads
+            self.prev_inControl_Knobs = config.START_IN_INCONTROL_KNOBS    # Set to default because otherwise 
+            self.prev_inControl_Faders = config.START_IN_INCONTROL_FADERS  # they'll revert badly sometimes
+            self.prev_inControl_Pads = config.START_IN_INCONTROL_PADS      #
             if newMode is True:
                 self.extendedMode = True
                 self.inControl_Knobs = True
@@ -443,4 +409,30 @@ class padMgr:
 
 pads = padMgr()
 
+class shiftMgr:
+    is_down = False
+    used = False
 
+    def press(self):
+        self.is_down = True
+        self.used = False
+    
+    def lift(self):
+        self.is_down = False
+        return self.used
+
+    def use(self):
+        if self.is_down:
+            self.used = True
+            return True
+        else: return False
+
+    def getDown(self):
+        return self.is_down
+    
+    def getUsed(self):
+        if self.is_down:
+            return self.used
+        else: return "ERROR Shift not down"
+
+shift = shiftMgr()

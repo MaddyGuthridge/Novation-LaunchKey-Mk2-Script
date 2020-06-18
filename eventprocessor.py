@@ -20,11 +20,6 @@ import PluginProcessors.processplugins as processplugins
 
 
 
-shiftDown = False
-shiftUsed = False
-
-
-
 # Recieve event and forward onto relative processors
 def process(command):
 
@@ -67,6 +62,9 @@ def redraw():
     if internal.PORT == config.DEVICE_PORT_EXTENDED:
 
         lights = lighting.LightMap()
+
+        # Get UI from primary processor
+        processfirst.redraw(lights)
 
         # Get UI drawn from plugins
         processplugins.redraw(lights)
@@ -139,20 +137,16 @@ class processedEvent:
 
         self.shifted = False
 
-        global shiftDown
-        global shiftUsed
+        
         # Process shift button
         if self.id == config.SHIFT_BUTTON:
             if self.value == 127:
-                shiftUsed = False
-                shiftDown = True
+                internal.shift.press()
             elif self.value == 0:
-                shiftDown = False
-                if shiftUsed:
-                    self.handled = True
-        elif shiftDown:
-            self.shifted = True
-            shiftUsed = True
+                self.handled = internal.shift.lift()
+                
+        elif internal.shift.getDown():
+            self.shifted = internal.shift.use()
 
         self.parse()                                                                                                                               
 

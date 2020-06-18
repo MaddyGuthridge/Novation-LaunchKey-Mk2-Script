@@ -35,12 +35,14 @@ class LightMap:
     def setPadColour(self, x, y, colour, override = False):
         if self.PadMap[x][y] == -1 or override: # If pad available to map
             self.PadMap[x][y] = colour
+            return True
+        else: return False
     
     # Sets colours based on state of LightMap object
     def setFromMatrix(self, map):
         for x in range(len(self.PadMap)):
             for y in range(len(self.PadMap[x])):
-                if self.PadMap[x][y] != map[x][y]:
+                if self.PadMap[x][y] == -1:
                     self.setPadColour(x, y, map[x][y])
         return
 
@@ -64,7 +66,7 @@ class LightMap:
     def solidifyAll(self):
         for x in range(len(self.PadMap)):
             for y in range(len(self.PadMap[x])):
-                if self.PadMap[x][y] == -1: self.PadMap[x][y] = 0
+                self.solidifyPad(x, y)
 
     
 
