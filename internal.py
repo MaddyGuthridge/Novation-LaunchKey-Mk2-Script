@@ -267,7 +267,6 @@ class extended:
                 sendMidiMessage(0x9F, 0x0C, 0x7F)
             elif newMode is False and self.extendedMode is True:
                 sendMidiMessage(0x9F, 0x0C, 0x00)
-            else: logError("New mode mode not boolean")
         
         # Set knobs
         elif option == eventconsts.INCONTROL_KNOBS:
@@ -275,7 +274,6 @@ class extended:
                 sendMidiMessage(0x9F, 0x0D, 0x7F)
             elif newMode is False and self.inControl_Knobs is True:
                 sendMidiMessage(0x9F, 0x0D, 0x00)
-            else: logError("New mode mode not boolean")
         
         # Set faders
         elif option == eventconsts.INCONTROL_FADERS:
@@ -283,7 +281,6 @@ class extended:
                 sendMidiMessage(0x9F, 0x0E, 0x7F)
             elif newMode is False and self.inControl_Faders is True:
                 sendMidiMessage(0x9F, 0x0E, 0x00)
-            else: logError("New mode mode not boolean")
         
         # Set pads
         elif option == eventconsts.INCONTROL_PADS:
@@ -291,7 +288,6 @@ class extended:
                 sendMidiMessage(0x9F, 0x0F, 0x7F)
             elif newMode is False and self.inControl_Pads is True:
                 sendMidiMessage(0x9F, 0x0F, 0x00)
-            else: logError("New mode mode not boolean")
 
     # Processes extended mode messages from device
     def recieve(self, newMode, option = eventconsts.SYSTEM_EXTENDED):

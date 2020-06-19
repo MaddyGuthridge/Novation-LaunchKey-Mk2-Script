@@ -92,6 +92,8 @@ class actionPrinter:
         if self.eventProcessors[0] == "":
             self.eventProcessors[0] = string
         else:
+            if self.eventActions[len(self.eventActions) - 1] == "":
+                self.eventActions[len(self.eventActions) - 1] = "[Did not handle]"
             self.eventProcessors.append(string)
             self.eventActions.append("")
 

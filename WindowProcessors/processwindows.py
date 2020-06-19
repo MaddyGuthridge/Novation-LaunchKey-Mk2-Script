@@ -10,6 +10,7 @@ import internal
 
 import WindowProcessors.processmixer
 import WindowProcessors.ProcessBrowser
+import WindowProcessors.processchannelrack
 
 import WindowProcessors.ProcessDefault
 
@@ -19,6 +20,9 @@ def getWindowObject():
     
     elif internal.window.active_fl_window == config.WINDOW_BROWSER:
         return WindowProcessors.ProcessBrowser
+    
+    elif internal.window.active_fl_window == config.WINDOW_CHANNEL_RACK:
+        return WindowProcessors.processchannelrack
 
     else: return WindowProcessors.ProcessDefault
 
