@@ -9,6 +9,7 @@ import mixer
 import eventconsts
 import internal
 import config
+import lighting
 
 
 # Process is called to handle events
@@ -174,6 +175,10 @@ def process(command):
     
 
 def redraw(lights):
+
+    setPeaks(lights)
+    
+
     return
 
 def activeStart():
@@ -189,6 +194,32 @@ def topWindowEnd():
     return
 
 # Internal functions
+
+def processPeak(lights, y, level):
+    level = level ** 3
+    colour = lighting.COLOUR_RED
+    for i in range(8):
+        
+        if level > 1 - (i + 1)/8:
+            if i >= 4:
+                colour = lighting.COLOUR_GREEN
+            elif i >= 2:
+                colour = lighting.COLOUR_YELLOW
+            elif i >= 1:
+                colour = lighting.COLOUR_ORANGE
+            lights.setPadColour(7 - i, y, colour)
+    
+
+def setPeaks(lights):
+    # Get selected mixer track
+    selected_track = mixer.trackNumber()
+    peakLeft = mixer.getTrackPeaks(selected_track, 0)
+    peakRight = mixer.getTrackPeaks(selected_track, 1)
+
+    processPeak(lights, 0, peakLeft)
+    processPeak(lights, 1, peakRight)
+
+    return
 
 def processMuteSolo(track, command):
     if command.value == 0: return
