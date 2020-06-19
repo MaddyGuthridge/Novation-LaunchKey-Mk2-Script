@@ -215,8 +215,12 @@ class processedEvent:
         
         
         # Check if buttons were lifted
-        if self.value is 0: self.is_Lift = True
-        else: self.is_Lift = False
+        if self.value is 0: 
+            self.is_lift = True
+            print("lift")
+        else: 
+            self.is_lift = False
+            print("press")
         
         
 
@@ -226,9 +230,9 @@ class processedEvent:
         # Process double presses (seperate for lifted and pressed buttons)
         self.is_double_click = False
         if self.isBinary is True: 
-            if self.is_Lift is True:
+            if self.is_lift is True:
                 self.is_double_click = isDoubleClickLift(self.id)
-            elif self.is_Lift is False and self.isBinary is True: 
+            elif self.is_lift is False and self.isBinary is True: 
                 self.is_double_click = isDoubleClickPress(self.id)
         
     def edit(self, event):

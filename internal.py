@@ -451,11 +451,11 @@ class beatMgr:
 
     def redraw(self, lights):
         if transport.getLoopMode():
-            bar_col = lighting.COLOUR_LIGHT_BLUE
-            beat_col = lighting.COLOUR_GREEN
+            bar_col = lighting.BEAT_SONG_BAR
+            beat_col = lighting.BEAT_SONG_BEAT
         else:
-            bar_col = lighting.COLOUR_RED
-            beat_col = lighting.COLOUR_ORANGE
+            bar_col = lighting.BEAT_PAT_BAR
+            beat_col = lighting.BEAT_PAT_BEAT
 
 
         if self.beat is 1: lights.setPadColour(8, 0, bar_col)                # Bar

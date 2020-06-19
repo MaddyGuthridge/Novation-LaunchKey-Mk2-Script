@@ -5,7 +5,9 @@ This script handles events when the channel rack is active
 """
 
 import channels
+import ui
 
+import lighting
 import config
 import internal
 import eventconsts
@@ -15,6 +17,42 @@ import eventconsts
 def process(command):
 
     command.actions.addProcessor("Channel rack Processor")
+
+    current_track = channels.channelNumber()
+    #---------------------------------
+    # Pads
+    #---------------------------------
+    if command.type == eventconsts.TYPE_PAD and command.is_lift:
+        # Grid bits
+        if command.padY == 0 and command.padX != 8:
+            command.handled = True
+
+            gridBits.toggleBit(current_track, command.padX)
+        
+        coord = [command.padX, command.padY]
+
+        # Next/prev track
+        if coord == [0, 1]:
+            ui.previous()
+            command.handled = True
+        if coord == [1, 1]:
+            ui.next()
+            command.handled = True
+        # Scroll grid bits
+        if coord == [2, 1]:
+            gridBits.scrollLeft()
+            command.handled = True
+        if coord == [3, 1]:
+            gridBits.scrollRight()
+            command.handled = True
+        # Zoom grid bits
+        if coord == [4, 1]:
+            gridBits.zoomOut()
+            command.handled = True
+        if coord == [5, 1]:
+            gridBits.zoomIn()
+            command.handled = True
+        
 
     #---------------------------------
     # Faders
@@ -175,7 +213,15 @@ def process(command):
 
 def redraw(lights):
 
+    setGridBits(lights)
 
+    # Set colours for controls
+    lights.setPadColour(0, 1, lighting.UI_NAV_VERTICAL)     # Prev track
+    lights.setPadColour(1, 1, lighting.UI_NAV_VERTICAL)     # Next track
+    lights.setPadColour(2, 1, lighting.UI_NAV_HORIZONTAL)   # Move left
+    lights.setPadColour(3, 1, lighting.UI_NAV_HORIZONTAL)   # Move right
+    lights.setPadColour(4, 1, lighting.UI_ZOOM)             # Zoom out
+    lights.setPadColour(5, 1, lighting.UI_ZOOM)             # Zoom in
 
     return
 
@@ -203,6 +249,41 @@ def topWindowEnd():
 
 
     # Internal functions
+
+class getBitMgr:
+    scroll = 0
+    zoom = 1
+
+    def getBit(self, track, position):
+        return channels.getGridBit(track, position*self.zoom + 8*self.scroll)
+    
+    def toggleBit(self, track, position):
+        val = not channels.getGridBit(track, position*self.zoom + 8*self.scroll)
+        return channels.setGridBit(track, position*self.zoom + 8*self.scroll, val)
+    
+    def scrollLeft(self):
+        if self.scroll > 0:
+            self.scroll -= 1
+        
+    def scrollRight(self):
+        self.scroll += 1
+
+    def zoomOut(self):
+        self.zoom *= 2
+        print(self.zoom)
+    
+    def zoomIn(self):
+        if self.zoom > 1: self.zoom = int(self.zoom / 2)
+        print(self.zoom)
+
+gridBits = getBitMgr()
+
+def setGridBits(lights):
+    current_track = channels.channelNumber()
+    for i in range(8):
+        if gridBits.getBit(current_track, i):
+            lights.setPadColour(i, 0, lighting.COLOUR_RED)
+    return
 
 def processMuteSolo(channel, command):
     if command.value == 0: return

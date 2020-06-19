@@ -17,24 +17,24 @@ def redraw(lights):
 
     # In Popup Menu
     if ui.isInPopupMenu():
-        lights.setPadColour(1, 0, lighting.COLOUR_LIGHT_BLUE)   # Up
-        lights.setPadColour(1, 1, lighting.COLOUR_LIGHT_BLUE)   # Down
-        lights.setPadColour(0, 1, lighting.COLOUR_PURPLE)       # Left
-        lights.setPadColour(2, 1, lighting.COLOUR_PURPLE)       # Right
-        lights.setPadColour(3, 1, lighting.COLOUR_RED)          # No
-        lights.setPadColour(4, 1, lighting.COLOUR_GREEN)        # Yes
+        lights.setPadColour(1, 0, lighting.UI_NAV_VERTICAL)         # Up
+        lights.setPadColour(1, 1, lighting.UI_NAV_VERTICAL)         # Down
+        lights.setPadColour(0, 1, lighting.UI_NAV_HORIZONTAL)       # Left
+        lights.setPadColour(2, 1, lighting.UI_NAV_HORIZONTAL)       # Right
+        lights.setPadColour(3, 1, lighting.UI_ACCEPT)               # No
+        lights.setPadColour(4, 1, lighting.UI_REJECT)               # Yes
         lights.solidifyAll()
 
     # Shift key triggers window switcher
     if internal.shift.getDown():
-        lights.setPadColour(0, 1, lighting.COLOUR_GREEN)        # Playlist
-        lights.setPadColour(1, 1, lighting.COLOUR_RED)          # Channel rack
-        lights.setPadColour(2, 1, lighting.COLOUR_PINK)         # Piano roll
-        lights.setPadColour(3, 1, lighting.COLOUR_LIGHT_BLUE)   # Mixer
-        lights.setPadColour(4, 1, lighting.COLOUR_ORANGE)       # Browser
+        lights.setPadColour(0, 1, lighting.WINDOW_PLAYLIST)         # Playlist
+        lights.setPadColour(1, 1, lighting.WINDOW_CHANNEL_RACK)     # Channel rack
+        lights.setPadColour(2, 1, lighting.WINDOW_PIANO_ROLL)       # Piano roll
+        lights.setPadColour(3, 1, lighting.WINDOW_MIXER)            # Mixer
+        lights.setPadColour(4, 1, lighting.WINDOW_BROWSER)          # Browser
 
-        lights.setPadColour(6, 0, lighting.COLOUR_PURPLE)       # Prev plugin
-        lights.setPadColour(7, 0, lighting.COLOUR_PURPLE)       # Prev plugin
+        lights.setPadColour(6, 0, lighting.UI_NAV_HORIZONTAL)       # Prev plugin
+        lights.setPadColour(7, 0, lighting.UI_NAV_HORIZONTAL)       # Prev plugin
 
         lights.solidifyAll()
 
@@ -56,7 +56,7 @@ def process(command):
                 internal.pads.lift(command.padX, command.padY)
 
         # Shift - Window switcher
-        if internal.shift.getDown() and command.type == eventconsts.TYPE_PAD and command.is_Lift:
+        if internal.shift.getDown() and command.type == eventconsts.TYPE_PAD and command.is_lift:
             if command.note == eventconsts.Pads[0][1]: 
                 ui.showWindow(config.WINDOW_PLAYLIST)
                 command.actions.appendAction("Switched window to Playlist")
@@ -92,7 +92,7 @@ def process(command):
                 command.actions.appendAction("Next window")
                 command.handled = True
 
-        if ui.isInPopupMenu() and command.type == eventconsts.TYPE_PAD and command.is_Lift:
+        if ui.isInPopupMenu() and command.type == eventconsts.TYPE_PAD and command.is_lift:
             if command.note == eventconsts.Pads[1][0]:
                 ui.up()
                 command.handled = True
@@ -129,26 +129,26 @@ def process(command):
 
         # All
         if command.id == eventconsts.SYSTEM_EXTENDED:
-            internal.extendedMode.recieve(not command.is_Lift)
-            command.actions.appendAction("Set Extended Mode to " + str(not command.is_Lift))
+            internal.extendedMode.recieve(not command.is_lift)
+            command.actions.appendAction("Set Extended Mode to " + str(not command.is_lift))
             command.handled = True
 
         # Knobs
         if command.id == eventconsts.INCONTROL_KNOBS:
-            internal.extendedMode.recieve(not command.is_Lift, eventconsts.INCONTROL_KNOBS)
-            command.actions.appendAction("Set Extended Mode (Knobs) to " + str(not command.is_Lift))
+            internal.extendedMode.recieve(not command.is_lift, eventconsts.INCONTROL_KNOBS)
+            command.actions.appendAction("Set Extended Mode (Knobs) to " + str(not command.is_lift))
             command.handled = True
         
         # Faders
         if command.id == eventconsts.INCONTROL_FADERS:
-            internal.extendedMode.recieve(not command.is_Lift, eventconsts.INCONTROL_FADERS)
-            command.actions.appendAction("Set Extended Mode (Faders) to " + str(not command.is_Lift))
+            internal.extendedMode.recieve(not command.is_lift, eventconsts.INCONTROL_FADERS)
+            command.actions.appendAction("Set Extended Mode (Faders) to " + str(not command.is_lift))
             command.handled = True
         
         # Pads
         if command.id == eventconsts.INCONTROL_PADS:
-            internal.extendedMode.recieve(not command.is_Lift, eventconsts.INCONTROL_PADS)
-            command.actions.appendAction("Set Extended Mode (Pads) to " + str(not command.is_Lift))
+            internal.extendedMode.recieve(not command.is_lift, eventconsts.INCONTROL_PADS)
+            command.actions.appendAction("Set Extended Mode (Pads) to " + str(not command.is_lift))
             command.handled = True
         
         # That random event on the knobs button

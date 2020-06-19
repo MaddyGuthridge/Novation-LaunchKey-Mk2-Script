@@ -35,25 +35,25 @@ def process(command):
     #---------------------------------
 
     # Play-pause: only on lift
-    if command.id == eventconsts.TRANSPORT_PLAY and command.is_Lift: 
+    if command.id == eventconsts.TRANSPORT_PLAY and command.is_lift: 
         transport.start()
         command.actions.appendAction("Play/Pause Transport")
         command.handled = True
 
     # Stop: only on lift
-    if command.id == eventconsts.TRANSPORT_STOP and command.is_Lift: 
+    if command.id == eventconsts.TRANSPORT_STOP and command.is_lift: 
         transport.stop()
         command.actions.appendAction("Stop Transport")
         command.handled = True
 
     # Loop: only on lift
-    if command.id == eventconsts.TRANSPORT_LOOP and command.is_Lift: 
+    if command.id == eventconsts.TRANSPORT_LOOP and command.is_lift: 
         transport.setLoopMode()
         command.actions.appendAction("Toggle Loop Mode")
         command.handled = True
     
     # Record: only on lift
-    if command.id == eventconsts.TRANSPORT_RECORD and command.is_Lift: 
+    if command.id == eventconsts.TRANSPORT_RECORD and command.is_lift: 
         transport.record()
         command.actions.appendAction("Toggle Recording")
         command.handled = True
@@ -66,9 +66,9 @@ def process(command):
             speed = 2
             command.actions.appendAction("[2x Speed]")
 
-        if command.is_Lift is False: 
+        if command.is_lift is False: 
             transport.continuousMove(speed, 2)
-        if command.is_Lift is True: 
+        if command.is_lift is True: 
             transport.continuousMove(speed, 0)
             command.actions.appendAction("Stopped")
         command.handled = True
@@ -81,21 +81,21 @@ def process(command):
             speed = -2
             command.actions.appendAction("[2x Speed]")
 
-        if command.is_Lift is False: 
+        if command.is_lift is False: 
             transport.continuousMove(speed, 2)
-        if command.is_Lift is True: 
+        if command.is_lift is True: 
             transport.continuousMove(speed, 0)
             command.actions.appendAction("Stopped")
         command.handled = True
     
     # Next Track: next UI element
-    if command.id == eventconsts.TRANSPORT_TRACK_NEXT and command.is_Lift:
+    if command.id == eventconsts.TRANSPORT_TRACK_NEXT and command.is_lift:
         ui.next()
         command.actions.appendAction("Next UI Element")
         command.handled = True
 
     # Prev Track: prev UI element
-    if command.id == eventconsts.TRANSPORT_TRACK_PREVIOUS and command.is_Lift:
+    if command.id == eventconsts.TRANSPORT_TRACK_PREVIOUS and command.is_lift:
         ui.previous()
         command.actions.appendAction("Previous UI Element")
         command.handled = True
