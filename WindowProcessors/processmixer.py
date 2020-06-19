@@ -5,6 +5,7 @@ This script processes events when the mixer window is active
 """
 
 import mixer
+import transport
 
 import eventconsts
 import internal
@@ -16,6 +17,8 @@ import lighting
 def process(command):
 
     command.actions.addProcessor("Mixer Processor")
+
+    current_track = mixer.trackNumber()
 
     #---------------------------------
     # Faders
@@ -69,9 +72,7 @@ def process(command):
                 command.handled = True
             # Otherwise change current track
             else:
-                # Get current track number
-                track = mixer.trackNumber()
-                setVolume(command, track, command.value)
+                setVolume(command, current_track, command.value)
                 command.handled = True
 
     #---------------------------------
@@ -121,9 +122,7 @@ def process(command):
                 command.handled = True
             # Otherwise change current track
             else:
-                # Get current track number
-                track = mixer.trackNumber()
-                setPan(command, track, command.value)
+                setPan(command, current_track, command.value)
                 command.handled = True
 
 
@@ -169,14 +168,22 @@ def process(command):
                 processMuteSolo(0, command)
                 command.handled = True
             else:
-                processMuteSolo(mixer.trackNumber(), command)
+                processMuteSolo(current_track, command)
                 command.handled = True
 
-    
+    #---------------------------------
+    # Other
+    #---------------------------------
+
+    if command.id == eventconsts.TRANSPORT_RECORD and command.is_lift:
+        mixer.armTrack(current_track)
+        command.handled = True
 
 def redraw(lights):
 
-    setPeaks(lights)
+    # When playing, display peak metre
+    if transport.isPlaying():
+        setPeaks(lights)
     
 
     return

@@ -27,6 +27,7 @@ def redraw(lights):
 
     # Shift key triggers window switcher
     if internal.shift.getDown():
+        
         lights.setPadColour(0, 1, lighting.WINDOW_PLAYLIST)         # Playlist
         lights.setPadColour(1, 1, lighting.WINDOW_CHANNEL_RACK)     # Channel rack
         lights.setPadColour(2, 1, lighting.WINDOW_PIANO_ROLL)       # Piano roll
@@ -55,8 +56,16 @@ def process(command):
             else:
                 internal.pads.lift(command.padX, command.padY)
 
-        # Shift - Window switcher
+        # Shift button (in control for pads (window switcher))
+        if command.id == config.SHIFT_BUTTON:
+            if command.is_lift:
+                internal.extendedMode.revert(eventconsts.INCONTROL_PADS)
+            else:
+                internal.extendedMode.setVal(True, eventconsts.INCONTROL_PADS)
+
+        # Shift down - Window switcher
         if internal.shift.getDown() and command.type == eventconsts.TYPE_PAD and command.is_lift:
+            
             if command.note == eventconsts.Pads[0][1]: 
                 ui.showWindow(config.WINDOW_PLAYLIST)
                 command.actions.appendAction("Switched window to Playlist")
@@ -92,6 +101,9 @@ def process(command):
                 command.actions.appendAction("Next window")
                 command.handled = True
 
+            
+
+        # Right click menu
         if ui.isInPopupMenu() and command.type == eventconsts.TYPE_PAD and command.is_lift:
             if command.note == eventconsts.Pads[1][0]:
                 ui.up()

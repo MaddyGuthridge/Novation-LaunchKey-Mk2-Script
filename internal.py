@@ -265,29 +265,46 @@ class extended:
         if option == eventconsts.SYSTEM_EXTENDED:
             if newMode is True and self.extendedMode is False:
                 sendMidiMessage(0x9F, 0x0C, 0x7F)
+            elif newMode is True and self.extendedMode is True: # Doesn't send event but still add it to history
+                self.prev_extendedMode = True
             elif newMode is False and self.extendedMode is True:
                 sendMidiMessage(0x9F, 0x0C, 0x00)
+            elif newMode is False and self.extendedMode is False: # Doesn't send event but still add it to history
+                self.prev_extendedMode = False
+            
         
         # Set knobs
         elif option == eventconsts.INCONTROL_KNOBS:
             if newMode is True and self.inControl_Knobs is False:
                 sendMidiMessage(0x9F, 0x0D, 0x7F)
+            elif newMode is True and self.inControl_Knobs is True: # Doesn't send event but still add it to history
+                self.prev_inControl_Knobs = True
             elif newMode is False and self.inControl_Knobs is True:
                 sendMidiMessage(0x9F, 0x0D, 0x00)
+            elif newMode is False and self.inControl_Knobs is False: # Doesn't send event but still add it to history
+                self.prev_inControl_Knobs = False
         
         # Set faders
         elif option == eventconsts.INCONTROL_FADERS:
             if newMode is True and self.inControl_Faders is False:
                 sendMidiMessage(0x9F, 0x0E, 0x7F)
+            elif newMode is True and self.inControl_Faders is True: # Doesn't send event but still add it to history
+                self.prev_inControl_Faders = True
             elif newMode is False and self.inControl_Faders is True:
                 sendMidiMessage(0x9F, 0x0E, 0x00)
+            elif newMode is False and self.inControl_Faders is False: # Doesn't send event but still add it to history
+                self.prev_inControl_Faders = False
         
         # Set pads
         elif option == eventconsts.INCONTROL_PADS:
             if newMode is True and self.inControl_Pads is False:
                 sendMidiMessage(0x9F, 0x0F, 0x7F)
+            elif newMode is True and self.inControl_Pads is True: # Doesn't send event but still add it to history
+                self.prev_inControl_Pads = True
             elif newMode is False and self.inControl_Pads is True:
                 sendMidiMessage(0x9F, 0x0F, 0x00)
+            elif newMode is False and self.inControl_Pads is False: # Doesn't send event but still add it to history
+                self.prev_inControl_Pads = False
 
     # Processes extended mode messages from device
     def recieve(self, newMode, option = eventconsts.SYSTEM_EXTENDED):

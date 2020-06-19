@@ -217,10 +217,8 @@ class processedEvent:
         # Check if buttons were lifted
         if self.value is 0: 
             self.is_lift = True
-            print("lift")
         else: 
             self.is_lift = False
-            print("press")
         
         
 
