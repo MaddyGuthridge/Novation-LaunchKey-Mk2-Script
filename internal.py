@@ -12,6 +12,7 @@ import time
 
 import device
 import ui
+import transport
 
 import eventconsts
 import config
@@ -444,3 +445,28 @@ class shiftMgr:
         else: return "ERROR Shift not down"
 
 shift = shiftMgr()
+
+class beatMgr:
+    beat = 0
+    
+    def set(self, beat):
+        self.beat = beat
+        self.redraw(lighting.state)
+
+    def redraw(self, lights):
+        if transport.getLoopMode():
+            bar_col = lighting.COLOUR_LIGHT_BLUE
+            beat_col = lighting.COLOUR_GREEN
+        else:
+            bar_col = lighting.COLOUR_RED
+            beat_col = lighting.COLOUR_ORANGE
+
+
+        if self.beat is 1: lights.setPadColour(8, 0, bar_col)                # Bar
+        elif self.beat is 2: lights.setPadColour(8, 0, beat_col)             # Beat
+        elif self.beat is 0: lights.setPadColour(8, 0, lighting.COLOUR_OFF)  # Off
+
+beat = beatMgr()
+
+
+

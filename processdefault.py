@@ -15,6 +15,11 @@ import eventconsts
 import internal
 
 def redraw(lights):
+
+    # redraw beat indicator
+    internal.beat.redraw(lights)
+
+    # Pads white if pressed
     for x in range(len(internal.pads.padsDown)):
             for y in range(len(internal.pads.padsDown[x])):
                 if internal.pads.getVal(x, y):

@@ -120,9 +120,7 @@ class TGeneric():
         return
     
     def OnUpdateBeatIndicator(self, beat):
-        if beat is 1: internal.sendMidiMessage(0xBF, 0x3B, 0x7F) # Bar
-        elif beat is 2: internal.sendMidiMessage(0xBF, 0x3B, 0x7F) # Beat
-        elif beat is 0: internal.sendMidiMessage(0xBF, 0x3B, 0x00) # Off
+        internal.beat.set(beat)
 
 Generic = TGeneric()
 
