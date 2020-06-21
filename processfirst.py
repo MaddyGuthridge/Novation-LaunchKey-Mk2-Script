@@ -21,8 +21,8 @@ def redraw(lights):
         lights.setPadColour(1, 1, lighting.UI_NAV_VERTICAL)         # Down
         lights.setPadColour(0, 1, lighting.UI_NAV_HORIZONTAL)       # Left
         lights.setPadColour(2, 1, lighting.UI_NAV_HORIZONTAL)       # Right
-        lights.setPadColour(3, 1, lighting.UI_ACCEPT)               # No
-        lights.setPadColour(4, 1, lighting.UI_REJECT)               # Yes
+        lights.setPadColour(3, 1, lighting.UI_REJECT)               # No
+        lights.setPadColour(4, 1, lighting.UI_ACCEPT)               # Yes
         lights.solidifyAll()
 
     # Shift key triggers window switcher
@@ -105,34 +105,32 @@ def process(command):
 
         # Right click menu
         if ui.isInPopupMenu() and command.type == eventconsts.TYPE_PAD and command.is_lift:
+            
+            # Always handle all presses
+            command.handled = True
+
             if command.note == eventconsts.Pads[1][0]:
                 ui.up()
-                command.handled = True
                 command.actions.appendAction("UI Up")
 
             if command.note == eventconsts.Pads[1][1]:
                 ui.down()
-                command.handled = True
                 command.actions.appendAction("UI Down")
 
             if command.note == eventconsts.Pads[0][1]:
                 ui.left()
-                command.handled = True
                 command.actions.appendAction("UI Left")
             
             if command.note == eventconsts.Pads[2][1]:
                 ui.right()
-                command.handled = True
                 command.actions.appendAction("UI Right")
 
             if command.note == eventconsts.Pads[3][1]:
                 ui.escape()
-                command.handled = True
                 command.actions.appendAction("UI Escape")
 
             if command.note == eventconsts.Pads[4][1]:
                 ui.enter()
-                command.handled = True
                 command.actions.appendAction("UI Enter")
 
         #
