@@ -123,6 +123,9 @@ def lightShow():
     sleepTime = 0.05
     x = 0
     while True:
+
+        time.sleep(sleepTime)
+
         # Group 1
         if (x >= 0) and (x < len(rainbowColours)):
             state.setPadColour(0, 1, rainbowColours[x])
@@ -168,7 +171,7 @@ def lightShow():
             state.setPadColour(7, 0, rainbowColours[x - 8])
         
         x += 1
-        time.sleep(sleepTime)
+       
         
         if x > len(rainbowColours) + 8: break
 
