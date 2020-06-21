@@ -13,18 +13,21 @@ import eventconsts
 import internal
 import config
 import processdefault
+import processfirst
+import lighting
 import WindowProcessors.processwindows as processwindows
 import PluginProcessors.processplugins as processplugins
 
 
 
-shiftDown = False
-shiftUsed = False
-
-
-
 # Recieve event and forward onto relative processors
 def process(command):
+
+    # Call primary processor
+    processfirst.process(command)
+    if command.handled:
+        return
+
     # Attempt to process event using custom processors for plugins
     processplugins.process(command)
 
@@ -38,17 +41,42 @@ def process(command):
 
 # Called after a window is activated
 def activeStart():
-    if internal.window.plugin_focused:
-        processplugins.activeStart()
-    else:
-        processwindows.activeStart()
+    # Only in extended mode:
+    if internal.PORT == config.DEVICE_PORT_EXTENDED:
+        if internal.window.plugin_focused:
+            processplugins.activeStart()
+        else:
+            processwindows.activeStart()
 
 # Called just before active window is deactivated
 def activeEnd():
-    if internal.window.plugin_focused:
-        processplugins.activeEnd()
-    else:
-        processwindows.activeEnd()
+    # Only in extended mode:
+    if internal.PORT == config.DEVICE_PORT_EXTENDED:
+        if internal.window.plugin_focused:
+            processplugins.activeEnd()
+        else:
+            processwindows.activeEnd()
+
+def redraw():
+    # Only in extended mode:
+    if internal.PORT == config.DEVICE_PORT_EXTENDED:
+
+        lights = lighting.LightMap()
+
+        # Get UI from primary processor
+        processfirst.redraw(lights)
+
+        # Get UI drawn from plugins
+        processplugins.redraw(lights)
+
+        # Get UI drawn from windows
+        processwindows.redraw(lights)
+
+        # Get UI drawn from default processor
+        processdefault.redraw(lights)
+
+        # Call pads refresh function
+        lighting.state.setFromMap(lights)
 
 # Stores actions taken by various processor modules
 class actionPrinter:
@@ -64,6 +92,8 @@ class actionPrinter:
         if self.eventProcessors[0] == "":
             self.eventProcessors[0] = string
         else:
+            if self.eventActions[len(self.eventActions) - 1] == "":
+                self.eventActions[len(self.eventActions) - 1] = "[Did not handle]"
             self.eventProcessors.append(string)
             self.eventActions.append("")
 
@@ -109,20 +139,16 @@ class processedEvent:
 
         self.shifted = False
 
-        global shiftDown
-        global shiftUsed
+        
         # Process shift button
         if self.id == config.SHIFT_BUTTON:
             if self.value == 127:
-                shiftUsed = False
-                shiftDown = True
+                internal.shift.press()
             elif self.value == 0:
-                shiftDown = False
-                if shiftUsed:
-                    self.handled = True
-        elif shiftDown:
-            self.shifted = True
-            shiftUsed = True
+                self.handled = internal.shift.lift()
+                
+        elif internal.shift.getDown():
+            self.shifted = internal.shift.use()
 
         self.parse()                                                                                                                               
 
@@ -189,8 +215,10 @@ class processedEvent:
         
         
         # Check if buttons were lifted
-        if self.value is 0: self.is_Lift = True
-        else: self.is_Lift = False
+        if self.value is 0: 
+            self.is_lift = True
+        else: 
+            self.is_lift = False
         
         
 
@@ -200,9 +228,9 @@ class processedEvent:
         # Process double presses (seperate for lifted and pressed buttons)
         self.is_double_click = False
         if self.isBinary is True: 
-            if self.is_Lift is True:
+            if self.is_lift is True:
                 self.is_double_click = isDoubleClickLift(self.id)
-            elif self.is_Lift is False and self.isBinary is True: 
+            elif self.is_lift is False and self.isBinary is True: 
                 self.is_double_click = isDoubleClickPress(self.id)
         
     def edit(self, event):

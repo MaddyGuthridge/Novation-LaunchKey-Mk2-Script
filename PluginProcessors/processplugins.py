@@ -14,7 +14,7 @@ imports = ["fpc"]
 #
 #
 
-
+import config
 import internal
 import PluginProcessors
 
@@ -29,18 +29,22 @@ for x in range(len(imports)):
 
 # Called when plugin is top plugin
 def topPluginStart():
-    for x in imports:
-        object_to_call = getattr(PluginProcessors, x)
-        if can_handle(object_to_call):
-            object_to_call.topPluginStart()
+    # Only in extended mode:
+    if internal.PORT == config.DEVICE_PORT_EXTENDED:
+        for x in imports:
+            object_to_call = getattr(PluginProcessors, x)
+            if can_handle(object_to_call):
+                object_to_call.topPluginStart()
     return
 
 # Called when plugin is no longer top plugin
 def topPluginEnd():
-    for x in imports:
-        object_to_call = getattr(PluginProcessors, x)
-        if can_handle(object_to_call):
-            object_to_call.topPluginEnd()
+    # Only in extended mode:
+    if internal.PORT == config.DEVICE_PORT_EXTENDED:
+        for x in imports:
+            object_to_call = getattr(PluginProcessors, x)
+            if can_handle(object_to_call):
+                object_to_call.topPluginEnd()
     return
 
 # Called when plugin brought to foreground
@@ -58,6 +62,12 @@ def activeEnd():
         if can_handle(object_to_call):
             object_to_call.activeEnd()
     return
+
+def redraw(lights):
+    for x in imports:
+        object_to_call = getattr(PluginProcessors, x)
+        if can_handle(object_to_call):
+            object_to_call.redraw(lights)
 
 def process(command):
     for x in imports:

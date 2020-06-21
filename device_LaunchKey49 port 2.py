@@ -1,6 +1,6 @@
-#   name=LaunchKey49 Mk2 (Extended )
-# url=
-# version = 0.0.1
+# name=LaunchKey Mk2 Extension
+# url=https://github.com/MiguelGuthridge/Novation-LaunchKey49-Mk2-Script
+# receiveFrom=LaunchKey Mk2
 
 """
 device_LaunchKey49 port 2.py
@@ -54,15 +54,18 @@ class TGeneric():
         # Set port to extended
         internal.PORT = config.DEVICE_PORT_EXTENDED
 
+        # Run shared init functions
+        internal.sharedInit()
+
         # Set the device into Extended Mode
         
         lighting.lightShow()
-        internal.setExtendedMode(True)
+        internal.extendedMode.setVal(True)
 
         # Process inControl preferences
-        if config.START_IN_INCONTROL_KNOBS == False: internal.setExtendedMode(False, eventconsts.INCONTROL_KNOBS) 
-        if config.START_IN_INCONTROL_FADERS == False: internal.setExtendedMode(False, eventconsts.INCONTROL_FADERS) 
-        if config.START_IN_INCONTROL_PADS == False: internal.setExtendedMode(False, eventconsts.INCONTROL_PADS) 
+        if config.START_IN_INCONTROL_KNOBS == False: internal.extendedMode.setVal(False, eventconsts.INCONTROL_KNOBS) 
+        if config.START_IN_INCONTROL_FADERS == False: internal.extendedMode.setVal(False, eventconsts.INCONTROL_FADERS) 
+        if config.START_IN_INCONTROL_PADS == False: internal.extendedMode.setVal(False, eventconsts.INCONTROL_PADS) 
         
 
         print('Initialisation complete')
@@ -73,7 +76,7 @@ class TGeneric():
 
     def OnDeInit(self):
         # Return the device into Basic Mode
-        internal.setExtendedMode(False)
+        internal.extendedMode.setVal(False)
         print('Deinitialisation complete')
         internal.printLineBreak()
         internal.printLineBreak()
@@ -113,15 +116,14 @@ class TGeneric():
     
     def OnIdle(self):
         internal.idleProcessor()
+        eventprocessor.redraw()
         return
 
     def OnRefresh(self, flags):
         return
     
     def OnUpdateBeatIndicator(self, beat):
-        if beat is 1: internal.sendMidiMessage(0xBF, 0x3B, 0x7F) # Bar
-        elif beat is 2: internal.sendMidiMessage(0xBF, 0x3B, 0x7F) # Beat
-        elif beat is 0: internal.sendMidiMessage(0xBF, 0x3B, 0x00) # Off
+        internal.beat.set(beat)
 
 Generic = TGeneric()
 

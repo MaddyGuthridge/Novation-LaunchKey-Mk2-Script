@@ -4,12 +4,27 @@ This file contains functions to process and act on events. It provides default f
 
 """
 
+import time
+
 import transport
 import ui
 
+import lighting
 import eventprocessor
 import eventconsts
 import internal
+
+def redraw(lights):
+
+    # redraw beat indicator
+    internal.beat.redraw(lights)
+
+    # Pads white if pressed
+    for x in range(len(internal.pads.padsDown)):
+            for y in range(len(internal.pads.padsDown[x])):
+                if internal.pads.getVal(x, y):
+                    lights.setPadColour(x, y, lighting.COLOUR_WHITE, True)
+    return
 
 def process(command):
 
@@ -20,25 +35,25 @@ def process(command):
     #---------------------------------
 
     # Play-pause: only on lift
-    if command.id == eventconsts.TRANSPORT_PLAY and command.is_Lift: 
+    if command.id == eventconsts.TRANSPORT_PLAY and command.is_lift: 
         transport.start()
         command.actions.appendAction("Play/Pause Transport")
         command.handled = True
 
     # Stop: only on lift
-    if command.id == eventconsts.TRANSPORT_STOP and command.is_Lift: 
+    if command.id == eventconsts.TRANSPORT_STOP and command.is_lift: 
         transport.stop()
         command.actions.appendAction("Stop Transport")
         command.handled = True
 
     # Loop: only on lift
-    if command.id == eventconsts.TRANSPORT_LOOP and command.is_Lift: 
+    if command.id == eventconsts.TRANSPORT_LOOP and command.is_lift: 
         transport.setLoopMode()
         command.actions.appendAction("Toggle Loop Mode")
         command.handled = True
     
     # Record: only on lift
-    if command.id == eventconsts.TRANSPORT_RECORD and command.is_Lift: 
+    if command.id == eventconsts.TRANSPORT_RECORD and command.is_lift: 
         transport.record()
         command.actions.appendAction("Toggle Recording")
         command.handled = True
@@ -51,9 +66,9 @@ def process(command):
             speed = 2
             command.actions.appendAction("[2x Speed]")
 
-        if command.is_Lift is False: 
+        if command.is_lift is False: 
             transport.continuousMove(speed, 2)
-        if command.is_Lift is True: 
+        if command.is_lift is True: 
             transport.continuousMove(speed, 0)
             command.actions.appendAction("Stopped")
         command.handled = True
@@ -66,55 +81,27 @@ def process(command):
             speed = -2
             command.actions.appendAction("[2x Speed]")
 
-        if command.is_Lift is False: 
+        if command.is_lift is False: 
             transport.continuousMove(speed, 2)
-        if command.is_Lift is True: 
+        if command.is_lift is True: 
             transport.continuousMove(speed, 0)
             command.actions.appendAction("Stopped")
         command.handled = True
     
     # Next Track: next UI element
-    if command.id == eventconsts.TRANSPORT_TRACK_NEXT and command.is_Lift:
+    if command.id == eventconsts.TRANSPORT_TRACK_NEXT and command.is_lift:
         ui.next()
         command.actions.appendAction("Next UI Element")
         command.handled = True
 
     # Prev Track: prev UI element
-    if command.id == eventconsts.TRANSPORT_TRACK_PREVIOUS and command.is_Lift:
+    if command.id == eventconsts.TRANSPORT_TRACK_PREVIOUS and command.is_lift:
         ui.previous()
         command.actions.appendAction("Previous UI Element")
         command.handled = True
 
-    # Extended mode events
+    #--------------------------------------------------
 
-    # Extended Mode
-    if command.id == eventconsts.SYSTEM_EXTENDED:
-        internal.recieveExtendedMode(not command.is_Lift)
-        command.actions.appendAction("Set Extended Mode to " + str(not command.is_Lift))
-        command.handled = True
-
-    # Knobs
-    if command.id == eventconsts.INCONTROL_KNOBS:
-        internal.recieveExtendedMode(not command.is_Lift, eventconsts.INCONTROL_KNOBS)
-        command.actions.appendAction("Set Extended Mode (Knobs) to " + str(not command.is_Lift))
-        command.handled = True
-    
-    # Faders
-    if command.id == eventconsts.INCONTROL_FADERS:
-        internal.recieveExtendedMode(not command.is_Lift, eventconsts.INCONTROL_FADERS)
-        command.actions.appendAction("Set Extended Mode (Faders) to " + str(not command.is_Lift))
-        command.handled = True
-    
-    # Pads
-    if command.id == eventconsts.INCONTROL_PADS:
-        internal.recieveExtendedMode(not command.is_Lift, eventconsts.INCONTROL_PADS)
-        command.actions.appendAction("Set Extended Mode (Pads) to " + str(not command.is_Lift))
-        command.handled = True
-    
-    # That random event on the knobs button
-    if command.id == eventconsts.SYSTEM_MISC:
-        command.handled = True
-    
     # Add did not handle flag if not handled
     if command.handled is False: 
         command.actions.appendAction("[Did not handle]")

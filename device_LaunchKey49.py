@@ -1,6 +1,5 @@
-#   name=LaunchKey49 Mk2
-# url=
-# version = 0.0.1
+# name=LaunchKey Mk2
+# url=https://github.com/MiguelGuthridge/Novation-LaunchKey49-Mk2-Script
 
 """
 device_LaunchKey49.py
@@ -35,6 +34,7 @@ import eventprocessor
 
 import processdefault
 
+# device.dispatch(2, 0x9F + (0x0C << 8) + (0x00 << 16))
 
 class TGeneric():
     def __init__(self):
@@ -43,6 +43,9 @@ class TGeneric():
     def OnInit(self):
         # Set port to basic
         internal.PORT = config.DEVICE_PORT_BASIC
+
+        # Run shared init functions
+        internal.sharedInit()
 
         print('Initialisation complete')
         internal.printLineBreak()

@@ -4,44 +4,118 @@ This file contains functions and constants related to controlling lights on the 
 
 """
 
-import internal
+
 import time
 
+import internal
 import eventconsts
 import eventprocessor
 
 # LightMap is sent around to collect colours on UI redraws
 class LightMap:
     def __init__(self):
-        # -1 = unset, 0 = off, 1-127 = colour
+        # 0 = off, 1-127 = colour
+        self.reset()
+    
+    # Set all pads to off      
+    def reset(self):
         self.PadMap = [
-            [-1, -1, -1, -1, -1, -1, -1, -1, -1],
-            [-1, -1, -1, -1, -1, -1, -1, -1, -1]
+            [-1, -1],
+            [-1, -1],
+            [-1, -1],
+            [-1, -1],
+            [-1, -1],
+            [-1, -1],
+            [-1, -1],
+            [-1, -1],
+            [-1, -1]
             ]
 
-# Lights manages state of lights
+    # Set the colour of a pad
+    def setPadColour(self, x, y, colour, override = False):
+        if self.PadMap[x][y] == -1 or override: # If pad available to map
+            self.PadMap[x][y] = colour
+            return True
+        else: return False
+    
+    # Sets colours based on state of LightMap object
+    def setFromMatrix(self, map):
+        for x in range(len(self.PadMap)):
+            for y in range(len(self.PadMap[x])):
+                if self.PadMap[x][y] == -1:
+                    self.setPadColour(x, y, map[x][y])
+        return
+
+
+    # Prevents pad from being overwritten
+    def solidifyPad(self, x, y):
+        if self.PadMap[x][y] == -1: # If pad available to map
+            self.PadMap[x][y] = 0
+    
+    # Prevents row from being overwritten
+    def solidifyRow(self, y):
+        for x in range(len(self.PadMap)):
+            if self.PadMap[x][y] == -1: self.PadMap[x][y] = 0
+    
+    # Prevents column from being overwritten
+    def solidifyColumn(self, x):
+        for y in range(len(self.PadMap)):
+            if self.PadMap[x][y] == -1: self.PadMap[x][y] = 0
+
+    # Prevents all pads from being overwritten
+    def solidifyAll(self):
+        for x in range(len(self.PadMap)):
+            for y in range(len(self.PadMap[x])):
+                self.solidifyPad(x, y)
+
+    
+
+# Lights manages state of pad lights
 class Lights:
     def __init__(self):
         # 0 = off, 1-127 = colour
         self.PadMap = [
-            [0, 0, 0, 0, 0, 0, 0, 0, 0],
-            [0, 0, 0, 0, 0, 0, 0, 0, 0]
+            [0, 0],
+            [0, 0],
+            [0, 0],
+            [0, 0],
+            [0, 0],
+            [0, 0],
+            [0, 0],
+            [0, 0],
+            [0, 0]
             ]
-
-    # Set the colour of a pad
-    def setPadColour(self, x, y, colour):
-        if internal.queryExtendedMode(): 
-            internal.sendMidiMessage(0x9F, eventconsts.Pads[x][y], colour)
-        else: 
-            internal.sendMidiMessage(0x9F, eventprocessor.convertPadMapping(eventconsts.Pads[x][y]), colour)
 
     # Set all pads to off      
     def reset(self):
+        
         internal.sendMidiMessage(0xBF, 0x00, 0x00)
-        self.PadMap = [
-            [0, 0, 0, 0, 0, 0, 0, 0, 0],
-            [0, 0, 0, 0, 0, 0, 0, 0, 0]
-            ]
+        self.__init__()
+
+    # Set the colour of a pad
+    def setPadColour(self, x, y, colour):
+        if internal.extendedMode.query(eventconsts.INCONTROL_PADS): 
+            internal.sendMidiMessage(0x9F, eventconsts.Pads[x][y], colour)
+            
+        else: 
+            internal.sendMidiMessage(0x9F, eventprocessor.convertPadMapping(eventconsts.Pads[x][y]), colour)
+        self.PadMap[x][y] = colour
+
+    
+    # Sets colours based on state of LightMap object
+    def setFromMap(self, map):
+        map.solidifyAll()
+        for x in range(len(self.PadMap)):
+            for y in range(len(self.PadMap[x])):
+                if self.PadMap[x][y] != map.PadMap[x][y]:
+                    self.setPadColour(x, y, map.PadMap[x][y])
+        return
+    
+    def redraw(self):
+        for x in range(len(self.PadMap)):
+            for y in range(len(self.PadMap[x])):
+                self.setPadColour(x, y, self.PadMap[x][y])
+
 state = Lights()
 
 # OoooOooOOOooO PREETTTTTYYYY!!!!!!
@@ -100,19 +174,10 @@ def lightShow():
 
     state.reset()
 
-# Quick update of pads (redrawing bouncers or something)
-def updatePads(event = None):
-    # If event exists: If not button, draw event value
 
-    # If in mixer: redraw bouncer
-    return
-
-# Full refresh of pads
-def refreshPads():
-    return
 
 # Define colour codes
-
+COLOUR_TRANSPARENT = -1
 COLOUR_OFF = 0
 COLOUR_WHITE = 3
 COLOUR_RED = 5
@@ -129,6 +194,36 @@ COLOUR_LIGHT_BLUE = 37
 
 rainbowColours = [COLOUR_RED, COLOUR_PINK, COLOUR_PURPLE, COLOUR_BLUE, COLOUR_LIGHT_BLUE, COLOUR_GREEN, COLOUR_YELLOW, COLOUR_ORANGE, COLOUR_OFF]
 
+# Define UI colours
+UI_NAV_VERTICAL = COLOUR_LIGHT_BLUE
+UI_NAV_HORIZONTAL = COLOUR_PURPLE
+UI_ZOOM = COLOUR_BLUE
+UI_ACCEPT = COLOUR_GREEN
+UI_REJECT = COLOUR_RED
+UI_CHOOSE = COLOUR_PURPLE
 
+# Define tool colours
+TOOL_PENCIL = COLOUR_ORANGE
+TOOL_BRUSH = COLOUR_LIGHT_BLUE
+TOOL_DELETE = COLOUR_RED
+TOOL_MUTE = COLOUR_PINK
+TOOL_SLIP = COLOUR_ORANGE
+TOOL_SLICE = COLOUR_LIGHT_BLUE
+TOOL_SELECT = COLOUR_YELLOW
+TOOL_ZOOM = COLOUR_BLUE
+TOOL_PLAYBACK = COLOUR_GREEN
+
+# Define Window Colours
+WINDOW_PLAYLIST = COLOUR_GREEN
+WINDOW_CHANNEL_RACK = COLOUR_RED
+WINDOW_PIANO_ROLL = COLOUR_PINK
+WINDOW_MIXER = COLOUR_LIGHT_BLUE
+WINDOW_BROWSER = COLOUR_ORANGE
+
+# Define Beat Indicator Colours
+BEAT_PAT_BAR = COLOUR_RED
+BEAT_PAT_BEAT = COLOUR_ORANGE
+BEAT_SONG_BAR = COLOUR_LIGHT_BLUE
+BEAT_SONG_BEAT = COLOUR_GREEN
 
 

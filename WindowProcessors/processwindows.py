@@ -9,39 +9,63 @@ import config
 import internal
 
 import WindowProcessors.processmixer
+import WindowProcessors.ProcessBrowser
+import WindowProcessors.processchannelrack
 
+import WindowProcessors.ProcessDefault
+
+def getWindowObject():
+    if internal.window.active_fl_window == config.WINDOW_MIXER:
+        return WindowProcessors.processmixer
+    
+    elif internal.window.active_fl_window == config.WINDOW_BROWSER:
+        return WindowProcessors.ProcessBrowser
+    
+    elif internal.window.active_fl_window == config.WINDOW_CHANNEL_RACK:
+        return WindowProcessors.processchannelrack
+
+    else: return WindowProcessors.ProcessDefault
 
 def process(command):
 
-    if internal.window.active_fl_window == config.WINDOW_MIXER:
-        WindowProcessors.processmixer.process(command)
+    current_window = getWindowObject()
+    current_window.process(command)
+
+    return
+
+def redraw(lights):
+
+    current_window = getWindowObject()
+    current_window.redraw(lights)
 
     return
 
 def activeStart():
 
-    if internal.window.active_fl_window == config.WINDOW_MIXER:
-        WindowProcessors.processmixer.activeStart()
+    current_window = getWindowObject()
+    current_window.activeStart()
 
     return
 
 def activeEnd():
 
-    if internal.window.active_fl_window == config.WINDOW_MIXER:
-        WindowProcessors.processmixer.activeEnd()
+    current_window = getWindowObject()
+    current_window.activeEnd()
 
     return
 
 def topWindowStart():
-
-    if internal.window.active_fl_window == config.WINDOW_MIXER:
-        WindowProcessors.processmixer.topWindowStart()
+    # Only in extended mode:
+    if internal.PORT == config.DEVICE_PORT_EXTENDED:
+        current_window = getWindowObject()
+        current_window.topWindowStart()
 
     return
 
 def topWindowEnd():
-
-    if internal.window.active_fl_window == config.WINDOW_MIXER:
-        WindowProcessors.processmixer.topWindowEnd()
+    # Only in extended mode:
+    if internal.PORT == config.DEVICE_PORT_EXTENDED:
+        current_window = getWindowObject()
+        current_window.topWindowEnd()
 
     return

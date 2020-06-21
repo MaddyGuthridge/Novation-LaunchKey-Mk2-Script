@@ -12,25 +12,44 @@ import time
 
 import device
 import ui
+import transport
+import general
 
 import eventconsts
 import config
 import eventprocessor
+import lighting
 
 import WindowProcessors.processwindows as processwindows
 import PluginProcessors.processplugins as processplugins
 
+MIN_FL_SCRIPT_VERSION = 4
+
 PORT = -1 # Set in initialisation function then left constant
 
-extendedMode = False
-inControl_Knobs = False
-inControl_Faders = False
-inControl_Pads = False
+
+""" # Inactive code... delete soon
 
 ActiveWindow = "Nil"
 
 # The previous mesage sent to the MIDI out device
 previous_event_out = 0
+"""
+
+def sharedInit():
+    printLineBreak()
+
+    print(config.SCRIPT_NAME + " - Version: " + config.SCRIPT_VERSION)
+    print(" - " + config.SCRIPT_AUTHOR)
+    print("")
+    print("Running in FL Studio Version: " + ui.getVersion())
+
+    midi_script_version = general.getVersion()
+    print("FL Studio Scripting version: " + str(midi_script_version) + ". Minimum recommended version: " + str(MIN_FL_SCRIPT_VERSION))
+
+    if midi_script_version < MIN_FL_SCRIPT_VERSION:
+        print("You may encounter issues using this script. Consider updating to the latest version FL Studio.")
+    print("")
 
 # Prints a line break
 def printLineBreak():
@@ -78,55 +97,6 @@ class windowMgr:
         self.active_plugin = ""
         self.active_fl_window = -1
     
-    """
-    def update(self):
-        self.active_fl_window
-        # Update FL Window
-        if   ui.getFocused(config.WINDOW_MIXER):        
-            new_fl_window = config.WINDOW_MIXER
-
-        elif ui.getFocused(config.WINDOW_PIANO_ROLL):   
-            new_fl_window = config.WINDOW_PIANO_ROLL
-
-        elif ui.getFocused(config.WINDOW_CHANNEL_RACK): 
-            new_fl_window = config.WINDOW_CHANNEL_RACK
-
-        elif ui.getFocused(config.WINDOW_PLAYLIST):     
-            new_fl_window = config.WINDOW_PLAYLIST
-
-        elif ui.getFocused(config.WINDOW_BROWSER):      
-            new_fl_window = config.WINDOW_BROWSER
-        
-        else: new_fl_window = -1
-
-        # If active window for FL plugin changes
-        if new_fl_window != self.active_fl_window:
-            eventprocessor.activeEnd()
-            self.active_fl_window = new_fl_window
-            eventprocessor.activeStart()
-
-        new = ui.getFocusedFormCaption()
-        # If window is FL Window
-        if ui.getFocused(config.WINDOW_MIXER) or ui.getFocused(config.WINDOW_PIANO_ROLL) or ui.getFocused(config.WINDOW_PLAYLIST) or \
-            ui.getFocused(config.WINDOW_CHANNEL_RACK) or ui.getFocused(config.WINDOW_BROWSER):
-
-            # If active window not focused
-            if self.plugin_focused == False: return
-            self.plugin_focused = False
-            print("Background: ", self.active_plugin)
-            printLineBreak()
-        else:
-            # If window didn't change
-            if new == self.active_plugin:
-                return False
-            else:
-                self.plugin_focused = True
-                self.active_plugin = new
-            print("Window: ", self.active_plugin, "[Active]")
-            printLineBreak()
-            return True
-    """
-
     def update(self):
         old_window = self.active_fl_window
         # Update FL Window
@@ -174,20 +144,28 @@ class windowMgr:
             # Start new window active
             eventprocessor.activeStart()
             return True
+        
         else: # Check for changes to Plugin
             new_plugin = ui.getFocusedFormCaption()
             old_plugin = self.active_plugin
             
-            last = -1
-            length = len(new_plugin)
-            for y in range(length):
-                if new_plugin[y] is '(':
-                    last = y + 1
-            if last == -1 or last > length: # If no brackets found
-                return False
-            
-            # Trim string
-            new_plugin = new_plugin[last: -2]
+            special_flag = False
+
+            # Check for special windows
+            if new_plugin == "Color selector" or new_plugin == "Script output":
+                special_flag = True
+
+            if not special_flag:
+                last = -1
+                length = len(new_plugin)
+                for y in range(length):
+                    if new_plugin[y] is '(':
+                        last = y + 1
+                if last == -1 or last > length: # If no brackets found
+                    return False
+                
+                # Trim string
+                new_plugin = new_plugin[last: -2]
 
             # If window didn't change
             
@@ -241,115 +219,164 @@ def printCommandOutput(command):
     printLineBreak()
     print("")
 
-# Queries whether extended mode is active. Only accessible from extended port
-def queryExtendedMode(option = eventconsts.SYSTEM_EXTENDED):
-    global extendedMode
-    global inControl_Knobs
-    global inControl_Faders
-    global inControl_Pads
-    
-    if option == eventconsts.SYSTEM_EXTENDED: return extendedMode
-    elif option == eventconsts.INCONTROL_KNOBS: return inControl_Knobs
-    elif option == eventconsts.INCONTROL_FADERS: return inControl_Faders
-    elif option == eventconsts.INCONTROL_PADS: return inControl_Pads
+# Handles extended mode state
+class extended:
+    def __init__(self):
+        self.extendedMode = False
+        self.inControl_Knobs = False
+        self.inControl_Faders = False
+        self.inControl_Pads = False
 
-# Sets extended mode on the device, use inControl constants to choose which
-def setExtendedMode(newMode, option = eventconsts.SYSTEM_EXTENDED):
-    global extendedMode
-    global inControl_Knobs
-    global inControl_Faders
-    global inControl_Pads
+        self.prev_extendedMode = False
+        self.prev_inControl_Knobs = False
+        self.prev_inControl_Faders = False
+        self.prev_inControl_Pads = False
 
-    # Set all
-    if option == eventconsts.SYSTEM_EXTENDED:
-        if newMode is True:
-            sendMidiMessage(0x9F, 0x0C, 0x7F)
-            extendedMode = True
-            inControl_Knobs = True
-            inControl_Faders = True
-            inControl_Pads = True
-        elif newMode is False:
-            sendMidiMessage(0x9F, 0x0C, 0x00)
-            extendedMode = False
-            inControl_Knobs = False
-            inControl_Faders = False
-            inControl_Pads = False
-        else: logError("New mode mode not boolean")
-    
-    # Set knobs
-    elif option == eventconsts.INCONTROL_KNOBS:
-        if newMode is True:
-            sendMidiMessage(0x9F, 0x0D, 0x7F)
-            inControl_Knobs = True
-        elif newMode is False:
-            sendMidiMessage(0x9F, 0x0D, 0x00)
-            inControl_Knobs = False
-        else: logError("New mode mode not boolean")
-    
-    # Set faders
-    elif option == eventconsts.INCONTROL_FADERS:
-        if newMode is True:
-            sendMidiMessage(0x9F, 0x0E, 0x7F)
-            inControl_Faders = True
-        elif newMode is False:
-            sendMidiMessage(0x9F, 0x0E, 0x00)
-            inControl_Faders = False
-        else: logError("New mode mode not boolean")
-    
-    # Set pads
-    elif option == eventconsts.INCONTROL_PADS:
-        if newMode is True:
-            sendMidiMessage(0x9F, 0x0F, 0x7F)
-            inControl_Pads = True
-        elif newMode is False:
-            sendMidiMessage(0x9F, 0x0F, 0x00)
-            inControl_Pads = False
-        else: logError("New mode mode not boolean")
+    # Queries whether extended mode is active. Only accessible from extended port
+    def query(self, option = eventconsts.SYSTEM_EXTENDED):
+        
+        if option == eventconsts.SYSTEM_EXTENDED: return self.extendedMode
+        elif option == eventconsts.INCONTROL_KNOBS: return self.inControl_Knobs
+        elif option == eventconsts.INCONTROL_FADERS: return self.inControl_Faders
+        elif option == eventconsts.INCONTROL_PADS: return self.inControl_Pads
 
-# Processes extended mode messages from device
-def recieveExtendedMode(newMode, option = eventconsts.SYSTEM_EXTENDED):
-    global extendedMode
-    global inControl_Knobs
-    global inControl_Faders
-    global inControl_Pads
+    def revert(self, option = eventconsts.SYSTEM_EXTENDED):
+        # Set all
+        if option == eventconsts.SYSTEM_EXTENDED:
+            
+            if self.prev_extendedMode is True:
+                self.setVal(True)
+            elif self.prev_extendedMode is False:
+                self.setVal(False)
+            else: logError("New mode mode not boolean")
 
-    # Set all
-    if option == eventconsts.SYSTEM_EXTENDED:
-        if newMode is True:
-            extendedMode = True
-            inControl_Knobs = True
-            inControl_Faders = True
-            inControl_Pads = True
-        elif newMode is False:
-            extendedMode = False
-            inControl_Knobs = False
-            inControl_Faders = False
-            inControl_Pads = False
-        else: logError("New mode mode not boolean")
-    
-    # Set knobs
-    elif option == eventconsts.INCONTROL_KNOBS:
-        if newMode is True:
-            inControl_Knobs = True
-        elif newMode is False:
-            inControl_Knobs = False
-        else: logError("New mode mode not boolean")
-    
-    # Set faders
-    elif option == eventconsts.INCONTROL_FADERS:
-        if newMode is True:
-            inControl_Faders = True
-        elif newMode is False:
-            inControl_Faders = False
-        else: logError("New mode mode not boolean")
-    
-    # Set pads
-    elif option == eventconsts.INCONTROL_PADS:
-        if newMode is True:
-            inControl_Pads = True
-        elif newMode is False:
-            inControl_Pads = False
-        else: logError("New mode mode not boolean")
+            
+
+        # Set knobs
+        elif option == eventconsts.INCONTROL_KNOBS:
+            
+            if self.prev_inControl_Knobs is True:
+                self.setVal(True, eventconsts.INCONTROL_KNOBS)
+            elif self.prev_inControl_Knobs is False:
+                self.setVal(False, eventconsts.INCONTROL_KNOBS)
+            else: logError("New mode mode not boolean")
+        
+        # Set faders
+        elif option == eventconsts.INCONTROL_FADERS:
+            if self.prev_inControl_Faders is True:
+                self.setVal(True, eventconsts.INCONTROL_FADERS)
+            elif self.prev_inControl_Faders is False:
+                self.setVal(False, eventconsts.INCONTROL_FADERS)
+            else: logError("New mode mode not boolean")
+        
+        # Set pads
+        elif option == eventconsts.INCONTROL_PADS:
+           
+            if self.prev_inControl_Pads is True:
+                self.setVal(True, eventconsts.INCONTROL_PADS)
+            elif self.prev_inControl_Pads is False:
+                self.setVal(False, eventconsts.INCONTROL_PADS)
+            else: logError("New mode mode not boolean")
+
+
+    # Sets extended mode on the device, use inControl constants to choose which
+    def setVal(self, newMode, option = eventconsts.SYSTEM_EXTENDED):
+        # Set all
+        if option == eventconsts.SYSTEM_EXTENDED:
+            if newMode is True and self.extendedMode is False:
+                sendMidiMessage(0x9F, 0x0C, 0x7F)
+            elif newMode is True and self.extendedMode is True: # Doesn't send event but still add it to history
+                self.prev_extendedMode = True
+            elif newMode is False and self.extendedMode is True:
+                sendMidiMessage(0x9F, 0x0C, 0x00)
+            elif newMode is False and self.extendedMode is False: # Doesn't send event but still add it to history
+                self.prev_extendedMode = False
+            
+        
+        # Set knobs
+        elif option == eventconsts.INCONTROL_KNOBS:
+            if newMode is True and self.inControl_Knobs is False:
+                sendMidiMessage(0x9F, 0x0D, 0x7F)
+            elif newMode is True and self.inControl_Knobs is True: # Doesn't send event but still add it to history
+                self.prev_inControl_Knobs = True
+            elif newMode is False and self.inControl_Knobs is True:
+                sendMidiMessage(0x9F, 0x0D, 0x00)
+            elif newMode is False and self.inControl_Knobs is False: # Doesn't send event but still add it to history
+                self.prev_inControl_Knobs = False
+        
+        # Set faders
+        elif option == eventconsts.INCONTROL_FADERS:
+            if newMode is True and self.inControl_Faders is False:
+                sendMidiMessage(0x9F, 0x0E, 0x7F)
+            elif newMode is True and self.inControl_Faders is True: # Doesn't send event but still add it to history
+                self.prev_inControl_Faders = True
+            elif newMode is False and self.inControl_Faders is True:
+                sendMidiMessage(0x9F, 0x0E, 0x00)
+            elif newMode is False and self.inControl_Faders is False: # Doesn't send event but still add it to history
+                self.prev_inControl_Faders = False
+        
+        # Set pads
+        elif option == eventconsts.INCONTROL_PADS:
+            if newMode is True and self.inControl_Pads is False:
+                sendMidiMessage(0x9F, 0x0F, 0x7F)
+            elif newMode is True and self.inControl_Pads is True: # Doesn't send event but still add it to history
+                self.prev_inControl_Pads = True
+            elif newMode is False and self.inControl_Pads is True:
+                sendMidiMessage(0x9F, 0x0F, 0x00)
+            elif newMode is False and self.inControl_Pads is False: # Doesn't send event but still add it to history
+                self.prev_inControl_Pads = False
+
+    # Processes extended mode messages from device
+    def recieve(self, newMode, option = eventconsts.SYSTEM_EXTENDED):
+        print("recieved value")
+        # Set all
+        if option == eventconsts.SYSTEM_EXTENDED:
+            # Process variables for previous states
+            self.prev_extendedMode = self.extendedMode
+            self.prev_inControl_Knobs = config.START_IN_INCONTROL_KNOBS    # Set to default because otherwise 
+            self.prev_inControl_Faders = config.START_IN_INCONTROL_FADERS  # they'll revert badly sometimes
+            self.prev_inControl_Pads = config.START_IN_INCONTROL_PADS      #
+            if newMode is True:
+                self.extendedMode = True
+                self.inControl_Knobs = True
+                self.inControl_Faders = True
+                self.inControl_Pads = True
+            elif newMode is False:
+                self.extendedMode = False
+                self.inControl_Knobs = False
+                self.inControl_Faders = False
+                self.inControl_Pads = False
+            else: logError("New mode mode not boolean")
+        
+        # Set knobs
+        elif option == eventconsts.INCONTROL_KNOBS:
+            self.prev_inControl_Knobs = self.inControl_Knobs
+            if newMode is True:
+                self.inControl_Knobs = True
+            elif newMode is False:
+                self.inControl_Knobs = False
+            else: logError("New mode mode not boolean")
+        
+        # Set faders
+        elif option == eventconsts.INCONTROL_FADERS:
+            self.prev_inControl_Faders = self.inControl_Faders
+            if newMode is True:
+                self.inControl_Faders = True
+            elif newMode is False:
+                self.inControl_Faders = False
+            else: logError("New mode mode not boolean")
+        
+        # Set pads
+        elif option == eventconsts.INCONTROL_PADS:
+            self.prev_inControl_Pads = self.inControl_Pads
+            if newMode is True:
+                self.inControl_Pads = True
+            elif newMode is False:
+                self.inControl_Pads = False
+            else: logError("New mode mode not boolean")
+
+
+extendedMode = extended()
 
 # Compares revieved event to previous
 def compareEvent(event):
@@ -362,7 +389,10 @@ EventNameT = ['Note Off', 'Note On ', 'Key Aftertouch', 'Control Change','Progra
 def sendMidiMessage(status, data1, data2):
     global previous_event_out
     previous_event_out  = toMidiMessage(status, data1, data2)
-    device.midiOutMsg(previous_event_out)
+    if PORT == config.DEVICE_PORT_EXTENDED:
+        device.midiOutMsg(previous_event_out)
+    else:
+        device.dispatch(0, previous_event_out)
 
 # Generates a MIDI message given arguments
 def toMidiMessage(status, data1, data2):
@@ -395,4 +425,81 @@ def idleProcessor():
 # Print out error message
 def logError(message):
     print("Error: ", message)
+
+class padMgr:
+    # Contains whether or not a pad is down (for use in extended mode)
+    padsDown = [
+        [False, False],
+        [False, False],
+        [False, False],
+        [False, False],
+        [False, False],
+        [False, False],
+        [False, False],
+        [False, False],
+        [False, False]
+    ]
+
+    def press(self, x, y):
+        self.padsDown[x][y] = True
+    
+    def lift(self, x, y):
+        self.padsDown[x][y] = False
+
+    def getVal(self, x, y):
+        return self.padsDown[x][y]
+
+pads = padMgr()
+
+class shiftMgr:
+    is_down = False
+    used = False
+
+    def press(self):
+        self.is_down = True
+        self.used = False
+    
+    def lift(self):
+        self.is_down = False
+        return self.used
+
+    def use(self):
+        if self.is_down:
+            self.used = True
+            return True
+        else: return False
+
+    def getDown(self):
+        return self.is_down
+    
+    def getUsed(self):
+        if self.is_down:
+            return self.used
+        else: return "ERROR Shift not down"
+
+shift = shiftMgr()
+
+class beatMgr:
+    beat = 0
+    
+    def set(self, beat):
+        self.beat = beat
+        self.redraw(lighting.state)
+
+    def redraw(self, lights):
+        if transport.getLoopMode():
+            bar_col = lighting.BEAT_SONG_BAR
+            beat_col = lighting.BEAT_SONG_BEAT
+        else:
+            bar_col = lighting.BEAT_PAT_BAR
+            beat_col = lighting.BEAT_PAT_BEAT
+
+
+        if self.beat is 1: lights.setPadColour(8, 0, bar_col)                # Bar
+        elif self.beat is 2: lights.setPadColour(8, 0, beat_col)             # Beat
+        elif self.beat is 0: lights.setPadColour(8, 0, lighting.COLOUR_OFF)  # Off
+
+beat = beatMgr()
+
+
 
