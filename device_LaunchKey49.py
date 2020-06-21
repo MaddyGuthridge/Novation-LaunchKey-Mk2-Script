@@ -44,6 +44,9 @@ class TGeneric():
         # Set port to basic
         internal.PORT = config.DEVICE_PORT_BASIC
 
+        # Run shared init functions
+        internal.sharedInit()
+
         print('Initialisation complete')
         internal.printLineBreak()
         internal.printLineBreak()

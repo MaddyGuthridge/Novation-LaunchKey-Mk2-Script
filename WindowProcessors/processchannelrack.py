@@ -50,7 +50,10 @@ def process(command):
             gridBits.zoomOut()
             command.handled = True
         if coord == [5, 1]:
-            gridBits.zoomIn()
+            if command.is_double_click:
+                gridBits.resetZoom()
+            else:
+                gridBits.zoomIn()
             command.handled = True
         
 
@@ -270,11 +273,12 @@ class getBitMgr:
 
     def zoomOut(self):
         self.zoom *= 2
-        print(self.zoom)
     
     def zoomIn(self):
         if self.zoom > 1: self.zoom = int(self.zoom / 2)
-        print(self.zoom)
+
+    def resetZoom(self):
+        self.zoom = 1
 
 gridBits = getBitMgr()
 

@@ -13,6 +13,7 @@ import time
 import device
 import ui
 import transport
+import general
 
 import eventconsts
 import config
@@ -22,14 +23,33 @@ import lighting
 import WindowProcessors.processwindows as processwindows
 import PluginProcessors.processplugins as processplugins
 
+MIN_FL_SCRIPT_VERSION = 4
+
 PORT = -1 # Set in initialisation function then left constant
 
 
+""" # Inactive code... delete soon
 
 ActiveWindow = "Nil"
 
 # The previous mesage sent to the MIDI out device
 previous_event_out = 0
+"""
+
+def sharedInit():
+    printLineBreak()
+
+    print(config.SCRIPT_NAME + " - Version: " + config.SCRIPT_VERSION)
+    print(" - " + config.SCRIPT_AUTHOR)
+    print("")
+    print("Running in FL Studio Version: " + ui.getVersion())
+
+    midi_script_version = general.getVersion()
+    print("FL Studio Scripting version: " + str(midi_script_version) + ". Minimum recommended version: " + str(MIN_FL_SCRIPT_VERSION))
+
+    if midi_script_version < MIN_FL_SCRIPT_VERSION:
+        print("You may encounter issues using this script. Consider updating to the latest version FL Studio.")
+    print("")
 
 # Prints a line break
 def printLineBreak():

@@ -54,6 +54,9 @@ class TGeneric():
         # Set port to extended
         internal.PORT = config.DEVICE_PORT_EXTENDED
 
+        # Run shared init functions
+        internal.sharedInit()
+
         # Set the device into Extended Mode
         
         lighting.lightShow()

@@ -53,3 +53,9 @@ WINDOW_PIANO_ROLL = 3
 WINDOW_CHANNEL_RACK = 1
 WINDOW_MIXER = 0
 WINDOW_BROWSER = 4
+
+# Script Info: Changing this isn't recommended as it may make debugging more difficult for me
+SCRIPT_NAME = "Novation LaunchKey Mk2 Controller Script"
+SCRIPT_AUTHOR = "Miguel Guthridge"
+SCRIPT_VERSION = "1.0.0"
+
