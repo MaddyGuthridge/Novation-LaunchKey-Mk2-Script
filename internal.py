@@ -27,6 +27,8 @@ MIN_FL_SCRIPT_VERSION = 4
 
 PORT = -1 # Set in initialisation function then left constant
 
+SHARED_INIT_OK = False
+
 
 """ # Inactive code... delete soon
 
@@ -37,6 +39,7 @@ previous_event_out = 0
 """
 
 def sharedInit():
+    global SHARED_INIT_OK
     printLineBreak()
 
     print(config.SCRIPT_NAME + " - Version: " + config.SCRIPT_VERSION)
@@ -49,6 +52,7 @@ def sharedInit():
 
     if midi_script_version < MIN_FL_SCRIPT_VERSION:
         print("You may encounter issues using this script. Consider updating to the latest version FL Studio.")
+    else: SHARED_INIT_OK = True
     print("")
 
 # Prints a line break
