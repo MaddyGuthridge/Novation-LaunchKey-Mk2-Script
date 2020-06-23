@@ -15,6 +15,9 @@ import eventconsts
 # Change this to change which button is treated as the shift button
 SHIFT_BUTTON = eventconsts.TRANSPORT_LOOP
 
+# Check for updates online. Change to False if you don't want to be notified or something
+CHECK_UPDATES = True
+
 # Port values. Change these to match the ports for each device set in FL Studio
 DEVICE_PORT_BASIC = 220
 DEVICE_PORT_EXTENDED = 225
@@ -54,8 +57,11 @@ WINDOW_CHANNEL_RACK = 1
 WINDOW_MIXER = 0
 WINDOW_BROWSER = 4
 
-# Script Info: Changing this isn't recommended as it may make debugging more difficult for me
+# Script Info: Only change this if you're forking the project or something
 SCRIPT_NAME = "Novation LaunchKey Mk2 Controller Script"
 SCRIPT_AUTHOR = "Miguel Guthridge"
-SCRIPT_VERSION = "1.0.0"
-
+SCRIPT_VERSION_MAJOR = 1
+SCRIPT_VERSION_MINOR = 0
+SCRIPT_VERSION_REVISION = 2
+SCRIPT_URL = "https://github.com/MiguelGuthridge/Novation-LaunchKey-Mk2-Script"
+UPDATE_JSON_URL = "https://api.github.com/repos/MiguelGuthridge/Novation-LaunchKey-Mk2-Script/tags"

@@ -19,6 +19,7 @@ import eventconsts
 import config
 import eventprocessor
 import lighting
+# import updatecheck # Currently modules are unavailable
 
 import WindowProcessors.processwindows as processwindows
 import PluginProcessors.processplugins as processplugins
@@ -28,6 +29,7 @@ MIN_FL_SCRIPT_VERSION = 4
 PORT = -1 # Set in initialisation function then left constant
 
 SHARED_INIT_OK = False
+SCRIPT_UPDATE_AVAILABLE = False
 
 
 """ # Inactive code... delete soon
@@ -38,14 +40,27 @@ ActiveWindow = "Nil"
 previous_event_out = 0
 """
 
+def getVersionStr():
+    return str(config.SCRIPT_VERSION_MAJOR) + '.' + str(config.SCRIPT_VERSION_MINOR) + '.' + str(config.SCRIPT_VERSION_REVISION)
+
 def sharedInit():
     global SHARED_INIT_OK
+    global SCRIPT_UPDATE_AVAILABLE
     printLineBreak()
 
-    print(config.SCRIPT_NAME + " - Version: " + config.SCRIPT_VERSION)
+    print(config.SCRIPT_NAME + " - Version: " + getVersionStr())
     print(" - " + config.SCRIPT_AUTHOR)
     print("")
     print("Running in FL Studio Version: " + ui.getVersion())
+
+    # Check for script updates
+    # updatecheck.check()
+    if SCRIPT_UPDATE_AVAILABLE:
+        printLineBreak()
+        print("An update to this script is available!")
+        print("Follow this link to download it: " + config.SCRIPT_URL)
+        printLineBreak()
+
 
     midi_script_version = general.getVersion()
     print("FL Studio Scripting version: " + str(midi_script_version) + ". Minimum recommended version: " + str(MIN_FL_SCRIPT_VERSION))
