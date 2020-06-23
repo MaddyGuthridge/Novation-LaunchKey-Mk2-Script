@@ -50,6 +50,8 @@ def redraw(lights):
 def process(command):
     command.actions.addProcessor("BBCSO Processor")
 
+    # Currently very much broken - may need API update?
+
     if command.id == eventconsts.BASIC_FADER_1:
         command.edit(eventprocessor.rawEvent(0xB0, EXPRESSION, command.value))
     

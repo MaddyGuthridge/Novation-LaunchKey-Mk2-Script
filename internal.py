@@ -94,6 +94,7 @@ idleClock = performanceMonitor()
 class windowMgr:
     def __init__(self):
         self.plugin_focused = False
+        self.previous_plugin = ""
         self.active_plugin = ""
         self.active_fl_window = -1
     
@@ -167,7 +168,7 @@ class windowMgr:
                 # Trim string
                 new_plugin = new_plugin[last: -2]
 
-            # If window didn't change
+            # If window changed
             
             if new_plugin != self.active_plugin or self.plugin_focused == False:
 
@@ -176,6 +177,7 @@ class windowMgr:
 
                 # End replaced plugin
                 if new_plugin != self.active_plugin:
+                    self.previous_plugin = self.active_plugin
                     processplugins.topPluginEnd()
 
                 # Set new plugin
@@ -194,6 +196,11 @@ class windowMgr:
                 eventprocessor.activeStart()
                 return True
             else: return False
+
+    # Revert to previous plugin
+    def revertPlugin(self):
+        self.active_plugin = self.previous_plugin
+        self.previous_plugin = ""
 
 
 window = windowMgr()

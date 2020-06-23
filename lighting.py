@@ -39,10 +39,10 @@ class LightMap:
         else: return False
     
     # Sets colours based on state of LightMap object
-    def setFromMatrix(self, map):
+    def setFromMatrix(self, map, override = False):
         for x in range(len(self.PadMap)):
             for y in range(len(self.PadMap[x])):
-                if self.PadMap[x][y] == -1:
+                if self.PadMap[x][y] == -1 or override:
                     self.setPadColour(x, y, map[x][y])
         return
 
