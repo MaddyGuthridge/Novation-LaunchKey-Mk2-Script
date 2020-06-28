@@ -35,8 +35,10 @@ NOTE_OFF = 0x8
 Notes = [NOTE_ON, NOTE_OFF]
 
 PEDAL = 0x40B0
+PITCH_BEND = 0x00E0
+MOD_WHEEL = 0x01B0
 
-BasicEvents = [PEDAL]
+BasicEvents = [PEDAL, PITCH_BEND, MOD_WHEEL]
 
 # Define System Message
 SYSTEM_EXTENDED = 0x0C9F

@@ -105,10 +105,10 @@ class actionPrinter:
     def flush(self):
         for x in range(len(self.eventProcessors)):
             out = self.eventProcessors[x]
-            out = internal.newGetTab(out)
+            out = internal.newGetTab(out, 2)
             out += self.eventActions[x]
             print(out)
-            if self.eventActions[x] != "":
+            if self.eventActions[x] != "" and not "[Did not handle]" in self.eventActions[x]:
                 ui.setHintMsg(self.eventActions[x])
 
         self.eventActions.clear()
@@ -191,7 +191,8 @@ class processedEvent:
         
         elif self.id in eventconsts.BasicEvents:
             self.type = eventconsts.TYPE_BASIC_EVENT
-            self.isBinary = True
+            if self.id == eventconsts.PEDAL:
+                self.isBinary = True
 
         # If coordinates are returned, it is a pad
         elif (self.status == 0x9F or self.status == 0x8F) or ((self.status == 0x99 or self.status == 0x89)):
@@ -330,7 +331,7 @@ class processedEvent:
             b = self.getID_Pads()
         elif self.type is eventconsts.TYPE_BASIC_EVENT:
             a = "Basic Event"
-            b = "Pedal" # Currently pedal is only basic event
+            b = self.getID_Basic()
         else: 
             internal.logError("Bad event type")
             a = "ERROR!!!"
@@ -348,6 +349,13 @@ class processedEvent:
         if   self.id == eventconsts.INCONTROL_KNOBS: return "Knobs"
         elif self.id == eventconsts.INCONTROL_FADERS: return "Faders"
         elif self.id == eventconsts.INCONTROL_PADS: return "Pads"
+        else: return "ERROR"
+    
+    # Returns string event ID for basic events
+    def getID_Basic(self):
+        if self.id == eventconsts.PEDAL: return "Pedal"
+        elif self.id == eventconsts.MOD_WHEEL: return "Modulation"
+        elif self.id == eventconsts.PITCH_BEND: return "Pitch Bend"
         else: return "ERROR"
 
     # Returns string event ID for transport events
@@ -443,7 +451,7 @@ class processedEvent:
             if self.value == 0:
                 b = "(Off)"
             else: b = "(On)"
-        a = internal.newGetTab(a, 5)
+        a = internal.newGetTab(a, length=5)
         return a + b
 
     # Returns string with (formatted) hex of event

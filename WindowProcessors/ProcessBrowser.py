@@ -28,7 +28,7 @@ def topWindowEnd():
     return
 
 def redraw(lights):
-    lights.setPadColour(2, 1, lighting.COLOUR_PURPLE)   # Prev
+    lights.setPadColour(3, 0, lighting.COLOUR_PURPLE)   # Prev
     lights.setPadColour(3, 1, lighting.COLOUR_PURPLE)   # Next
     lights.setPadColour(4, 1, lighting.COLOUR_RED)      # Stop
     lights.setPadColour(5, 1, lighting.COLOUR_GREEN)    # Play
@@ -39,11 +39,11 @@ def process(command):
 
     command.actions.addProcessor("Browser Processor")
 
-    if command.type == eventconsts.TYPE_PAD and command.value != 0:
+    if command.type == eventconsts.TYPE_PAD and command.is_lift:
         coord = [command.padX, command.padY]
         
         # Previous
-        if coord == [2, 1]:
+        if coord == [3, 0]:
             ui.up()
             command.actions.appendAction("Previous")
 
