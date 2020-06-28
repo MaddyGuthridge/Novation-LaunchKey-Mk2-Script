@@ -6,6 +6,10 @@ You shouldn't need to adjust these values,
 but if you are modifying the script for use with a different controller with the same features,
 this is the place to start.
 """
+
+# Access FL Event consts through here
+import midi
+
 # Define contant for determining event type
 TYPE_UNRECOGNISED = -1
 TYPE_SYSTEM_MSG = 0

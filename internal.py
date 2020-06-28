@@ -485,23 +485,48 @@ shift = shiftMgr()
 
 class beatMgr:
     beat = 0
+
+    is_tapping_tempo = False
     
-    def set(self, beat):
+    metronome_enabled = False
+
+    # Toggle state of metronome
+    def toggle_metronome(self):
+        self.metronome_enabled = not self.metronome_enabled
+
+        transport.globalTransport(eventconsts.midi.FPT_Metronome, True)
+
+        return self.metronome_enabled
+
+    def toggle_tempo_tap(self):
+        self.is_tapping_tempo = not self.is_tapping_tempo
+        return self.is_tapping_tempo
+
+    def tap_tempo(self):
+        transport.globalTransport(eventconsts.midi.FPT_TapTempo, True)
+
+    # Set current beat
+    def set_beat(self, beat):
         self.beat = beat
         self.redraw(lighting.state)
 
+    # Redraw lights
     def redraw(self, lights):
-        if transport.getLoopMode():
-            bar_col = lighting.BEAT_SONG_BAR
-            beat_col = lighting.BEAT_SONG_BEAT
+
+        if self.is_tapping_tempo:
+            lights.setPadColour(8, 0, lighting.TEMPO_TAP)
+
         else:
-            bar_col = lighting.BEAT_PAT_BAR
-            beat_col = lighting.BEAT_PAT_BEAT
+            if transport.getLoopMode():
+                bar_col = lighting.BEAT_SONG_BAR
+                beat_col = lighting.BEAT_SONG_BEAT
+            else:
+                bar_col = lighting.BEAT_PAT_BAR
+                beat_col = lighting.BEAT_PAT_BEAT
 
-
-        if self.beat is 1: lights.setPadColour(8, 0, bar_col)                # Bar
-        elif self.beat is 2: lights.setPadColour(8, 0, beat_col)             # Beat
-        elif self.beat is 0: lights.setPadColour(8, 0, lighting.COLOUR_OFF)  # Off
+            if self.beat is 1: lights.setPadColour(8, 0, bar_col)                # Bar
+            elif self.beat is 2: lights.setPadColour(8, 0, beat_col)             # Beat
+            elif self.beat is 0: lights.setPadColour(8, 0, lighting.COLOUR_OFF)  # Off
 
 beat = beatMgr()
 

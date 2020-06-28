@@ -123,7 +123,7 @@ class TGeneric():
         return
     
     def OnUpdateBeatIndicator(self, beat):
-        internal.beat.set(beat)
+        internal.beat.set_beat(beat)
 
 Generic = TGeneric()
 
