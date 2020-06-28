@@ -55,14 +55,20 @@ def sharedInit():
     else: SHARED_INIT_OK = True
     print("")
 
+    beat.refresh() # Update beat indicator
+
+def refresh():
+    beat.refresh()
+
+
 # Prints a line break
 def printLineBreak():
     print("————————————————————————————————————————————————————")
 
 # Returns string with tab characters at the end
-def newGetTab(string, length = config.TAB_LENGTH):
+def newGetTab(string, multiplier = 1, length = config.TAB_LENGTH):
     string += " "
-    toAdd = length - len(string) % length
+    toAdd = (length * multiplier) - len(string) % (length * multiplier)
 
     for x in range(toAdd):
         string += " "
@@ -332,7 +338,6 @@ class extended:
 
     # Processes extended mode messages from device
     def recieve(self, newMode, option = eventconsts.SYSTEM_EXTENDED):
-        print("recieved value")
         # Set all
         if option == eventconsts.SYSTEM_EXTENDED:
             # Process variables for previous states
@@ -485,12 +490,38 @@ shift = shiftMgr()
 
 class beatMgr:
     beat = 0
+
+    is_tapping_tempo = False
     
-    def set(self, beat):
+    metronome_enabled = False
+
+    def refresh(self):
+        self.metronome_enabled = (general.getUseMetronome() == 1)
+
+    # Toggle state of metronome
+    def toggle_metronome(self):
+        transport.globalTransport(eventconsts.midi.FPT_Metronome, True)
+        self.metronome_enabled = (general.getUseMetronome() == 1)
+        return self.metronome_enabled
+
+    def toggle_tempo_tap(self):
+        self.is_tapping_tempo = not self.is_tapping_tempo
+        return self.is_tapping_tempo
+
+    def tap_tempo(self):
+        transport.globalTransport(eventconsts.midi.FPT_TapTempo, True)
+
+    # Set current beat
+    def set_beat(self, beat):
         self.beat = beat
         self.redraw(lighting.state)
 
+    # Redraw lights
     def redraw(self, lights):
+
+        if self.is_tapping_tempo:
+            lights.setPadColour(8, 0, lighting.TEMPO_TAP)
+        
         if transport.getLoopMode():
             bar_col = lighting.BEAT_SONG_BAR
             beat_col = lighting.BEAT_SONG_BEAT
@@ -498,10 +529,11 @@ class beatMgr:
             bar_col = lighting.BEAT_PAT_BAR
             beat_col = lighting.BEAT_PAT_BEAT
 
+        if self.beat is 1: lights.setPadColour(8, 0, bar_col)     # Bar
+        elif self.beat is 2: lights.setPadColour(8, 0, beat_col)  # Beat
 
-        if self.beat is 1: lights.setPadColour(8, 0, bar_col)                # Bar
-        elif self.beat is 2: lights.setPadColour(8, 0, beat_col)             # Beat
-        elif self.beat is 0: lights.setPadColour(8, 0, lighting.COLOUR_OFF)  # Off
+        if self.metronome_enabled:
+            lights.setPadColour(8, 0, lighting.METRONOME)
 
 beat = beatMgr()
 
