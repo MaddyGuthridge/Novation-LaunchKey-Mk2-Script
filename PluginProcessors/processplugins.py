@@ -74,6 +74,8 @@ def process(command):
         object_to_call = getattr(PluginProcessors, x)
         if can_handle(object_to_call):
             object_to_call.process(command)
+        
+        if command.handled: return
 
 def can_handle(object_to_call):
     for x in range(len(object_to_call.plugins)):

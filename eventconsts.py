@@ -29,7 +29,7 @@ TYPE_NOTE = 20
 TYPE_BASIC_EVENT = 21
 
 
-NOTE_ON = 0x9 # Shortened as data1 contains note name
+NOTE_ON = 0x9 # Shortened as data1 also contains note channel
 NOTE_OFF = 0x8
 
 Notes = [NOTE_ON, NOTE_OFF]
