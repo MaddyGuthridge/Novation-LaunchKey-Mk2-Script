@@ -53,6 +53,8 @@ def sharedInit():
     if midi_script_version < MIN_FL_SCRIPT_VERSION:
         print("You may encounter issues using this script. Consider updating to the latest version FL Studio.")
     else: SHARED_INIT_OK = True
+    if config.CONSOLE_DEBUG_LEVEL > 0:
+        print("Console debugging level:", config.CONSOLE_DEBUG_LEVEL)
     print("")
 
     beat.refresh() # Update beat indicator
@@ -76,28 +78,36 @@ def newGetTab(string, multiplier = 1, length = config.TAB_LENGTH):
 
 # Counts processing time
 class performanceMonitor:
-    def __init__(self):
+    def __init__(self, monitor_name, debug_level):
+
+        self.name = monitor_name
+        self.debug_level = debug_level
+
         self.total_time = 0
         self.startTime = -1
         self.endTime = -1
+        self.num_events = 0
     
     def start(self):
         self.startTime = time.perf_counter()
     
     def stop(self):
         self.endTime = time.perf_counter()
-        a = self.endTime - self.startTime
-        self.total_time += a
-        if config.CONSOLE_PRINT_PERFORMANCE_TIMES:
-            print("")
-            print("Processed in: ", round(self.endTime, 4), " seconds")
-            print("Total processing time: ", round(self.total(), 4))
-        return a
+        process_time = self.endTime - self.startTime
+        self.total_time += process_time
+        self.num_events += 1
+        if config.CONSOLE_DEBUG_LEVEL >= self.debug_level:
+            printLineBreak()
+            print(self.name)
+            print("Processed in:", round(process_time, 4), "seconds")
+            print("Average processing time:", round(self.total() / self.num_events, 4), "seconds")
+            printLineBreak()
+        return process_time
     
     def total(self):
         return self.total_time
-eventClock = performanceMonitor()
-idleClock = performanceMonitor()
+eventClock = performanceMonitor("Event Processor", 1)
+idleClock = performanceMonitor("Idle Processor", 3)
 
 
 # Manages active window - CURRENTLY BROKEN!!!!
@@ -258,7 +268,7 @@ class extended:
                 self.setVal(True)
             elif self.prev_extendedMode is False:
                 self.setVal(False)
-            else: logError("New mode mode not boolean")
+            else: debugLog("New mode mode not boolean")
 
             
 
@@ -269,7 +279,7 @@ class extended:
                 self.setVal(True, eventconsts.INCONTROL_KNOBS)
             elif self.prev_inControl_Knobs is False:
                 self.setVal(False, eventconsts.INCONTROL_KNOBS)
-            else: logError("New mode mode not boolean")
+            else: debugLog("New mode mode not boolean")
         
         # Set faders
         elif option == eventconsts.INCONTROL_FADERS:
@@ -277,7 +287,7 @@ class extended:
                 self.setVal(True, eventconsts.INCONTROL_FADERS)
             elif self.prev_inControl_Faders is False:
                 self.setVal(False, eventconsts.INCONTROL_FADERS)
-            else: logError("New mode mode not boolean")
+            else: debugLog("New mode mode not boolean")
         
         # Set pads
         elif option == eventconsts.INCONTROL_PADS:
@@ -286,7 +296,7 @@ class extended:
                 self.setVal(True, eventconsts.INCONTROL_PADS)
             elif self.prev_inControl_Pads is False:
                 self.setVal(False, eventconsts.INCONTROL_PADS)
-            else: logError("New mode mode not boolean")
+            else: debugLog("New mode mode not boolean")
 
 
     # Sets extended mode on the device, use inControl constants to choose which
@@ -355,7 +365,7 @@ class extended:
                 self.inControl_Knobs = False
                 self.inControl_Faders = False
                 self.inControl_Pads = False
-            else: logError("New mode mode not boolean")
+            else: debugLog("New mode mode not boolean")
         
         # Set knobs
         elif option == eventconsts.INCONTROL_KNOBS:
@@ -364,7 +374,7 @@ class extended:
                 self.inControl_Knobs = True
             elif newMode is False:
                 self.inControl_Knobs = False
-            else: logError("New mode mode not boolean")
+            else: debugLog("New mode mode not boolean")
         
         # Set faders
         elif option == eventconsts.INCONTROL_FADERS:
@@ -373,7 +383,7 @@ class extended:
                 self.inControl_Faders = True
             elif newMode is False:
                 self.inControl_Faders = False
-            else: logError("New mode mode not boolean")
+            else: debugLog("New mode mode not boolean")
         
         # Set pads
         elif option == eventconsts.INCONTROL_PADS:
@@ -382,7 +392,7 @@ class extended:
                 self.inControl_Pads = True
             elif newMode is False:
                 self.inControl_Pads = False
-            else: logError("New mode mode not boolean")
+            else: debugLog("New mode mode not boolean")
 
 
 extendedMode = extended()
@@ -399,8 +409,10 @@ def sendMidiMessage(status, data1, data2):
     global previous_event_out
     previous_event_out  = toMidiMessage(status, data1, data2)
     if PORT == config.DEVICE_PORT_EXTENDED:
+        debugLog("Dispatched external MIDI message", 2)
         device.midiOutMsg(previous_event_out)
     else:
+        debugLog("Dispatched internal MIDI message", 2)
         device.dispatch(0, previous_event_out)
 
 # Generates a MIDI message given arguments
@@ -432,8 +444,9 @@ def idleProcessor():
     idleClock.stop()
 
 # Print out error message
-def logError(message):
-    print("Error: ", message)
+def debugLog(message, level = 0):
+    if level <= config.CONSOLE_DEBUG_LEVEL:
+        print(message)
 
 class padMgr:
     # Contains whether or not a pad is down (for use in extended mode)

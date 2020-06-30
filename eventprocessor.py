@@ -8,6 +8,7 @@ import time
 
 import device
 import ui
+import utils
 
 import eventconsts
 import internal
@@ -22,18 +23,23 @@ import PluginProcessors.processplugins as processplugins
 
 # Recieve event and forward onto relative processors
 def process(command):
-
+    
+    # If basic processor, don't bother for note events
+    if internal.PORT == config.DEVICE_PORT_BASIC and command.type == eventconsts.TYPE_NOTE:
+        return
+    
     # Call primary processor
     processfirst.process(command)
-    if command.handled:
-        return
+
+    if command.handled: return
 
     # Attempt to process event using custom processors for plugins
     processplugins.process(command)
 
+    if command.handled: return
+
     # Process content from windows
     processwindows.process(command)
-
 
     # If command hasn't been handled by any above uses, use the default controls
     if command.handled is False:
@@ -133,6 +139,8 @@ class processedEvent:
         self.status = event.status
         self.note = event.data1
         self.value = event.data2
+        self.status_nibble = event.status >> 4              # Get first half of status byte
+        self.channel = event.status & int('00001111', 2)    # Get 2nd half of status byte
         
         # Bit-shift status and data bytes to get event ID
         self.id = (self.status + (self.note << 8))
@@ -194,18 +202,21 @@ class processedEvent:
             if self.id == eventconsts.PEDAL:
                 self.isBinary = True
 
-        # If coordinates are returned, it is a pad
-        elif (self.status == 0x9F or self.status == 0x8F) or ((self.status == 0x99 or self.status == 0x89)):
-            x, y = self.getPadCoord()
-            if x != -1 and y != -1:
-                # Is a pad
-                self.padX = x
-                self.padY = y
-                self.isBinary = True
-                if self.isPadExtendedMode():
-                    self.type = eventconsts.TYPE_PAD
-                else:
-                    self.type = eventconsts.TYPE_BASIC_PAD
+        elif self.status_nibble == eventconsts.NOTE_ON or self.status_nibble == eventconsts.NOTE_OFF:
+        # Pads are actually note events
+            if (self.status == 0x9F or self.status == 0x8F) or ((self.status == 0x99 or self.status == 0x89)):
+                x, y = self.getPadCoord()
+                if x != -1 and y != -1:
+                    # Is a pad
+                    self.padX = x
+                    self.padY = y
+                    self.isBinary = True
+                    if self.isPadExtendedMode():
+                        self.type = eventconsts.TYPE_PAD
+                    else:
+                        self.type = eventconsts.TYPE_BASIC_PAD
+            else:
+                self.type = eventconsts.TYPE_NOTE
 
 
         # And also different signals for the mixer buttons in basic mode
@@ -308,6 +319,9 @@ class processedEvent:
         b = ""
         if self.type is eventconsts.TYPE_UNRECOGNISED: 
             a = "Unrecognised"
+        elif self.type is eventconsts.TYPE_NOTE:
+            a = "Note"
+            b = utils.GetNoteName(self.note) + " (Ch. " + str(self.channel) + ')'
         elif self.type is eventconsts.TYPE_SYSTEM_MSG: 
             a = "System"
             b = self.getID_System()
@@ -333,7 +347,7 @@ class processedEvent:
             a = "Basic Event"
             b = self.getID_Basic()
         else: 
-            internal.logError("Bad event type")
+            internal.debugLog("Bad event type")
             a = "ERROR!!!"
         a = internal.newGetTab(a)
         return a + b
@@ -485,7 +499,7 @@ def convertPadMapping(padNumber):
         for x in range(len(eventconsts.Pads[y])):
             if padNumber == eventconsts.Pads[y][x]:
                 return eventconsts.BasicPads[y][x]
-    internal.logError("Pad number note defined")
+    internal.debugLog("Pad number note defined")
 
 # Returns true if is a double click for a press
 lastPressID = -1
