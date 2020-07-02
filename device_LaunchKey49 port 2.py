@@ -61,6 +61,7 @@ class TGeneric():
         
         lighting.lightShow()
         internal.extendedMode.setVal(True)
+        
 
         # Process inControl preferences
         if config.START_IN_INCONTROL_KNOBS == False: internal.extendedMode.setVal(False, eventconsts.INCONTROL_KNOBS) 
@@ -75,6 +76,7 @@ class TGeneric():
         print("")
 
     def OnDeInit(self):
+        lighting.lightShow()
         # Return the device into Basic Mode
         internal.extendedMode.setVal(False)
         print('Deinitialisation complete')
