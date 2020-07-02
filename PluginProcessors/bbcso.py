@@ -50,7 +50,7 @@ def activeEnd():
 def redraw(lights):
     if not internal.extendedMode.query(eventconsts.INCONTROL_PADS):
         for x in range(0, 8):
-            lights.setPadColour(x, 1, lighting.COLOUR_DARK_GREY)
+            lights.setPadColour(x, 1, lighting.COLOUR_LIGHT_BLUE)
 
     return
 

@@ -4,6 +4,8 @@ This script handles events when the channel rack is active
 
 """
 
+import math # For logarithm
+
 import channels
 import ui
 
@@ -28,34 +30,51 @@ def process(command):
             command.handled = True
 
             gridBits.toggleBit(current_track, command.padX)
+            command.actions.appendAction("Grid Bits: Toggle bit")
         
         coord = [command.padX, command.padY]
 
         # Next/prev track
         if coord == [0, 1]:
             ui.previous()
+            command.actions.appendAction("Channel Rack: Previous channel")
             command.handled = True
         if coord == [1, 1]:
             ui.next()
+            command.actions.appendAction("Channel Rack: Next channel")
             command.handled = True
         # Scroll grid bits
         if coord == [2, 1]:
-            gridBits.scrollLeft()
-            command.handled = True
+            if command.is_double_click:
+                gridBits.resetScroll()
+                command.actions.appendAction("Grid Bits: Reset scroll")
+                command.handled = True
+            else:
+                gridBits.scrollLeft()
+                command.actions.appendAction("Grid Bits: Scroll left")
+                command.handled = True
         if coord == [3, 1]:
             gridBits.scrollRight()
+            command.actions.appendAction("Grid Bits: Scroll right")
             command.handled = True
         # Zoom grid bits
         if coord == [4, 1]:
             gridBits.zoomOut()
+            command.actions.appendAction("Grid Bits: Zoom out")
             command.handled = True
         if coord == [5, 1]:
             if command.is_double_click:
                 gridBits.resetZoom()
+                command.actions.appendAction("Grid Bits: Reset zoom")
             else:
                 gridBits.zoomIn()
+                command.actions.appendAction("Grid Bits: Zoom in")
             command.handled = True
-        
+        # To piano roll
+        if coord == [7, 1]:
+            ui.showWindow(config.WINDOW_PIANO_ROLL)
+            command.actions.appendAction("Sent to pianoroll")
+            command.handled = True
 
     #---------------------------------
     # Faders
@@ -218,6 +237,31 @@ def redraw(lights):
 
     setGridBits(lights)
 
+    light_num_scroll = gridBits.scroll
+    if light_num_scroll < 8:
+
+        if not gridBits.getBit(channels.channelNumber(), light_num_scroll):
+            lights.setPadColour(light_num_scroll, 0, lighting.COLOUR_LIGHT_LILAC)
+        else:
+            lights.setPadColour(light_num_scroll, 0, lighting.COLOUR_PINK, True)
+         
+
+    light_num_zoom = 7 - int(math.log(gridBits.zoom, 2))
+    if light_num_zoom >= 0:
+        if not gridBits.getBit(channels.channelNumber(), light_num_zoom):
+            lights.setPadColour(light_num_zoom, 0, lighting.COLOUR_LIGHT_LIGHT_BLUE)
+        else:
+            lights.setPadColour(light_num_zoom, 0, lighting.COLOUR_BLUE, True)
+
+    if light_num_scroll == light_num_zoom:
+        if not gridBits.getBit(channels.channelNumber(), light_num_zoom):
+            lights.setPadColour(light_num_zoom, 0, lighting.COLOUR_LIGHT_YELLOW, True)
+        else:
+            lights.setPadColour(light_num_zoom, 0, lighting.COLOUR_PINK, True)
+
+    for x in range(0, 8):
+        lights.setPadColour(x, 0, lighting.COLOUR_DARK_GREY)
+
     # Set colours for controls
     lights.setPadColour(0, 1, lighting.UI_NAV_VERTICAL)     # Prev track
     lights.setPadColour(1, 1, lighting.UI_NAV_VERTICAL)     # Next track
@@ -225,6 +269,8 @@ def redraw(lights):
     lights.setPadColour(3, 1, lighting.UI_NAV_HORIZONTAL)   # Move right
     lights.setPadColour(4, 1, lighting.UI_ZOOM)             # Zoom out
     lights.setPadColour(5, 1, lighting.UI_ZOOM)             # Zoom in
+
+    lights.setPadColour(7, 1, lighting.UI_ACCEPT)           # To piano roll
 
     return
 
@@ -235,6 +281,10 @@ def activeStart():
     return
 
 def activeEnd():
+
+    # Reset Grid Bit controller
+    gridBits.resetZoom()
+    gridBits.resetScroll()
 
     internal.extendedMode.revert(eventconsts.INCONTROL_PADS)
 
@@ -264,6 +314,9 @@ class getBitMgr:
         val = not channels.getGridBit(track, position*self.zoom + 8*self.scroll)
         return channels.setGridBit(track, position*self.zoom + 8*self.scroll, val)
     
+    def resetScroll(self):
+        self.scroll = 0
+
     def scrollLeft(self):
         if self.scroll > 0:
             self.scroll -= 1
