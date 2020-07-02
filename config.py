@@ -32,8 +32,13 @@ START_IN_INCONTROL_PADS = True
 
 TAB_LENGTH = 16 # How much spacing to add in console output
 
-CONSOLE_PRINT_PERFORMANCE_TIMES = False # Indicates whether processing times will be printed to the console. 
-                                        # Enable if debugging (although it kinda clogs up the console a LOT)
+# Controls level of console messages. Useful for debugging performance
+# 0 = Errors only
+# 1 = Event processor performance
+# 2 = MIDI Dispatch events
+# 3 = Idle processor performance
+CONSOLE_DEBUG_LEVEL = 0
+
 
 #-------------------------------
 # CONSTANTS
@@ -57,5 +62,5 @@ WINDOW_BROWSER = 4
 # Script Info: Changing this isn't recommended as it may make debugging more difficult for me
 SCRIPT_NAME = "Novation LaunchKey Mk2 Controller Script"
 SCRIPT_AUTHOR = "Miguel Guthridge"
-SCRIPT_VERSION = "1.0.0"
+SCRIPT_VERSION = "1.1.1"
 

@@ -6,6 +6,10 @@ You shouldn't need to adjust these values,
 but if you are modifying the script for use with a different controller with the same features,
 this is the place to start.
 """
+
+# Access FL Event consts through here
+import midi
+
 # Define contant for determining event type
 TYPE_UNRECOGNISED = -1
 TYPE_SYSTEM_MSG = 0
@@ -25,14 +29,16 @@ TYPE_NOTE = 20
 TYPE_BASIC_EVENT = 21
 
 
-NOTE_ON = 0x9 # Shortened as data1 contains note name
+NOTE_ON = 0x9 # Shortened as data1 also contains note channel
 NOTE_OFF = 0x8
 
 Notes = [NOTE_ON, NOTE_OFF]
 
 PEDAL = 0x40B0
+PITCH_BEND = 0x00E0
+MOD_WHEEL = 0x01B0
 
-BasicEvents = [PEDAL]
+BasicEvents = [PEDAL, PITCH_BEND, MOD_WHEEL]
 
 # Define System Message
 SYSTEM_EXTENDED = 0x0C9F

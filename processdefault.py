@@ -31,6 +31,28 @@ def process(command):
     command.actions.addProcessor("Default Processor")
 
     #---------------------------------
+    # Tempo button
+    #---------------------------------
+    if (command.type == eventconsts.TYPE_PAD or command.type == eventconsts.TYPE_BASIC_PAD) and command.is_lift:
+        if command.padX == 8 and command.padY == 0:
+
+            # Double press: tap tempo
+            if command.is_double_click:
+                internal.beat.toggle_metronome()
+                internal.beat.toggle_tempo_tap()
+                command.actions.appendAction("Toggled Tempo Tapping")
+
+            if internal.beat.is_tapping_tempo:
+                internal.beat.tap_tempo()
+                command.actions.appendAction("Tapped Tempo")
+            else:
+                # Toggle metronome back to original
+                internal.beat.toggle_metronome()
+                command.actions.appendAction("Toggled Metronome")
+            command.handled = True
+    
+    
+    #---------------------------------
     # Transport functions
     #---------------------------------
 

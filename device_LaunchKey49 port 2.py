@@ -120,10 +120,11 @@ class TGeneric():
         return
 
     def OnRefresh(self, flags):
+        internal.refresh()
         return
     
     def OnUpdateBeatIndicator(self, beat):
-        internal.beat.set(beat)
+        internal.beat.set_beat(beat)
 
 Generic = TGeneric()
 
