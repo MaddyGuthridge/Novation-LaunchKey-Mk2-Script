@@ -13,29 +13,55 @@ import eventconsts
 import internal
 import lighting
 
-def redraw(lights):
+in_popup = False
 
+def redraw(lights):
+    global in_popup
     # In Popup Menu
     if ui.isInPopupMenu():
-        lights.setPadColour(1, 0, lighting.UI_NAV_VERTICAL)         # Up
-        lights.setPadColour(1, 1, lighting.UI_NAV_VERTICAL)         # Down
-        lights.setPadColour(0, 1, lighting.UI_NAV_HORIZONTAL)       # Left
-        lights.setPadColour(2, 1, lighting.UI_NAV_HORIZONTAL)       # Right
-        lights.setPadColour(3, 1, lighting.UI_REJECT)               # No
-        lights.setPadColour(4, 1, lighting.UI_ACCEPT)               # Yes
+        if not in_popup:
+            internal.window.reset_animation_tick()
+            in_popup = True
+        
+        if internal.window.get_animation_tick() > 0:
+            lights.setPadColour(1, 1, lighting.UI_NAV_VERTICAL)         # Down
+
+        if internal.window.get_animation_tick() > 1:
+            lights.setPadColour(1, 0, lighting.UI_NAV_VERTICAL)         # Up
+            lights.setPadColour(0, 1, lighting.UI_NAV_HORIZONTAL)       # Left
+            lights.setPadColour(2, 1, lighting.UI_NAV_HORIZONTAL)       # Right
+
+        if internal.window.get_animation_tick() > 2:
+            lights.setPadColour(3, 1, lighting.UI_REJECT)               # No
+
+        if internal.window.get_animation_tick() > 3:
+            lights.setPadColour(4, 1, lighting.UI_ACCEPT)               # Yes
+        
         lights.solidifyAll()
+
+    else:
+        if in_popup:
+            internal.window.reset_animation_tick()
+            in_popup = False
 
     # Shift key triggers window switcher
     if internal.shift.getDown():
         
-        lights.setPadColour(0, 1, lighting.WINDOW_PLAYLIST)         # Playlist
-        lights.setPadColour(1, 1, lighting.WINDOW_CHANNEL_RACK)     # Channel rack
-        lights.setPadColour(2, 1, lighting.WINDOW_PIANO_ROLL)       # Piano roll
-        lights.setPadColour(3, 1, lighting.WINDOW_MIXER)            # Mixer
-        lights.setPadColour(4, 1, lighting.WINDOW_BROWSER)          # Browser
+        if internal.window.get_animation_tick() > 0:
+            lights.setPadColour(0, 1, lighting.WINDOW_PLAYLIST)         # Playlist
+        if internal.window.get_animation_tick() > 1:
+            lights.setPadColour(1, 1, lighting.WINDOW_CHANNEL_RACK)     # Channel rack
+        if internal.window.get_animation_tick() > 2:
+            lights.setPadColour(2, 1, lighting.WINDOW_PIANO_ROLL)       # Piano roll
+        if internal.window.get_animation_tick() > 3:
+            lights.setPadColour(3, 1, lighting.WINDOW_MIXER)            # Mixer
+            lights.setPadColour(7, 0, lighting.UI_NAV_HORIZONTAL)       # Next plugin
+        if internal.window.get_animation_tick() > 4:
+            lights.setPadColour(4, 1, lighting.WINDOW_BROWSER)          # Browser
+            lights.setPadColour(6, 0, lighting.UI_NAV_HORIZONTAL)       # Prev plugin
 
-        lights.setPadColour(6, 0, lighting.UI_NAV_HORIZONTAL)       # Prev plugin
-        lights.setPadColour(7, 0, lighting.UI_NAV_HORIZONTAL)       # Prev plugin
+        
+        
 
         lights.solidifyAll()
 

@@ -234,43 +234,22 @@ def process(command):
     return
 
 def redraw(lights):
+    if internal.extendedMode.query(eventconsts.INCONTROL_PADS):
+        setGridBits(lights)
 
-    setGridBits(lights)
+        # Set colours for controls
+        if internal.window.get_animation_tick() >= 0:
+            lights.setPadColour(0, 1, lighting.UI_NAV_VERTICAL)     # Prev track
+            lights.setPadColour(1, 1, lighting.UI_NAV_VERTICAL)     # Next track
+        if internal.window.get_animation_tick() >= 1:
+            lights.setPadColour(2, 1, lighting.UI_NAV_HORIZONTAL)   # Move left
+            lights.setPadColour(3, 1, lighting.UI_NAV_HORIZONTAL)   # Move right
+        if internal.window.get_animation_tick() >= 2:
+            lights.setPadColour(4, 1, lighting.UI_ZOOM)             # Zoom out
+            lights.setPadColour(5, 1, lighting.UI_ZOOM)             # Zoom in
 
-    light_num_scroll = gridBits.scroll
-    if light_num_scroll < 8:
-
-        if not gridBits.getBit(channels.channelNumber(), light_num_scroll):
-            lights.setPadColour(light_num_scroll, 0, lighting.COLOUR_LIGHT_LILAC)
-        else:
-            lights.setPadColour(light_num_scroll, 0, lighting.COLOUR_PINK, True)
-         
-
-    light_num_zoom = 7 - int(math.log(gridBits.zoom, 2))
-    if light_num_zoom >= 0:
-        if not gridBits.getBit(channels.channelNumber(), light_num_zoom):
-            lights.setPadColour(light_num_zoom, 0, lighting.COLOUR_LIGHT_LIGHT_BLUE)
-        else:
-            lights.setPadColour(light_num_zoom, 0, lighting.COLOUR_BLUE, True)
-
-    if light_num_scroll == light_num_zoom:
-        if not gridBits.getBit(channels.channelNumber(), light_num_zoom):
-            lights.setPadColour(light_num_zoom, 0, lighting.COLOUR_LIGHT_YELLOW, True)
-        else:
-            lights.setPadColour(light_num_zoom, 0, lighting.COLOUR_PINK, True)
-
-    for x in range(0, 8):
-        lights.setPadColour(x, 0, lighting.COLOUR_DARK_GREY)
-
-    # Set colours for controls
-    lights.setPadColour(0, 1, lighting.UI_NAV_VERTICAL)     # Prev track
-    lights.setPadColour(1, 1, lighting.UI_NAV_VERTICAL)     # Next track
-    lights.setPadColour(2, 1, lighting.UI_NAV_HORIZONTAL)   # Move left
-    lights.setPadColour(3, 1, lighting.UI_NAV_HORIZONTAL)   # Move right
-    lights.setPadColour(4, 1, lighting.UI_ZOOM)             # Zoom out
-    lights.setPadColour(5, 1, lighting.UI_ZOOM)             # Zoom in
-
-    lights.setPadColour(7, 1, lighting.UI_ACCEPT)           # To piano roll
+        if internal.window.get_animation_tick() >= 3:
+            lights.setPadColour(7, 1, lighting.UI_ACCEPT)           # To piano roll
 
     return
 
@@ -291,7 +270,7 @@ def activeEnd():
     return
 
 def topWindowStart():
-    
+    internal.window.reset_animation_tick()
 
     return
 
@@ -303,7 +282,7 @@ def topWindowEnd():
 
     # Internal functions
 
-class getBitMgr:
+class gridBitMgr:
     scroll = 0
     zoom = 1
 
@@ -333,13 +312,42 @@ class getBitMgr:
     def resetZoom(self):
         self.zoom = 1
 
-gridBits = getBitMgr()
+gridBits = gridBitMgr()
 
 def setGridBits(lights):
     current_track = channels.channelNumber()
     for i in range(8):
-        if gridBits.getBit(current_track, i):
-            lights.setPadColour(i, 0, lighting.COLOUR_RED)
+        if i <= internal.window.get_animation_tick():
+            if gridBits.getBit(current_track, i):
+                lights.setPadColour(i, 0, lighting.COLOUR_RED)
+            else:
+                lights.setPadColour(i, 0, lighting.COLOUR_DARK_GREY)
+
+    # Set scroll indicator
+    light_num_scroll = gridBits.scroll
+    if light_num_scroll < 8:
+
+        if not gridBits.getBit(channels.channelNumber(), light_num_scroll):
+            lights.setPadColour(light_num_scroll, 0, lighting.COLOUR_LIGHT_LILAC, True)
+        else:
+            lights.setPadColour(light_num_scroll, 0, lighting.COLOUR_PINK, True)
+         
+    # Set zoom indicator
+    light_num_zoom = 7 - int(math.log(gridBits.zoom, 2))
+    if light_num_zoom >= 0 and internal.window.get_animation_tick() > 7:
+        if not gridBits.getBit(channels.channelNumber(), light_num_zoom):
+            lights.setPadColour(light_num_zoom, 0, lighting.COLOUR_LIGHT_LIGHT_BLUE, True)
+        else:
+            lights.setPadColour(light_num_zoom, 0, lighting.COLOUR_BLUE, True)
+
+    # If zoom and scroll lie on same pad
+    if light_num_scroll == light_num_zoom:
+        if not gridBits.getBit(channels.channelNumber(), light_num_zoom):
+            lights.setPadColour(light_num_zoom, 0, lighting.COLOUR_LIGHT_YELLOW, True)
+        else:
+            lights.setPadColour(light_num_zoom, 0, lighting.COLOUR_PINK, True)
+
+
     return
 
 def processMuteSolo(channel, command):

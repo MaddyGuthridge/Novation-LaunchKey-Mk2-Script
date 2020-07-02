@@ -59,9 +59,22 @@ def sharedInit():
 
     beat.refresh() # Update beat indicator
 
-def refresh():
+def refreshProcessor():
     beat.refresh()
 
+# Called on idle
+def idleProcessor():
+    # Start performance timer
+    idleClock.start()
+
+    # Increment animation tick
+    window.incr_animation_tick()
+
+    # Update active window
+    window.update()
+
+    # Stop performance timer
+    idleClock.stop()
 
 # Prints a line break
 def printLineBreak():
@@ -117,7 +130,21 @@ class windowMgr:
         self.previous_plugin = ""
         self.active_plugin = ""
         self.active_fl_window = -1
+        self.animation_tick_number = 0
     
+    # Reset tick number to zero
+    def reset_animation_tick(self):
+        self.animation_tick_number = 0
+
+    # Called on idle to increase tick number
+    def incr_animation_tick(self):
+        self.animation_tick_number += 1
+
+    # Get number of ticks since window update
+    def get_animation_tick(self):
+        return self.animation_tick_number
+
+    # Update active window
     def update(self):
         old_window = self.active_fl_window
         # Update FL Window
@@ -222,7 +249,6 @@ class windowMgr:
         self.active_plugin = self.previous_plugin
         self.previous_plugin = ""
 
-
 window = windowMgr()
 
 # Gets string for FL Window
@@ -261,7 +287,6 @@ class extended:
 
     # Queries whether extended mode is active. Only accessible from extended port
     def query(self, option = eventconsts.SYSTEM_EXTENDED):
-        
         if option == eventconsts.SYSTEM_EXTENDED: return self.extendedMode
         elif option == eventconsts.INCONTROL_KNOBS: return self.inControl_Knobs
         elif option == eventconsts.INCONTROL_FADERS: return self.inControl_Faders
@@ -395,21 +420,23 @@ class extended:
         # Set pads
         elif option == eventconsts.INCONTROL_PADS:
             self.prev_inControl_Pads = self.inControl_Pads
+            window.reset_animation_tick()
             if newMode is True:
                 self.inControl_Pads = True
             elif newMode is False:
                 self.inControl_Pads = False
             else: debugLog("New mode mode not boolean")
 
-
 extendedMode = extended()
 
+""" Unneeded code - delete soon
 # Compares revieved event to previous
 def compareEvent(event):
     if toMidiMessage(event.status, event.data1, event.data2) is previous_event_out: return True
     else: return False
 
 EventNameT = ['Note Off', 'Note On ', 'Key Aftertouch', 'Control Change','Program Change',  'Channel Aftertouch', 'Pitch Bend', 'System Message' ]
+"""
 
 # Sends message to the default MIDI out device
 def sendMidiMessage(status, data1, data2):
@@ -440,15 +467,6 @@ def didSnap(value, snapTo):
 # Converts MIDI event range to float for use in volume, pan, etc functions
 def toFloat(value, min = 0, max = 1):
     return (value / 127) * (max - min) + min
-
-# Called on idle
-def idleProcessor():
-    # Start performance timer
-    idleClock.start()
-    window.update()
-
-    # Stop performance timer
-    idleClock.stop()
 
 # Print out error message
 def debugLog(message, level = 0):
@@ -487,6 +505,7 @@ class shiftMgr:
     def press(self):
         self.is_down = True
         self.used = False
+        window.reset_animation_tick()
     
     def lift(self):
         self.is_down = False
