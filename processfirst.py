@@ -6,6 +6,7 @@ This file processes events before anything else.
 
 import transport
 import ui
+import general
 
 import config
 import eventprocessor
@@ -51,17 +52,17 @@ def redraw(lights):
             lights.setPadColour(0, 1, lighting.WINDOW_PLAYLIST)         # Playlist
         if internal.window.get_animation_tick() > 1:
             lights.setPadColour(1, 1, lighting.WINDOW_CHANNEL_RACK)     # Channel rack
+            lights.setPadColour(0, 0, lighting.UI_UNDO)                 # Undo
         if internal.window.get_animation_tick() > 2:
             lights.setPadColour(2, 1, lighting.WINDOW_PIANO_ROLL)       # Piano roll
+            lights.setPadColour(1, 0, lighting.UI_REDO)                 # Redo
         if internal.window.get_animation_tick() > 3:
             lights.setPadColour(3, 1, lighting.WINDOW_MIXER)            # Mixer
             lights.setPadColour(7, 0, lighting.UI_NAV_HORIZONTAL)       # Next plugin
         if internal.window.get_animation_tick() > 4:
             lights.setPadColour(4, 1, lighting.WINDOW_BROWSER)          # Browser
             lights.setPadColour(6, 0, lighting.UI_NAV_HORIZONTAL)       # Prev plugin
-
-        
-        
+            
 
         lights.solidifyAll()
 
@@ -125,6 +126,16 @@ def process(command):
             if command.note == eventconsts.Pads[7][0]: 
                 ui.selectWindow(False)
                 command.actions.appendAction("Next window")
+                command.handled = True
+
+            if command.note == eventconsts.Pads[0][0]: 
+                general.undoUp()
+                command.actions.appendAction("Undo")
+                command.handled = True
+            
+            if command.note == eventconsts.Pads[1][0]: 
+                general.undoDown()
+                command.actions.appendAction("Redo")
                 command.handled = True
 
             

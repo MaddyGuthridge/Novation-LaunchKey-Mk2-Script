@@ -208,6 +208,9 @@ state = Lights()
 
 # OoooOooOOOooO PREETTTTTYYYY!!!!!!
 def lightShow():
+
+    state.reset()
+
     sleepTime = 0.05
     x = 0
     if internal.SHARED_INIT_OK:
@@ -305,6 +308,8 @@ UI_ZOOM = COLOUR_BLUE
 UI_ACCEPT = COLOUR_GREEN
 UI_REJECT = COLOUR_RED
 UI_CHOOSE = COLOUR_PURPLE
+UI_UNDO = COLOUR_LIGHT_LIGHT_BLUE
+UI_REDO = COLOUR_LIGHT_BLUE
 
 # Define tool colours
 TOOL_PENCIL = COLOUR_ORANGE
