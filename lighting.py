@@ -19,53 +19,83 @@ class LightMap:
     
     # Set all pads to off      
     def reset(self):
-        self.PadMap = [
-            [-1, -1],
-            [-1, -1],
-            [-1, -1],
-            [-1, -1],
-            [-1, -1],
-            [-1, -1],
-            [-1, -1],
-            [-1, -1],
-            [-1, -1]
+
+        # 0 = unfrozen, 1 = frozen
+        self.FrozenMap = [
+            [0, 0],
+            [0, 0],
+            [0, 0],
+            [0, 0],
+            [0, 0],
+            [0, 0],
+            [0, 0],
+            [0, 0],
+            [0, 0]
+            ]
+
+        # 0 = off, 1-127 = colour
+        self.PadColours = [
+            [0, 0],
+            [0, 0],
+            [0, 0],
+            [0, 0],
+            [0, 0],
+            [0, 0],
+            [0, 0],
+            [0, 0],
+            [0, 0]
+            ]
+
+        # 0 = off, 1 = on, 2 = pulse, negative = flash
+        self.PadStates = [
+            [0, 0],
+            [0, 0],
+            [0, 0],
+            [0, 0],
+            [0, 0],
+            [0, 0],
+            [0, 0],
+            [0, 0],
+            [0, 0]
             ]
 
     # Set the colour of a pad
-    def setPadColour(self, x, y, colour, override = False):
-        if self.PadMap[x][y] == -1 or override: # If pad available to map
-            self.PadMap[x][y] = colour
+    def setPadColour(self, x, y, colour, state = 3, override = False):
+        if self.FrozenMap[x][y] == 0 or override: # If pad available to map
+            self.PadColours[x][y] = colour
+            self.PadStates[x][y] = state
+            self.solidifyPad(x, y)
             return True
         else: return False
     
     # Sets colours based on state of LightMap object
-    def setFromMatrix(self, map, override = False):
-        for x in range(len(self.PadMap)):
-            for y in range(len(self.PadMap[x])):
-                if self.PadMap[x][y] == -1 or override:
-                    self.setPadColour(x, y, map[x][y])
+    def setFromMatrix(self, map, state=3, override = False):
+        for x in range(len(self.FrozenMap)):
+            for y in range(len(self.FrozenMap[x])):
+                if self.FrozenMap[x][y] == 0 or override:
+                    self.setPadColour(x, y, map[x][y], state)
         return
 
 
     # Prevents pad from being overwritten
     def solidifyPad(self, x, y):
-        if self.PadMap[x][y] == -1: # If pad available to map
-            self.PadMap[x][y] = 0
+        if self.FrozenMap[x][y] == 0: # If pad available to map
+            self.FrozenMap[x][y] = 1
     
     # Prevents row from being overwritten
     def solidifyRow(self, y):
-        for x in range(len(self.PadMap)):
-            if self.PadMap[x][y] == -1: self.PadMap[x][y] = 0
+        for x in range(len(self.FrozenMap)):
+            if self.FrozenMap[x][y] == 0: self.FrozenMap[x][y] = 1
     
     # Prevents column from being overwritten
     def solidifyColumn(self, x):
-        for y in range(len(self.PadMap)):
-            if self.PadMap[x][y] == -1: self.PadMap[x][y] = 0
+        for y in range(len(self.FrozenMap)):
+            if self.FrozenMap[x][y] == 0: self.FrozenMap[x][y] = 1
 
     # Prevents all pads from being overwritten
     def solidifyAll(self):
-        for x in range(len(self.PadMap)):
-            for y in range(len(self.PadMap[x])):
+        for x in range(len(self.FrozenMap)):
+            for y in range(len(self.FrozenMap[x])):
                 self.solidifyPad(x, y)
 
 # Lights manages state of pad lights
@@ -166,7 +196,7 @@ class Lights:
         map.solidifyAll()
         for x in range(len(self.PadColours)):
             for y in range(len(self.PadColours[x])):
-                self.setPadColour(x, y, map.PadMap[x][y])
+                self.setPadColour(x, y, map.PadColours[x][y], map.PadStates[x][y])
         return
     
     def redraw(self):
