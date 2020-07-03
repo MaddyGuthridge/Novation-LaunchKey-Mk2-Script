@@ -23,7 +23,7 @@ def redraw(lights):
     for x in range(len(internal.pads.padsDown)):
             for y in range(len(internal.pads.padsDown[x])):
                 if internal.pads.getVal(x, y):
-                    lights.setPadColour(x, y, lighting.COLOUR_WHITE, True)
+                    lights.setPadColour(x, y, lighting.COLOUR_WHITE, 2, True)
     return
 
 def process(command):
