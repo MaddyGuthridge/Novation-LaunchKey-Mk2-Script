@@ -131,6 +131,7 @@ class Lights:
     def reset(self):
         
         internal.sendMidiMessage(0xBF, 0x00, 0x00)
+        internal.window.reset_animation_tick()
         self.__init__()
 
     # Set the colour of a pad
@@ -308,8 +309,13 @@ UI_ZOOM = COLOUR_BLUE
 UI_ACCEPT = COLOUR_GREEN
 UI_REJECT = COLOUR_RED
 UI_CHOOSE = COLOUR_PURPLE
+
 UI_UNDO = COLOUR_LIGHT_LIGHT_BLUE
 UI_REDO = COLOUR_LIGHT_BLUE
+
+UI_COPY = COLOUR_BLUE
+UI_CUT = COLOUR_LIGHT_BLUE
+UI_PASTE = COLOUR_GREEN
 
 # Define tool colours
 TOOL_PENCIL = COLOUR_ORANGE

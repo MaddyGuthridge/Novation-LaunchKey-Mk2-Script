@@ -398,7 +398,8 @@ class extended:
                 self.inControl_Faders = False
                 self.inControl_Pads = False
             else: debugLog("New mode mode not boolean")
-        
+            lighting.state.reset()
+
         # Set knobs
         elif option == eventconsts.INCONTROL_KNOBS:
             self.prev_inControl_Knobs = self.inControl_Knobs
@@ -426,6 +427,7 @@ class extended:
             elif newMode is False:
                 self.inControl_Pads = False
             else: debugLog("New mode mode not boolean")
+            lighting.state.reset()
 
 extendedMode = extended()
 

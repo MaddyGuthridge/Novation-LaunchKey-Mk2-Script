@@ -33,6 +33,7 @@ def process(command):
         # UI Mode
         if command.padY == 1 and command.padX == 0:
             ui_mode.nextMode()
+            internal.window.reset_animation_tick()
             command.actions.appendAction("Channel Rack: Next UI mode")
             command.handled = True
 
@@ -199,7 +200,7 @@ def process(command):
 
     return
 
-
+# Process when in grid bits
 def process_bit_mode(command):
     current_track = channels.channelNumber()
     #---------------------------------
@@ -217,7 +218,7 @@ def process_bit_mode(command):
 
 
         # Scroll grid bits
-        if coord == [2, 1]:
+        if coord == [4, 1]:
             if command.is_double_click:
                 gridBits.resetScroll()
                 command.actions.appendAction("Grid Bits: Reset scroll")
@@ -226,16 +227,16 @@ def process_bit_mode(command):
                 gridBits.scrollLeft()
                 command.actions.appendAction("Grid Bits: Scroll left")
                 command.handled = True
-        if coord == [3, 1]:
+        if coord == [5, 1]:
             gridBits.scrollRight()
             command.actions.appendAction("Grid Bits: Scroll right")
             command.handled = True
         # Zoom grid bits
-        if coord == [4, 1]:
+        if coord == [6, 1]:
             gridBits.zoomOut()
             command.actions.appendAction("Grid Bits: Zoom out")
             command.handled = True
-        if coord == [5, 1]:
+        if coord == [7, 1]:
             if command.is_double_click:
                 gridBits.resetZoom()
                 command.actions.appendAction("Grid Bits: Reset zoom")
@@ -244,7 +245,7 @@ def process_bit_mode(command):
                 command.actions.appendAction("Grid Bits: Zoom in")
             command.handled = True
 
-
+# Process when in menu
 def process_menu_mode(command):
     coord = [command.padX, command.padY]
 
@@ -258,6 +259,19 @@ def process_menu_mode(command):
         command.actions.appendAction("Channel Rack: Next channel")
         command.handled = True
 
+    # Cut, Copy, Paste
+    if coord == [3, 0]:
+        ui.copy()
+        command.actions.appendAction("UI: Copy")
+        command.handled = True
+    if coord == [4, 0]:
+        ui.cut()
+        command.actions.appendAction("UI: Cut")
+        command.handled = True
+    if coord == [5, 0]:
+        ui.paste()
+        command.actions.appendAction("UI: Paste")
+        command.handled = True
 
     # To piano roll
     if coord == [7, 1]:
@@ -266,45 +280,56 @@ def process_menu_mode(command):
         command.handled = True
 
 def redraw(lights):
+    if internal.extendedMode.query(eventconsts.INCONTROL_PADS):
+        current_ui_mode = ui_mode.getMode()
 
-    current_ui_mode = ui_mode.getMode()
+        if current_ui_mode == 0:
+            ui_button_colour = MENU_MODE_COLOUR
+        else:
+            ui_button_colour = BIT_MODE_COLOUR
 
-    if current_ui_mode == 0:
-        ui_button_colour = MENU_MODE_COLOUR
-    else:
-        ui_button_colour = BIT_MODE_COLOUR
+        lights.setPadColour(0, 1, ui_button_colour)    
 
-    lights.setPadColour(0, 1, ui_button_colour)    
+        if current_ui_mode == 0:
+            redraw_menu_mode(lights)
 
-    if current_ui_mode == 0:
-        redraw_menu_mode(lights)
-
-    elif current_ui_mode == 1:
-        redraw_bit_mode(lights)
+        elif current_ui_mode == 1:
+            redraw_bit_mode(lights)
 
     return
 
+# Redraw when in menu
 def redraw_menu_mode(lights):
-    if internal.extendedMode.query(eventconsts.INCONTROL_PADS):
-        # Set colours for controls
-        if internal.window.get_animation_tick() >= 0:
-            lights.setPadColour(1, 0, lighting.UI_NAV_VERTICAL)     # Prev track
-            lights.setPadColour(1, 1, lighting.UI_NAV_VERTICAL)     # Next track
+    
+    # Set colours for controls
+    if internal.window.get_animation_tick() >= 1:
+        lights.setPadColour(1, 1, lighting.UI_NAV_VERTICAL)     # Next track
 
-        if internal.window.get_animation_tick() >= 3:
-            lights.setPadColour(7, 1, lighting.UI_ACCEPT)           # To piano roll
+    if internal.window.get_animation_tick() >= 2:
+        lights.setPadColour(1, 0, lighting.UI_NAV_VERTICAL)     # Prev track
+        lights.setPadColour(3, 0, lighting.UI_COPY)             # Copy
+    if internal.window.get_animation_tick() >= 3:
+        lights.setPadColour(4, 0, lighting.UI_CUT)              # Cut
+    if internal.window.get_animation_tick() >= 4:
+        lights.setPadColour(5, 0, lighting.UI_PASTE)            # Paste
 
+
+    if internal.window.get_animation_tick() >= 3:
+        lights.setPadColour(7, 1, lighting.UI_ACCEPT, 2)           # To piano roll
+
+# Redraw when in grid bits
 def redraw_bit_mode(lights):
-    if internal.extendedMode.query(eventconsts.INCONTROL_PADS):
-        setGridBits(lights)
+    setGridBits(lights)
 
-        # Set colours for controls
-        if internal.window.get_animation_tick() >= 1:
-            lights.setPadColour(2, 1, lighting.UI_NAV_HORIZONTAL)   # Move left
-            lights.setPadColour(3, 1, lighting.UI_NAV_HORIZONTAL)   # Move right
-        if internal.window.get_animation_tick() >= 2:
-            lights.setPadColour(4, 1, lighting.UI_ZOOM)             # Zoom out
-            lights.setPadColour(5, 1, lighting.UI_ZOOM)             # Zoom in
+    # Set colours for controls
+    if internal.window.get_animation_tick() >= 6:
+        lights.setPadColour(4, 1, lighting.UI_NAV_HORIZONTAL)   # Move left
+    if internal.window.get_animation_tick() >= 5:
+        lights.setPadColour(5, 1, lighting.UI_NAV_HORIZONTAL)   # Move right
+    if internal.window.get_animation_tick() >= 4:
+        lights.setPadColour(6, 1, lighting.UI_ZOOM)             # Zoom out
+    if internal.window.get_animation_tick() >= 3:
+        lights.setPadColour(7, 1, lighting.UI_ZOOM)             # Zoom in
 
 
 def activeStart():
@@ -318,6 +343,7 @@ def activeEnd():
     # Reset Grid Bit controller
     gridBits.resetZoom()
     gridBits.resetScroll()
+    ui_mode.resetMode()
 
     internal.extendedMode.revert(eventconsts.INCONTROL_PADS)
 
