@@ -509,6 +509,7 @@ class shiftMgr:
     
     def lift(self):
         self.is_down = False
+        window.reset_animation_tick()
         return self.used
 
     def use(self):

@@ -316,6 +316,32 @@ gridBits = gridBitMgr()
 
 def setGridBits(lights):
     current_track = channels.channelNumber()
+
+    # Set scroll indicator
+    light_num_scroll = gridBits.scroll
+    if light_num_scroll < 8:
+
+        if not gridBits.getBit(channels.channelNumber(), light_num_scroll):
+            lights.setPadColour(light_num_scroll, 0, lighting.COLOUR_LIGHT_LILAC)
+        else:
+            lights.setPadColour(light_num_scroll, 0, lighting.COLOUR_PINK)
+         
+    # Set zoom indicator
+    light_num_zoom = 7 - int(math.log(gridBits.zoom, 2))
+    if light_num_zoom >= 0 and internal.window.get_animation_tick() > 7:
+        if not gridBits.getBit(channels.channelNumber(), light_num_zoom):
+            lights.setPadColour(light_num_zoom, 0, lighting.COLOUR_LIGHT_LIGHT_BLUE)
+        else:
+            lights.setPadColour(light_num_zoom, 0, lighting.COLOUR_BLUE)
+
+    # If zoom and scroll lie on same pad
+    if light_num_scroll == light_num_zoom:
+        if not gridBits.getBit(channels.channelNumber(), light_num_zoom):
+            lights.setPadColour(light_num_zoom, 0, lighting.COLOUR_LIGHT_YELLOW)
+        else:
+            lights.setPadColour(light_num_zoom, 0, lighting.COLOUR_PINK)
+
+    # Set remaining grid bits
     for i in range(8):
         if i <= internal.window.get_animation_tick():
             if gridBits.getBit(current_track, i):
@@ -323,29 +349,7 @@ def setGridBits(lights):
             else:
                 lights.setPadColour(i, 0, lighting.COLOUR_DARK_GREY)
 
-    # Set scroll indicator
-    light_num_scroll = gridBits.scroll
-    if light_num_scroll < 8:
-
-        if not gridBits.getBit(channels.channelNumber(), light_num_scroll):
-            lights.setPadColour(light_num_scroll, 0, lighting.COLOUR_LIGHT_LILAC, True)
-        else:
-            lights.setPadColour(light_num_scroll, 0, lighting.COLOUR_PINK, True)
-         
-    # Set zoom indicator
-    light_num_zoom = 7 - int(math.log(gridBits.zoom, 2))
-    if light_num_zoom >= 0 and internal.window.get_animation_tick() > 7:
-        if not gridBits.getBit(channels.channelNumber(), light_num_zoom):
-            lights.setPadColour(light_num_zoom, 0, lighting.COLOUR_LIGHT_LIGHT_BLUE, True)
-        else:
-            lights.setPadColour(light_num_zoom, 0, lighting.COLOUR_BLUE, True)
-
-    # If zoom and scroll lie on same pad
-    if light_num_scroll == light_num_zoom:
-        if not gridBits.getBit(channels.channelNumber(), light_num_zoom):
-            lights.setPadColour(light_num_zoom, 0, lighting.COLOUR_LIGHT_YELLOW, True)
-        else:
-            lights.setPadColour(light_num_zoom, 0, lighting.COLOUR_PINK, True)
+    
 
 
     return
