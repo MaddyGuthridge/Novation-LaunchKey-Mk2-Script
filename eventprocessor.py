@@ -261,6 +261,10 @@ class processedEvent:
 
         self.actions.appendAction(newEventStr)
     
+    def handle(self, action):
+        self.handled = True
+        self.actions.appendAction(action)
+
     # Returns event info as string
     def getInfo(self):
         out = "Event:"

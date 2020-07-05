@@ -42,14 +42,14 @@ previous_event_out = 0
 """
 
 def getVersionStr():
-    return str(config.SCRIPT_VERSION_MAJOR) + '.' + str(config.SCRIPT_VERSION_MINOR) + '.' + str(config.SCRIPT_VERSION_REVISION)
+    return str(internalconstants.SCRIPT_VERSION_MAJOR) + '.' + str(internalconstants.SCRIPT_VERSION_MINOR) + '.' + str(internalconstants.SCRIPT_VERSION_REVISION)
 
 def sharedInit():
     global SHARED_INIT_OK
     global SCRIPT_UPDATE_AVAILABLE
     printLineBreak()
 
-    print(config.SCRIPT_NAME + " - Version: " + getVersionStr())
+    print(internalconstants.SCRIPT_NAME + " - Version: " + getVersionStr())
     print(" - " + internalconstants.SCRIPT_AUTHOR)
     print("")
     print("Running in FL Studio Version: " + ui.getVersion())
@@ -59,7 +59,7 @@ def sharedInit():
     if SCRIPT_UPDATE_AVAILABLE:
         printLineBreak()
         print("An update to this script is available!")
-        print("Follow this link to download it: " + config.SCRIPT_URL)
+        print("Follow this link to download it: " + internalconstants.SCRIPT_URL)
         printLineBreak()
 
 

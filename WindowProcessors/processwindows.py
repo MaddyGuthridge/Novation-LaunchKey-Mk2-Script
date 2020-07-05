@@ -12,6 +12,7 @@ import internalconstants
 import WindowProcessors.processmixer
 import WindowProcessors.ProcessBrowser
 import WindowProcessors.processchannelrack
+import WindowProcessors.processplaylist
 
 import WindowProcessors.ProcessDefault
 
@@ -24,6 +25,9 @@ def getWindowObject():
     
     elif internal.window.active_fl_window == internalconstants.WINDOW_CHANNEL_RACK:
         return WindowProcessors.processchannelrack
+
+    elif internal.window.active_fl_window == internalconstants.WINDOW_PLAYLIST:
+        return WindowProcessors.processplaylist
 
     else: return WindowProcessors.ProcessDefault
 

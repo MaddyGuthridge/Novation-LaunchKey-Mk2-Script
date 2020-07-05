@@ -9,6 +9,7 @@ import ui
 import general
 
 import config
+import internalconstants
 import eventprocessor
 import eventconsts
 import internal
@@ -94,27 +95,27 @@ def process(command):
         if internal.shift.getDown() and command.type == eventconsts.TYPE_PAD and command.is_lift:
             
             if command.note == eventconsts.Pads[0][1]: 
-                ui.showWindow(config.WINDOW_PLAYLIST)
+                ui.showWindow(internalconstants.WINDOW_PLAYLIST)
                 command.actions.appendAction("Switched window to Playlist")
                 command.handled = True
 
             if command.note == eventconsts.Pads[1][1]: 
-                ui.showWindow(config.WINDOW_CHANNEL_RACK)
+                ui.showWindow(internalconstants.WINDOW_CHANNEL_RACK)
                 command.actions.appendAction("Switched window to Channel rack")
                 command.handled = True
 
             if command.note == eventconsts.Pads[2][1]: 
-                ui.showWindow(config.WINDOW_PIANO_ROLL)
+                ui.showWindow(internalconstants.WINDOW_PIANO_ROLL)
                 command.actions.appendAction("Switched window to Piano roll")
                 command.handled = True
             
             if command.note == eventconsts.Pads[3][1]: 
-                ui.showWindow(config.WINDOW_MIXER)
+                ui.showWindow(internalconstants.WINDOW_MIXER)
                 command.actions.appendAction("Switched window to Mixer")
                 command.handled = True
             
             if command.note == eventconsts.Pads[4][1]: 
-                ui.showWindow(config.WINDOW_BROWSER)
+                ui.showWindow(internalconstants.WINDOW_BROWSER)
                 command.actions.appendAction("Switched window to Browser")
                 command.handled = True
             

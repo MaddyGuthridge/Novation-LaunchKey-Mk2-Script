@@ -4,6 +4,9 @@ This file contains constants used by the script to allow it to function properly
 It is not recommended that the user modify these constants, as they may break the script.
 
 """
+
+import midi
+
 #---------------------------------
 # Script Info - Change this if you're forking the project
 #---------------------------------
@@ -20,11 +23,11 @@ UPDATE_JSON_URL = "https://api.github.com/repos/MiguelGuthridge/Novation-LaunchK
 # Window constants
 #---------------------------------
 
-WINDOW_PLAYLIST = 2
-WINDOW_PIANO_ROLL = 3
-WINDOW_CHANNEL_RACK = 1
-WINDOW_MIXER = 0
-WINDOW_BROWSER = 4
+WINDOW_PLAYLIST = midi.widPlaylist
+WINDOW_PIANO_ROLL = midi.widPianoRoll
+WINDOW_CHANNEL_RACK = midi.widChannelRack
+WINDOW_MIXER = midi.widMixer
+WINDOW_BROWSER = midi.widBrowser
 
 #---------------------------------
 # Snapping constants
