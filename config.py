@@ -15,6 +15,9 @@ import eventconsts
 # Change this to change which button is treated as the shift button
 SHIFT_BUTTON = eventconsts.TRANSPORT_LOOP
 
+# Check for updates online. Change to False if you don't want to be notified or something
+CHECK_UPDATES = True
+
 # Port values. Change these to match the ports for each device set in FL Studio
 DEVICE_PORT_BASIC = 220
 DEVICE_PORT_EXTENDED = 225
@@ -38,6 +41,5 @@ TAB_LENGTH = 16 # How much spacing to add in console output
 # 2 = MIDI Dispatch events
 # 3 = Idle processor performance
 CONSOLE_DEBUG_LEVEL = 1
-
 
 
