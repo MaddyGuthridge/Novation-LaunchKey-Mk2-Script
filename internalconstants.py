@@ -5,12 +5,16 @@ It is not recommended that the user modify these constants, as they may break th
 
 """
 #---------------------------------
-# Script Info
+# Script Info - Change this if you're forking the project
 #---------------------------------
 
 SCRIPT_NAME = "Novation LaunchKey Mk2 Controller Script"
 SCRIPT_AUTHOR = "Miguel Guthridge"
-SCRIPT_VERSION = "1.1.1"
+SCRIPT_VERSION_MAJOR = 1
+SCRIPT_VERSION_MINOR = 0
+SCRIPT_VERSION_REVISION = 2
+SCRIPT_URL = "https://github.com/MiguelGuthridge/Novation-LaunchKey-Mk2-Script"
+UPDATE_JSON_URL = "https://api.github.com/repos/MiguelGuthridge/Novation-LaunchKey-Mk2-Script/tags"
 
 #---------------------------------
 # Window constants
