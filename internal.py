@@ -17,6 +17,7 @@ import general
 
 import eventconsts
 import config
+import internalconstants
 import eventprocessor
 import lighting
 
@@ -42,8 +43,8 @@ def sharedInit():
     global SHARED_INIT_OK
     printLineBreak()
 
-    print(config.SCRIPT_NAME + " - Version: " + config.SCRIPT_VERSION)
-    print(" - " + config.SCRIPT_AUTHOR)
+    print(internalconstants.SCRIPT_NAME + " - Version: " + internalconstants.SCRIPT_VERSION)
+    print(" - " + internalconstants.SCRIPT_AUTHOR)
     print("")
     print("Running in FL Studio Version: " + ui.getVersion())
 
@@ -119,8 +120,8 @@ class performanceMonitor:
     
     def total(self):
         return self.total_time
-eventClock = performanceMonitor("Event Processor", 1)
-idleClock = performanceMonitor("Idle Processor", 3)
+eventClock = performanceMonitor("Event Processor", internalconstants.DEBUG_PROCESSOR_PERFORMANCE)
+idleClock = performanceMonitor("Idle Processor", internalconstants.DEBUG_IDLE_PERFORMANCE)
 
 
 # Manages active window - CURRENTLY BROKEN!!!!
@@ -148,20 +149,20 @@ class windowMgr:
     def update(self):
         old_window = self.active_fl_window
         # Update FL Window
-        if   ui.getFocused(config.WINDOW_MIXER):        
-            new_fl_window = config.WINDOW_MIXER
+        if   ui.getFocused(internalconstants.WINDOW_MIXER):        
+            new_fl_window = internalconstants.WINDOW_MIXER
 
-        elif ui.getFocused(config.WINDOW_PIANO_ROLL):   
-            new_fl_window = config.WINDOW_PIANO_ROLL
+        elif ui.getFocused(internalconstants.WINDOW_PIANO_ROLL):   
+            new_fl_window = internalconstants.WINDOW_PIANO_ROLL
 
-        elif ui.getFocused(config.WINDOW_CHANNEL_RACK): 
-            new_fl_window = config.WINDOW_CHANNEL_RACK
+        elif ui.getFocused(internalconstants.WINDOW_CHANNEL_RACK): 
+            new_fl_window = internalconstants.WINDOW_CHANNEL_RACK
 
-        elif ui.getFocused(config.WINDOW_PLAYLIST):     
-            new_fl_window = config.WINDOW_PLAYLIST
+        elif ui.getFocused(internalconstants.WINDOW_PLAYLIST):     
+            new_fl_window = internalconstants.WINDOW_PLAYLIST
 
-        elif ui.getFocused(config.WINDOW_BROWSER):      
-            new_fl_window = config.WINDOW_BROWSER
+        elif ui.getFocused(internalconstants.WINDOW_BROWSER):      
+            new_fl_window = internalconstants.WINDOW_BROWSER
         
         else: new_fl_window = -1
 
@@ -254,11 +255,11 @@ window = windowMgr()
 # Gets string for FL Window
 def get_fl_window_string(index):
     if index == -1: return "NONE"
-    if index == config.WINDOW_MIXER: return "Mixer"
-    if index == config.WINDOW_PLAYLIST: return "Playlist"
-    if index == config.WINDOW_CHANNEL_RACK: return "Channel Rack"
-    if index == config.WINDOW_PIANO_ROLL: return "Piano Roll"
-    if index == config.WINDOW_BROWSER: return "Browser"
+    if index == internalconstants.WINDOW_MIXER: return "Mixer"
+    if index == internalconstants.WINDOW_PLAYLIST: return "Playlist"
+    if index == internalconstants.WINDOW_CHANNEL_RACK: return "Channel Rack"
+    if index == internalconstants.WINDOW_PIANO_ROLL: return "Piano Roll"
+    if index == internalconstants.WINDOW_BROWSER: return "Browser"
 
 # Print command data
 def printCommand(command):
@@ -445,10 +446,10 @@ def sendMidiMessage(status, data1, data2):
     global previous_event_out
     previous_event_out  = toMidiMessage(status, data1, data2)
     if PORT == config.DEVICE_PORT_EXTENDED:
-        debugLog("Dispatched external MIDI message", 2)
+        debugLog("Dispatched external MIDI message", internalconstants.DEBUG_DISPATCH_EVENTS)
         device.midiOutMsg(previous_event_out)
     else:
-        debugLog("Dispatched internal MIDI message", 2)
+        debugLog("Dispatched internal MIDI message", internalconstants.DEBUG_DISPATCH_EVENTS)
         device.dispatch(0, previous_event_out)
 
 # Generates a MIDI message given arguments

@@ -7,6 +7,7 @@ This script forwards events to event processors for FL Studio Windows
 
 import config
 import internal
+import internalconstants
 
 import WindowProcessors.processmixer
 import WindowProcessors.ProcessBrowser
@@ -15,13 +16,13 @@ import WindowProcessors.processchannelrack
 import WindowProcessors.ProcessDefault
 
 def getWindowObject():
-    if internal.window.active_fl_window == config.WINDOW_MIXER:
+    if internal.window.active_fl_window == internalconstants.WINDOW_MIXER:
         return WindowProcessors.processmixer
     
-    elif internal.window.active_fl_window == config.WINDOW_BROWSER:
+    elif internal.window.active_fl_window == internalconstants.WINDOW_BROWSER:
         return WindowProcessors.ProcessBrowser
     
-    elif internal.window.active_fl_window == config.WINDOW_CHANNEL_RACK:
+    elif internal.window.active_fl_window == internalconstants.WINDOW_CHANNEL_RACK:
         return WindowProcessors.processchannelrack
 
     else: return WindowProcessors.ProcessDefault

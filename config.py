@@ -23,7 +23,7 @@ LONG_PRESS_TIME = 0.5 # Change how long a long press needs to be held for
 DOUBLE_PRESS_TIME = 0.2 # Change how quickly a double press needs to be done to be detected
 
 ENABLE_SNAPPING = True # Change to False to prevent faders and knobs from snapping to default values
-SNAP_RANGE = 0.03 # Will snap if within this disatnce of snap value
+SNAP_RANGE = 0.05 # Will snap if within this disatnce of snap value
 
 # These values determine whether the controller will start with inControl modes enabled for each type
 START_IN_INCONTROL_KNOBS = True
@@ -37,30 +37,7 @@ TAB_LENGTH = 16 # How much spacing to add in console output
 # 1 = Event processor performance
 # 2 = MIDI Dispatch events
 # 3 = Idle processor performance
-CONSOLE_DEBUG_LEVEL = 0
+CONSOLE_DEBUG_LEVEL = 1
 
 
-#-------------------------------
-# CONSTANTS
-#-------------------------------
-
-# Mixer snap values
-MIXER_VOLUME_SNAP_TO = 0.8 # Snap mixer track volumes to 100%
-MIXER_PAN_SNAP_TO = 0.0 # Snap mixer track pannings to Centred
-MIXER_STEREO_SEP_SNAP_TO = 0.0 # Snap mixer track stereo separation to Original
-
-# Channel rack snap values
-CHANNEL_VOLUME_SNAP_TO = 0.78125 # Snap channel volumes to ~= 78% (FL Default)
-CHANNEL_PAN_SNAP_TO = 0.0 # Snap channel pans to Centred
-
-WINDOW_PLAYLIST = 2
-WINDOW_PIANO_ROLL = 3
-WINDOW_CHANNEL_RACK = 1
-WINDOW_MIXER = 0
-WINDOW_BROWSER = 4
-
-# Script Info: Changing this isn't recommended as it may make debugging more difficult for me
-SCRIPT_NAME = "Novation LaunchKey Mk2 Controller Script"
-SCRIPT_AUTHOR = "Miguel Guthridge"
-SCRIPT_VERSION = "1.1.1"
 

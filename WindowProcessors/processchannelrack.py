@@ -11,6 +11,7 @@ import ui
 
 import lighting
 import config
+import internalconstants
 import internal
 import eventconsts
 import processorhelpers
@@ -275,7 +276,7 @@ def process_menu_mode(command):
 
     # To piano roll
     if coord == [7, 1]:
-        ui.showWindow(config.WINDOW_PIANO_ROLL)
+        ui.showWindow(internalconstants.WINDOW_PIANO_ROLL)
         command.actions.appendAction("Sent to pianoroll")
         command.handled = True
 
@@ -451,13 +452,13 @@ def setVolume(command, track, value):
     volume = getVolumeSend(value)
     channels.setChannelVolume(track, volume)
     command.actions.appendAction("Set " + channels.getChannelName(track) + " volume to " + getVolumeValue(value))
-    if internal.didSnap(internal.toFloat(value), config.CHANNEL_VOLUME_SNAP_TO):
+    if internal.didSnap(internal.toFloat(value), internalconstants.CHANNEL_VOLUME_SNAP_TO):
         command.actions.appendAction("[Snapped]")
 
 # Returns volume value set to send to FL Studio
 def getVolumeSend(inVal):
     if config.ENABLE_SNAPPING:
-        return internal.snap(internal.toFloat(inVal), config.CHANNEL_VOLUME_SNAP_TO)
+        return internal.snap(internal.toFloat(inVal), internalconstants.CHANNEL_VOLUME_SNAP_TO)
     else: return internal.toFloat(inVal)
 
 
@@ -469,13 +470,13 @@ def setPan(command, track, value):
     volume = getPanSend(value)
     channels.setChannelPan(track, volume)
     command.actions.appendAction("Set " + channels.getChannelName(track) + " pan to " + getPanValue(value))
-    if internal.didSnap(internal.toFloat(value, -1), config.CHANNEL_PAN_SNAP_TO):
+    if internal.didSnap(internal.toFloat(value, -1), internalconstants.CHANNEL_PAN_SNAP_TO):
         command.actions.appendAction("[Snapped]")
 
 # Returns volume value set to send to FL Studio
 def getPanSend(inVal):
     if config.ENABLE_SNAPPING:
-        return internal.snap(internal.toFloat(inVal, -1), config.CHANNEL_PAN_SNAP_TO)
+        return internal.snap(internal.toFloat(inVal, -1), internalconstants.CHANNEL_PAN_SNAP_TO)
     else: return internal.toFloat(inVal, -1)
 
 
