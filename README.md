@@ -26,12 +26,9 @@ Events are processed in the context of the active window and plugin, allowing fo
 
 # Helpful Links:
 
-[-> Latest Release](https://github.com/MiguelGuthridge/Novation-LaunchKey-Mk2-Script/releases)
-
-[-> Wiki](https://github.com/MiguelGuthridge/Novation-LaunchKey-Mk2-Script/wiki)
-
-[-> Installation and Set-up](https://github.com/MiguelGuthridge/Novation-LaunchKey-Mk2-Script/wiki/Installation-and-Set-up)
-
-[-> Basic Usage](https://github.com/MiguelGuthridge/Novation-LaunchKey-Mk2-Script/wiki/Basic-Usage)
-
-[-> MIDI Scripting (FL Studio Manual)](https://www.image-line.com/support/flstudio_online_manual/html/midi_scripting.htm)
+| Link | Description |
+| ---        |    ---   |
+| [-> Latest Release](https://github.com/MiguelGuthridge/Novation-LaunchKey-Mk2-Script/releases) | Download the script |
+| [-> Script Manual](https://github.com/MiguelGuthridge/Novation-LaunchKey-Mk2-Script/wiki) | Lean to use the script |
+| [-> Installation and Set-up](https://github.com/MiguelGuthridge/Novation-LaunchKey-Mk2-Script/wiki/Installation-and-Set-up) | Instructions for installing the script |
+| [-> MIDI Scripting (FL Studio Manual)](https://www.image-line.com/support/flstudio_online_manual/html/midi_scripting.htm) | A page detailing FL Studio's Scripting API |
