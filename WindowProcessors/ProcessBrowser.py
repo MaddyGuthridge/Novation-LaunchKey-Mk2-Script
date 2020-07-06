@@ -22,17 +22,22 @@ def activeEnd():
     return
 
 def topWindowStart():
+    internal.window.reset_animation_tick()
     return
 
 def topWindowEnd():
     return
 
 def redraw(lights):
-    lights.setPadColour(3, 0, lighting.COLOUR_PURPLE)   # Prev
-    lights.setPadColour(3, 1, lighting.COLOUR_PURPLE)   # Next
-    lights.setPadColour(4, 1, lighting.COLOUR_RED)      # Stop
-    lights.setPadColour(5, 1, lighting.COLOUR_GREEN)    # Play
-    lights.setPadColour(7, 1, lighting.COLOUR_BLUE)     # Select
+    if internal.window.get_animation_tick() >= 0:
+        lights.setPadColour(3, 1, lighting.COLOUR_PURPLE)   # Next
+    if internal.window.get_animation_tick() >= 1:
+        lights.setPadColour(3, 0, lighting.COLOUR_PURPLE)   # Prev
+        lights.setPadColour(4, 1, lighting.COLOUR_RED)      # Stop
+    if internal.window.get_animation_tick() >= 2:
+        lights.setPadColour(5, 1, lighting.COLOUR_GREEN)    # Play
+    if internal.window.get_animation_tick() >= 4:
+        lights.setPadColour(7, 1, lighting.COLOUR_BLUE, 2)     # Select
     return
 
 def process(command):

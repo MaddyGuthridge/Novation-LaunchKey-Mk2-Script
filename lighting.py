@@ -19,62 +19,103 @@ class LightMap:
     
     # Set all pads to off      
     def reset(self):
-        self.PadMap = [
-            [-1, -1],
-            [-1, -1],
-            [-1, -1],
-            [-1, -1],
-            [-1, -1],
-            [-1, -1],
-            [-1, -1],
-            [-1, -1],
-            [-1, -1]
+
+        # 0 = unfrozen, 1 = frozen
+        self.FrozenMap = [
+            [0, 0],
+            [0, 0],
+            [0, 0],
+            [0, 0],
+            [0, 0],
+            [0, 0],
+            [0, 0],
+            [0, 0],
+            [0, 0]
+            ]
+
+        # 0 = off, 1-127 = colour
+        self.PadColours = [
+            [0, 0],
+            [0, 0],
+            [0, 0],
+            [0, 0],
+            [0, 0],
+            [0, 0],
+            [0, 0],
+            [0, 0],
+            [0, 0]
+            ]
+
+        # 0 = off, 1 = on, 2 = pulse, negative = flash
+        self.PadStates = [
+            [0, 0],
+            [0, 0],
+            [0, 0],
+            [0, 0],
+            [0, 0],
+            [0, 0],
+            [0, 0],
+            [0, 0],
+            [0, 0]
             ]
 
     # Set the colour of a pad
-    def setPadColour(self, x, y, colour, override = False):
-        if self.PadMap[x][y] == -1 or override: # If pad available to map
-            self.PadMap[x][y] = colour
+    def setPadColour(self, x, y, colour, state = 3, override = False):
+        if self.FrozenMap[x][y] == 0 or override: # If pad available to map
+            self.PadColours[x][y] = colour
+            self.PadStates[x][y] = state
+            self.solidifyPad(x, y)
             return True
         else: return False
     
     # Sets colours based on state of LightMap object
-    def setFromMatrix(self, map):
-        for x in range(len(self.PadMap)):
-            for y in range(len(self.PadMap[x])):
-                if self.PadMap[x][y] == -1:
-                    self.setPadColour(x, y, map[x][y])
+    def setFromMatrix(self, map, state=3, override = False):
+        for x in range(len(self.FrozenMap)):
+            for y in range(len(self.FrozenMap[x])):
+                if self.FrozenMap[x][y] == 0 or override:
+                    self.setPadColour(x, y, map[x][y], state)
         return
 
 
     # Prevents pad from being overwritten
     def solidifyPad(self, x, y):
-        if self.PadMap[x][y] == -1: # If pad available to map
-            self.PadMap[x][y] = 0
+        if self.FrozenMap[x][y] == 0: # If pad available to map
+            self.FrozenMap[x][y] = 1
     
     # Prevents row from being overwritten
     def solidifyRow(self, y):
-        for x in range(len(self.PadMap)):
-            if self.PadMap[x][y] == -1: self.PadMap[x][y] = 0
+        for x in range(len(self.FrozenMap)):
+            if self.FrozenMap[x][y] == 0: self.FrozenMap[x][y] = 1
     
     # Prevents column from being overwritten
     def solidifyColumn(self, x):
-        for y in range(len(self.PadMap)):
-            if self.PadMap[x][y] == -1: self.PadMap[x][y] = 0
+        for y in range(len(self.FrozenMap)):
+            if self.FrozenMap[x][y] == 0: self.FrozenMap[x][y] = 1
 
     # Prevents all pads from being overwritten
     def solidifyAll(self):
-        for x in range(len(self.PadMap)):
-            for y in range(len(self.PadMap[x])):
+        for x in range(len(self.FrozenMap)):
+            for y in range(len(self.FrozenMap[x])):
                 self.solidifyPad(x, y)
-
-    
 
 # Lights manages state of pad lights
 class Lights:
     def __init__(self):
         # 0 = off, 1-127 = colour
-        self.PadMap = [
+        self.PadColours = [
+            [0, 0],
+            [0, 0],
+            [0, 0],
+            [0, 0],
+            [0, 0],
+            [0, 0],
+            [0, 0],
+            [0, 0],
+            [0, 0]
+            ]
+
+        # 0 = off, 1 = on, 2 = pulse, negative = flash
+        self.PadStates = [
             [0, 0],
             [0, 0],
             [0, 0],
@@ -90,45 +131,102 @@ class Lights:
     def reset(self):
         
         internal.sendMidiMessage(0xBF, 0x00, 0x00)
+        internal.window.reset_animation_tick()
         self.__init__()
 
     # Set the colour of a pad
-    def setPadColour(self, x, y, colour):
+    def setPadColour(self, x, y, colour, state = 3, override = False):
+
+        # Handle light offs
+        if colour == 0 and state == 3:
+            state = 0
+
+        # Set legacy state
+        elif state == 3:
+            state = 1
+
+        if state == 0:
+            colour = 0
+
+        # Check if pad is already in that state - don't bother with event if so
+        if self.PadColours[x][y] == colour and self.PadStates[x][y] == state and not override:
+            return
+
+        # Set state variables
+        self.PadColours[x][y] = colour
+        self.PadStates[x][y] = state
+
+        status_a = 0x9
+        status_b = 0xF
+
+        if state == 0:
+            status_a = 0x8
+
+        elif state == 2:
+            status_b = 0x2
+
+        elif state < 0:
+            status_b = 0xF
+
+        # Round pads in basic mode
+        if x == 8 and not internal.extendedMode.query(eventconsts.INCONTROL_PADS):
+            status_a = 0xB
+
+        # Calculate Status
+        status = (status_a << 4) + status_b
+
         if internal.extendedMode.query(eventconsts.INCONTROL_PADS): 
-            internal.sendMidiMessage(0x9F, eventconsts.Pads[x][y], colour)
+            internal.sendMidiMessage(status, eventconsts.Pads[x][y], colour)
             
         else: 
-            internal.sendMidiMessage(0x9F, eventprocessor.convertPadMapping(eventconsts.Pads[x][y]), colour)
-        self.PadMap[x][y] = colour
+            internal.sendMidiMessage(status, eventprocessor.convertPadMapping(eventconsts.Pads[x][y]), colour)
+        
+        if state < 0: # Send extra event to trigger flashing
+            status_b = 0x1
+            status = (status_a << 4) + status_b
 
+            if internal.extendedMode.query(eventconsts.INCONTROL_PADS): 
+                
+                internal.sendMidiMessage(status, eventconsts.Pads[x][y], -state)
+                
+            else: 
+                internal.sendMidiMessage(status, eventprocessor.convertPadMapping(eventconsts.Pads[x][y]), -state)
     
     # Sets colours based on state of LightMap object
     def setFromMap(self, map):
         map.solidifyAll()
-        for x in range(len(self.PadMap)):
-            for y in range(len(self.PadMap[x])):
-                if self.PadMap[x][y] != map.PadMap[x][y]:
-                    self.setPadColour(x, y, map.PadMap[x][y])
+        for x in range(len(self.PadColours)):
+            for y in range(len(self.PadColours[x])):
+                self.setPadColour(x, y, map.PadColours[x][y], map.PadStates[x][y])
         return
     
     def redraw(self):
-        for x in range(len(self.PadMap)):
-            for y in range(len(self.PadMap[x])):
-                self.setPadColour(x, y, self.PadMap[x][y])
+        for x in range(len(self.PadColours)):
+            for y in range(len(self.PadColours[x])):
+                self.setPadColour(x, y, self.PadColours[x][y], override=True)
 
 state = Lights()
 
 # OoooOooOOOooO PREETTTTTYYYY!!!!!!
 def lightShow():
+
+    state.reset()
+
     sleepTime = 0.05
     x = 0
     if internal.SHARED_INIT_OK:
-        rainbowColours = [COLOUR_RED, COLOUR_PINK, COLOUR_PURPLE, COLOUR_BLUE, COLOUR_LIGHT_BLUE, COLOUR_GREEN, COLOUR_YELLOW, COLOUR_ORANGE, COLOUR_OFF]
+        if internal.SCRIPT_UPDATE_AVAILABLE:
+            rainbowColours = [COLOUR_BLUE, COLOUR_LIGHT_BLUE, COLOUR_LIGHT_BLUE, COLOUR_GREEN, COLOUR_GREEN, COLOUR_LIGHT_BLUE, COLOUR_LIGHT_BLUE, COLOUR_BLUE, COLOUR_OFF] 
+        else:
+            rainbowColours = [COLOUR_RED, COLOUR_PINK, COLOUR_PURPLE, COLOUR_BLUE, COLOUR_LIGHT_BLUE, COLOUR_GREEN, COLOUR_YELLOW, COLOUR_ORANGE, COLOUR_OFF]
     else:
         rainbowColours = [COLOUR_YELLOW, COLOUR_ORANGE, COLOUR_ORANGE, COLOUR_RED, COLOUR_RED, COLOUR_ORANGE, COLOUR_ORANGE, COLOUR_YELLOW, COLOUR_OFF] 
 
 
     while True:
+
+        time.sleep(sleepTime)
+
         # Group 1
         if (x >= 0) and (x < len(rainbowColours)):
             state.setPadColour(0, 1, rainbowColours[x])
@@ -174,7 +272,7 @@ def lightShow():
             state.setPadColour(7, 0, rainbowColours[x - 8])
         
         x += 1
-        time.sleep(sleepTime)
+       
         
         if x > len(rainbowColours) + 8: break
 
@@ -197,8 +295,13 @@ COLOUR_ORANGE = 84
 
 COLOUR_LIGHT_YELLOW = 109
 COLOUR_LIGHT_BLUE = 37
+COLOUR_LIGHT_LILAC = 116
+COLOUR_LIGHT_LIGHT_BLUE = 40
 
 COLOUR_DARK_GREY = 1
+COLOUR_DARK_PURPLE = 51
+COLOUR_DARK_BLUE = 47
+COLOUR_DARK_RED = 59
 
 
 
@@ -209,6 +312,13 @@ UI_ZOOM = COLOUR_BLUE
 UI_ACCEPT = COLOUR_GREEN
 UI_REJECT = COLOUR_RED
 UI_CHOOSE = COLOUR_PURPLE
+
+UI_UNDO = COLOUR_LIGHT_LIGHT_BLUE
+UI_REDO = COLOUR_LIGHT_BLUE
+
+UI_COPY = COLOUR_BLUE
+UI_CUT = COLOUR_LIGHT_BLUE
+UI_PASTE = COLOUR_GREEN
 
 # Define tool colours
 TOOL_PENCIL = COLOUR_ORANGE

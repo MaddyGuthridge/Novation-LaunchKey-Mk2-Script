@@ -6,6 +6,8 @@ This script is a custom processor module that can process events when the FPC pl
 
 REMAP_DRUMS = True
 
+plugins = ["FPC"]
+
 # Matrix of FPC Drums [y][x] (I should probs fix this some time for the sake of consistency But I can't be bothered)
 FPC_DRUM_CONSTS = [
     [49, 55, 51, 53],
@@ -37,7 +39,7 @@ COLOUR_MAP = [
 
 
 
-plugins = ["FPC"]
+
 
 def redraw(lights):
     if not internal.extendedMode.query(eventconsts.INCONTROL_PADS):

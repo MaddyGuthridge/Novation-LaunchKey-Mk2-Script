@@ -5,3 +5,4 @@ Controller.code-workspace
 # VS Code other files
 .vscode/
 
+__pycache__/

@@ -17,8 +17,10 @@ import general
 
 import eventconsts
 import config
+import internalconstants
 import eventprocessor
 import lighting
+# import updatecheck # Currently modules are unavailable
 
 import WindowProcessors.processwindows as processwindows
 import PluginProcessors.processplugins as processplugins
@@ -28,6 +30,7 @@ MIN_FL_SCRIPT_VERSION = 4
 PORT = -1 # Set in initialisation function then left constant
 
 SHARED_INIT_OK = False
+SCRIPT_UPDATE_AVAILABLE = False
 
 
 """ # Inactive code... delete soon
@@ -38,14 +41,27 @@ ActiveWindow = "Nil"
 previous_event_out = 0
 """
 
+def getVersionStr():
+    return str(internalconstants.SCRIPT_VERSION_MAJOR) + '.' + str(internalconstants.SCRIPT_VERSION_MINOR) + '.' + str(internalconstants.SCRIPT_VERSION_REVISION)
+
 def sharedInit():
     global SHARED_INIT_OK
+    global SCRIPT_UPDATE_AVAILABLE
     printLineBreak()
 
-    print(config.SCRIPT_NAME + " - Version: " + config.SCRIPT_VERSION)
-    print(" - " + config.SCRIPT_AUTHOR)
+    print(internalconstants.SCRIPT_NAME + " - Version: " + getVersionStr())
+    print(" - " + internalconstants.SCRIPT_AUTHOR)
     print("")
     print("Running in FL Studio Version: " + ui.getVersion())
+
+    # Check for script updates
+    # updatecheck.check()
+    if SCRIPT_UPDATE_AVAILABLE:
+        printLineBreak()
+        print("An update to this script is available!")
+        print("Follow this link to download it: " + internalconstants.SCRIPT_URL)
+        printLineBreak()
+
 
     midi_script_version = general.getVersion()
     print("FL Studio Scripting version: " + str(midi_script_version) + ". Minimum recommended version: " + str(MIN_FL_SCRIPT_VERSION))
@@ -59,9 +75,22 @@ def sharedInit():
 
     beat.refresh() # Update beat indicator
 
-def refresh():
+def refreshProcessor():
     beat.refresh()
 
+# Called on idle
+def idleProcessor():
+    # Start performance timer
+    idleClock.start()
+
+    # Increment animation tick
+    window.incr_animation_tick()
+
+    # Update active window
+    window.update()
+
+    # Stop performance timer
+    idleClock.stop()
 
 # Prints a line break
 def printLineBreak():
@@ -106,34 +135,49 @@ class performanceMonitor:
     
     def total(self):
         return self.total_time
-eventClock = performanceMonitor("Event Processor", 1)
-idleClock = performanceMonitor("Idle Processor", 3)
+eventClock = performanceMonitor("Event Processor", internalconstants.DEBUG_PROCESSOR_PERFORMANCE)
+idleClock = performanceMonitor("Idle Processor", internalconstants.DEBUG_IDLE_PERFORMANCE)
 
 
 # Manages active window - CURRENTLY BROKEN!!!!
 class windowMgr:
     def __init__(self):
         self.plugin_focused = False
+        self.previous_plugin = ""
         self.active_plugin = ""
         self.active_fl_window = -1
+        self.animation_tick_number = 0
     
+    # Reset tick number to zero
+    def reset_animation_tick(self):
+        self.animation_tick_number = 0
+
+    # Called on idle to increase tick number
+    def incr_animation_tick(self):
+        self.animation_tick_number += 1
+
+    # Get number of ticks since window update
+    def get_animation_tick(self):
+        return self.animation_tick_number
+
+    # Update active window
     def update(self):
         old_window = self.active_fl_window
         # Update FL Window
-        if   ui.getFocused(config.WINDOW_MIXER):        
-            new_fl_window = config.WINDOW_MIXER
+        if   ui.getFocused(internalconstants.WINDOW_MIXER):        
+            new_fl_window = internalconstants.WINDOW_MIXER
 
-        elif ui.getFocused(config.WINDOW_PIANO_ROLL):   
-            new_fl_window = config.WINDOW_PIANO_ROLL
+        elif ui.getFocused(internalconstants.WINDOW_PIANO_ROLL):   
+            new_fl_window = internalconstants.WINDOW_PIANO_ROLL
 
-        elif ui.getFocused(config.WINDOW_CHANNEL_RACK): 
-            new_fl_window = config.WINDOW_CHANNEL_RACK
+        elif ui.getFocused(internalconstants.WINDOW_CHANNEL_RACK): 
+            new_fl_window = internalconstants.WINDOW_CHANNEL_RACK
 
-        elif ui.getFocused(config.WINDOW_PLAYLIST):     
-            new_fl_window = config.WINDOW_PLAYLIST
+        elif ui.getFocused(internalconstants.WINDOW_PLAYLIST):     
+            new_fl_window = internalconstants.WINDOW_PLAYLIST
 
-        elif ui.getFocused(config.WINDOW_BROWSER):      
-            new_fl_window = config.WINDOW_BROWSER
+        elif ui.getFocused(internalconstants.WINDOW_BROWSER):      
+            new_fl_window = internalconstants.WINDOW_BROWSER
         
         else: new_fl_window = -1
 
@@ -187,7 +231,7 @@ class windowMgr:
                 # Trim string
                 new_plugin = new_plugin[last: -2]
 
-            # If window didn't change
+            # If window changed
             
             if new_plugin != self.active_plugin or self.plugin_focused == False:
 
@@ -196,6 +240,7 @@ class windowMgr:
 
                 # End replaced plugin
                 if new_plugin != self.active_plugin:
+                    self.previous_plugin = self.active_plugin
                     processplugins.topPluginEnd()
 
                 # Set new plugin
@@ -215,17 +260,21 @@ class windowMgr:
                 return True
             else: return False
 
+    # Revert to previous plugin
+    def revertPlugin(self):
+        self.active_plugin = self.previous_plugin
+        self.previous_plugin = ""
 
 window = windowMgr()
 
 # Gets string for FL Window
 def get_fl_window_string(index):
     if index == -1: return "NONE"
-    if index == config.WINDOW_MIXER: return "Mixer"
-    if index == config.WINDOW_PLAYLIST: return "Playlist"
-    if index == config.WINDOW_CHANNEL_RACK: return "Channel Rack"
-    if index == config.WINDOW_PIANO_ROLL: return "Piano Roll"
-    if index == config.WINDOW_BROWSER: return "Browser"
+    if index == internalconstants.WINDOW_MIXER: return "Mixer"
+    if index == internalconstants.WINDOW_PLAYLIST: return "Playlist"
+    if index == internalconstants.WINDOW_CHANNEL_RACK: return "Channel Rack"
+    if index == internalconstants.WINDOW_PIANO_ROLL: return "Piano Roll"
+    if index == internalconstants.WINDOW_BROWSER: return "Browser"
 
 # Print command data
 def printCommand(command):
@@ -254,7 +303,6 @@ class extended:
 
     # Queries whether extended mode is active. Only accessible from extended port
     def query(self, option = eventconsts.SYSTEM_EXTENDED):
-        
         if option == eventconsts.SYSTEM_EXTENDED: return self.extendedMode
         elif option == eventconsts.INCONTROL_KNOBS: return self.inControl_Knobs
         elif option == eventconsts.INCONTROL_FADERS: return self.inControl_Faders
@@ -366,7 +414,8 @@ class extended:
                 self.inControl_Faders = False
                 self.inControl_Pads = False
             else: debugLog("New mode mode not boolean")
-        
+            lighting.state.reset()
+
         # Set knobs
         elif option == eventconsts.INCONTROL_KNOBS:
             self.prev_inControl_Knobs = self.inControl_Knobs
@@ -388,31 +437,34 @@ class extended:
         # Set pads
         elif option == eventconsts.INCONTROL_PADS:
             self.prev_inControl_Pads = self.inControl_Pads
+            window.reset_animation_tick()
             if newMode is True:
                 self.inControl_Pads = True
             elif newMode is False:
                 self.inControl_Pads = False
             else: debugLog("New mode mode not boolean")
-
+            lighting.state.reset()
 
 extendedMode = extended()
 
+""" Unneeded code - delete soon
 # Compares revieved event to previous
 def compareEvent(event):
     if toMidiMessage(event.status, event.data1, event.data2) is previous_event_out: return True
     else: return False
 
 EventNameT = ['Note Off', 'Note On ', 'Key Aftertouch', 'Control Change','Program Change',  'Channel Aftertouch', 'Pitch Bend', 'System Message' ]
+"""
 
 # Sends message to the default MIDI out device
 def sendMidiMessage(status, data1, data2):
     global previous_event_out
     previous_event_out  = toMidiMessage(status, data1, data2)
     if PORT == config.DEVICE_PORT_EXTENDED:
-        debugLog("Dispatched external MIDI message", 2)
+        debugLog("Dispatched external MIDI message", internalconstants.DEBUG_DISPATCH_EVENTS)
         device.midiOutMsg(previous_event_out)
     else:
-        debugLog("Dispatched internal MIDI message", 2)
+        debugLog("Dispatched internal MIDI message", internalconstants.DEBUG_DISPATCH_EVENTS)
         device.dispatch(0, previous_event_out)
 
 # Generates a MIDI message given arguments
@@ -433,15 +485,6 @@ def didSnap(value, snapTo):
 # Converts MIDI event range to float for use in volume, pan, etc functions
 def toFloat(value, min = 0, max = 1):
     return (value / 127) * (max - min) + min
-
-# Called on idle
-def idleProcessor():
-    # Start performance timer
-    idleClock.start()
-    window.update()
-
-    # Stop performance timer
-    idleClock.stop()
 
 # Print out error message
 def debugLog(message, level = 0):
@@ -480,9 +523,11 @@ class shiftMgr:
     def press(self):
         self.is_down = True
         self.used = False
+        window.reset_animation_tick()
     
     def lift(self):
         self.is_down = False
+        window.reset_animation_tick()
         return self.used
 
     def use(self):
