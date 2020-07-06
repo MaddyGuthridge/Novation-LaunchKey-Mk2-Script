@@ -37,7 +37,7 @@ def redraw(lights):
     if internal.window.get_animation_tick() >= 2:
         lights.setPadColour(5, 1, lighting.COLOUR_GREEN)    # Play
     if internal.window.get_animation_tick() >= 4:
-        lights.setPadColour(7, 1, lighting.COLOUR_BLUE)     # Select
+        lights.setPadColour(7, 1, lighting.COLOUR_BLUE, 2)     # Select
     return
 
 def process(command):
