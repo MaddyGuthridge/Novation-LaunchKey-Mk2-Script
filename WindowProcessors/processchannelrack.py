@@ -262,12 +262,12 @@ def process_menu_mode(command):
 
     # Cut, Copy, Paste
     if coord == [3, 0]:
-        ui.copy()
-        command.actions.appendAction("UI: Copy")
-        command.handled = True
-    if coord == [4, 0]:
         ui.cut()
         command.actions.appendAction("UI: Cut")
+        command.handled = True
+    if coord == [4, 0]:
+        ui.copy()
+        command.actions.appendAction("UI: Copy")
         command.handled = True
     if coord == [5, 0]:
         ui.paste()
