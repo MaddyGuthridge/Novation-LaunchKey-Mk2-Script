@@ -476,6 +476,7 @@ def snap(value, snapTo):
     if abs(value - snapTo) <= config.SNAP_RANGE:
         return snapTo
     else: return value
+
 # Returns snap value
 def didSnap(value, snapTo):
     if abs(value - snapTo) <= config.SNAP_RANGE:
@@ -519,6 +520,7 @@ pads = padMgr()
 class shiftMgr:
     is_down = False
     used = False
+    sticky = False
 
     def press(self):
         self.is_down = True
@@ -535,6 +537,18 @@ class shiftMgr:
             self.used = True
             return True
         else: return False
+
+    # Sets shift key to be down until pressed again
+    def set_sticky(self):
+        self.press()
+        self.sticky = True
+
+    def use_sticky(self):
+        self.lift()
+        self.sticky = False
+
+    def get_sticky(self):
+        return self.sticky
 
     def getDown(self):
         return self.is_down

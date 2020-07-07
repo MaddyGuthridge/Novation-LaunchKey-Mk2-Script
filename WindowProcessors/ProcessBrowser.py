@@ -22,7 +22,8 @@ def activeEnd():
     return
 
 def topWindowStart():
-    internal.window.reset_animation_tick()
+    if not internal.shift.getDown():   
+        internal.window.reset_animation_tick()
     return
 
 def topWindowEnd():
