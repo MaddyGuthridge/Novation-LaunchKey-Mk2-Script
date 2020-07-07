@@ -152,7 +152,7 @@ class processedEvent:
         # Process shift button
         if self.id == config.SHIFT_BUTTON:
             if self.is_lift:
-                if self.is_double_click:
+                if self.is_double_click and config.ENABLE_STICKY_SHIFT:
                     internal.shift.set_sticky()
                 else:
                     self.handled = internal.shift.lift()
