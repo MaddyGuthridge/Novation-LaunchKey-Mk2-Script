@@ -147,18 +147,33 @@ class processedEvent:
 
         self.shifted = False
 
+        self.parse()  
         
         # Process shift button
         if self.id == config.SHIFT_BUTTON:
-            if self.value == 127:
+            if self.is_lift:
+                if self.is_double_click and config.ENABLE_STICKY_SHIFT:
+                    internal.shift.set_sticky()
+                else:
+                    self.handled = internal.shift.lift()
+            else:
                 internal.shift.press()
-            elif self.value == 0:
-                self.handled = internal.shift.lift()
-                
+
+            if internal.shift.get_sticky():
+                self.handle("Deactivate Held Shift")
+
+        elif internal.shift.get_sticky():
+            if self.isBinary:
+                if self.is_lift:
+                    internal.shift.use_sticky()
+                    self.shifted = True
+
+            
+
         elif internal.shift.getDown():
             self.shifted = internal.shift.use()
 
-        self.parse()                                                                                                                               
+                                                                                                                                     
 
     def parse(self):
         # Indicates whether to consider as a value or as an on/off

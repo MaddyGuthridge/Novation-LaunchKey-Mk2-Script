@@ -92,7 +92,7 @@ def process(command):
                 internal.extendedMode.setVal(True, eventconsts.INCONTROL_PADS)
 
         # Shift down - Window switcher
-        if internal.shift.getDown() and command.type == eventconsts.TYPE_PAD and command.is_lift:
+        if command.shifted and command.type == eventconsts.TYPE_PAD and command.is_lift:
             
             if command.note == eventconsts.Pads[0][1]: 
                 ui.showWindow(internalconstants.WINDOW_PLAYLIST)
