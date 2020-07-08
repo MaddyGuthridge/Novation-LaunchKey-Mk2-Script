@@ -1,11 +1,11 @@
 """
 config.py
 This file contains variables intended for the user to edit to suit their needs.
-It also contains constants which are used to enable featurs such as snapping.
-You can modify those values too, and the script will still work, but it may not operate in ways you would expect.
+All these variables should be safe to edit, but if things break, you might want to revert your changes here
 
 """
 import eventconsts
+import internalconstants
 
 #-------------------------------
 # USER VARIABLES
@@ -38,11 +38,7 @@ START_IN_INCONTROL_PADS = True
 
 TAB_LENGTH = 16 # How much spacing to add in console output
 
-# Controls level of console messages. Useful for debugging performance
-# 0 = Errors only
-# 1 = Event processor performance
-# 2 = MIDI Dispatch events
-# 3 = Idle processor performance
-CONSOLE_DEBUG_LEVEL = 2
+# Controls which console messages are printed. Add things from internalconstants
+CONSOLE_DEBUG_MODE = [internalconstants.DEBUG_LIGHTING_RESET, internalconstants.DEBUG_LIGHTING_MESSAGE]
 
 

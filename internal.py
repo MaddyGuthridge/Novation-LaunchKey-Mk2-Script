@@ -69,8 +69,8 @@ def sharedInit():
     if midi_script_version < MIN_FL_SCRIPT_VERSION:
         print("You may encounter issues using this script. Consider updating to the latest version FL Studio.")
     else: SHARED_INIT_OK = True
-    if config.CONSOLE_DEBUG_LEVEL > 0:
-        print("Console debugging level:", config.CONSOLE_DEBUG_LEVEL)
+    if config.CONSOLE_DEBUG_MODE != []:
+        print("Advanced debugging is enabled.")
     print("")
 
     beat.refresh() # Update beat indicator
@@ -125,7 +125,7 @@ class performanceMonitor:
         process_time = self.endTime - self.startTime
         self.total_time += process_time
         self.num_events += 1
-        if config.CONSOLE_DEBUG_LEVEL >= self.debug_level:
+        if self.debug_level in config.CONSOLE_DEBUG_MODE:
             printLineBreak()
             print(self.name)
             print("Processed in:", round(process_time, 4), "seconds")
@@ -458,14 +458,14 @@ EventNameT = ['Note Off', 'Note On ', 'Key Aftertouch', 'Control Change','Progra
 
 # Sends message to the default MIDI out device
 def sendMidiMessage(status, data1, data2):
-    global previous_event_out
-    previous_event_out  = toMidiMessage(status, data1, data2)
+    event_out  = toMidiMessage(status, data1, data2)
+    str_event_out = str(status) + " " + str(data1) + " " + str(data2)
     if PORT == config.DEVICE_PORT_EXTENDED:
-        debugLog("Dispatched external MIDI message", internalconstants.DEBUG_DISPATCH_EVENTS)
-        device.midiOutMsg(previous_event_out)
+        debugLog("Dispatched external MIDI message " + str_event_out, internalconstants.DEBUG_DISPATCH_EVENT)
+        device.midiOutMsg(event_out)
     else:
-        debugLog("Dispatched internal MIDI message", internalconstants.DEBUG_DISPATCH_EVENTS)
-        device.dispatch(0, previous_event_out)
+        debugLog("Dispatched internal MIDI message" + str_event_out, internalconstants.DEBUG_DISPATCH_EVENT)
+        device.dispatch(0, event_out)
 
 # Generates a MIDI message given arguments
 def toMidiMessage(status, data1, data2):
@@ -489,7 +489,7 @@ def toFloat(value, min = 0, max = 1):
 
 # Print out error message
 def debugLog(message, level = 0):
-    if level <= config.CONSOLE_DEBUG_LEVEL:
+    if level in config.CONSOLE_DEBUG_MODE or level == internalconstants.DEBUG_ERROR:
         print(message)
 
 class padMgr:
