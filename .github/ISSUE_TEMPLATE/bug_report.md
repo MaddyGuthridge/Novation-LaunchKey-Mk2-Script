@@ -26,8 +26,11 @@ A clear and concise description of what you expected to happen.
 **Photos**
 If needed, add photos of the results to help explain your problem.
 
-**Desktop (please complete the following information):**
+**System Information**
  - OS: [e.g. Windows 10]
+ - FL Studio Version
+ - Script Version
+ - Controller Model (How many keys?)
 
 **Additional context**
 Add any other context about the problem here.
