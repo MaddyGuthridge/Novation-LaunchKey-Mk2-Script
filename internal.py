@@ -216,7 +216,7 @@ class windowMgr:
             special_flag = False
 
             # Check for special windows
-            if new_plugin == "Color selector" or new_plugin == "Script output":
+            if new_plugin == internalconstants.WINDOW_COLOUR_PICKER or new_plugin == internalconstants.WINDOW_SCRIPT_OUTPUT:
                 special_flag = True
 
             if not special_flag:

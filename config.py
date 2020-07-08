@@ -43,6 +43,6 @@ TAB_LENGTH = 16 # How much spacing to add in console output
 # 1 = Event processor performance
 # 2 = MIDI Dispatch events
 # 3 = Idle processor performance
-CONSOLE_DEBUG_LEVEL = 0
+CONSOLE_DEBUG_LEVEL = 2
 
 
