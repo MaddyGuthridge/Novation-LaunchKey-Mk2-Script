@@ -20,7 +20,7 @@ in_popup = False
 def redraw(lights):
     global in_popup
     # In Popup Menu
-    if ui.isInPopupMenu():
+    if ui.isInPopupMenu() and (internal.window.active_plugin != internalconstants.WINDOW_SCRIPT_OUTPUT):
         if not in_popup:
             internal.window.reset_animation_tick()
             in_popup = True
@@ -142,7 +142,7 @@ def process(command):
             
 
         # Right click menu
-        if ui.isInPopupMenu() and command.type == eventconsts.TYPE_PAD and command.is_lift:
+        if ui.isInPopupMenu() and command.type == eventconsts.TYPE_PAD and command.is_lift and (internal.window.active_plugin != internalconstants.WINDOW_SCRIPT_OUTPUT):
             
             # Always handle all presses
             command.handled = True

@@ -29,6 +29,8 @@ WINDOW_CHANNEL_RACK = midi.widChannelRack
 WINDOW_MIXER = midi.widMixer
 WINDOW_BROWSER = midi.widBrowser
 
+WINDOW_SCRIPT_OUTPUT = "Script output"
+WINDOW_COLOUR_PICKER = "Color selector"
 #---------------------------------
 # Snapping constants
 #---------------------------------
@@ -46,7 +48,9 @@ CHANNEL_PAN_SNAP_TO = 0.0 # Snap channel pans to Centred
 # Debug level constants
 #---------------------------------
 
-DEBUG_ERRORS_ONLY = 0
-DEBUG_PROCESSOR_PERFORMANCE = 1
-DEBUG_DISPATCH_EVENTS = 2
-DEBUG_IDLE_PERFORMANCE = 3
+DEBUG_ERROR = "Errors"
+DEBUG_PROCESSOR_PERFORMANCE = "Processor performance"
+DEBUG_LIGHTING_RESET = "Lighting reset"
+DEBUG_LIGHTING_MESSAGE = "Lighting message"
+DEBUG_DISPATCH_EVENT = "Dispatch event"
+DEBUG_IDLE_PERFORMANCE = "Idle Performance"

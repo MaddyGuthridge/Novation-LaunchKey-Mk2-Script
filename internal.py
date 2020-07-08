@@ -54,7 +54,7 @@ def sharedInit():
     print("")
     print("Running in FL Studio Version: " + ui.getVersion())
 
-    # Check for script updates
+    # Check for script updates - UNCOMMENT THIS WHEN MODULES ADDED
     # updatecheck.check()
     if SCRIPT_UPDATE_AVAILABLE:
         printLineBreak()
@@ -62,15 +62,17 @@ def sharedInit():
         print("Follow this link to download it: " + internalconstants.SCRIPT_URL)
         printLineBreak()
 
-
+    # Check FL Scripting version
     midi_script_version = general.getVersion()
     print("FL Studio Scripting version: " + str(midi_script_version) + ". Minimum recommended version: " + str(MIN_FL_SCRIPT_VERSION))
-
+    # Outdated FL version
     if midi_script_version < MIN_FL_SCRIPT_VERSION:
         print("You may encounter issues using this script. Consider updating to the latest version FL Studio.")
     else: SHARED_INIT_OK = True
-    if config.CONSOLE_DEBUG_LEVEL > 0:
-        print("Console debugging level:", config.CONSOLE_DEBUG_LEVEL)
+
+    # Check debug mode
+    if config.CONSOLE_DEBUG_MODE != []:
+        print("Advanced debugging is enabled:", config.CONSOLE_DEBUG_MODE)
     print("")
 
     beat.refresh() # Update beat indicator
@@ -125,7 +127,7 @@ class performanceMonitor:
         process_time = self.endTime - self.startTime
         self.total_time += process_time
         self.num_events += 1
-        if config.CONSOLE_DEBUG_LEVEL >= self.debug_level:
+        if self.debug_level in config.CONSOLE_DEBUG_MODE:
             printLineBreak()
             print(self.name)
             print("Processed in:", round(process_time, 4), "seconds")
@@ -216,7 +218,7 @@ class windowMgr:
             special_flag = False
 
             # Check for special windows
-            if new_plugin == "Color selector" or new_plugin == "Script output":
+            if new_plugin == internalconstants.WINDOW_COLOUR_PICKER or new_plugin == internalconstants.WINDOW_SCRIPT_OUTPUT:
                 special_flag = True
 
             if not special_flag:
@@ -458,14 +460,14 @@ EventNameT = ['Note Off', 'Note On ', 'Key Aftertouch', 'Control Change','Progra
 
 # Sends message to the default MIDI out device
 def sendMidiMessage(status, data1, data2):
-    global previous_event_out
-    previous_event_out  = toMidiMessage(status, data1, data2)
+    event_out  = toMidiMessage(status, data1, data2)
+    str_event_out = str(status) + " " + str(data1) + " " + str(data2)
     if PORT == config.DEVICE_PORT_EXTENDED:
-        debugLog("Dispatched external MIDI message", internalconstants.DEBUG_DISPATCH_EVENTS)
-        device.midiOutMsg(previous_event_out)
+        debugLog("Dispatched external MIDI message " + str_event_out, internalconstants.DEBUG_DISPATCH_EVENT)
+        device.midiOutMsg(event_out)
     else:
-        debugLog("Dispatched internal MIDI message", internalconstants.DEBUG_DISPATCH_EVENTS)
-        device.dispatch(0, previous_event_out)
+        debugLog("Dispatched internal MIDI message" + str_event_out, internalconstants.DEBUG_DISPATCH_EVENT)
+        device.dispatch(0, event_out)
 
 # Generates a MIDI message given arguments
 def toMidiMessage(status, data1, data2):
@@ -489,7 +491,7 @@ def toFloat(value, min = 0, max = 1):
 
 # Print out error message
 def debugLog(message, level = 0):
-    if level <= config.CONSOLE_DEBUG_LEVEL:
+    if level in config.CONSOLE_DEBUG_MODE or level == internalconstants.DEBUG_ERROR:
         print(message)
 
 class padMgr:
