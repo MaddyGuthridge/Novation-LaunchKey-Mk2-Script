@@ -179,11 +179,11 @@ class Lights:
 
         if internal.extendedMode.query(eventconsts.INCONTROL_PADS): 
             internal.sendMidiMessage(status, eventconsts.Pads[x][y], colour)
-            internal.debugLog("Sent lighting command (InControl Enabled)", internalconstants.DEBUG_LIGHTING_MESSAGE)
+            internal.debugLog("Sent lighting command [" + str(x) + ", " + str(y) + "] (InControl Enabled)", internalconstants.DEBUG_LIGHTING_MESSAGE)
             
         else: 
             internal.sendMidiMessage(status, eventprocessor.convertPadMapping(eventconsts.Pads[x][y]), colour)
-            internal.debugLog("Sent lighting command (InControl Disabled)", internalconstants.DEBUG_LIGHTING_MESSAGE)
+            internal.debugLog("Sent lighting command [" + str(x) + ", " + str(y) + "] (InControl Disabled)", internalconstants.DEBUG_LIGHTING_MESSAGE)
         
         if state < 0: # Send extra event to trigger flashing
             status_b = 0x1
@@ -192,11 +192,11 @@ class Lights:
             if internal.extendedMode.query(eventconsts.INCONTROL_PADS): 
                 
                 internal.sendMidiMessage(status, eventconsts.Pads[x][y], -state)
-                internal.debugLog("Sent light flash command (InControl Enabled)", internalconstants.DEBUG_LIGHTING_MESSAGE)
+                internal.debugLog("Sent light flash command [" + str(x) + ", " + str(y) + "] (InControl Enabled)", internalconstants.DEBUG_LIGHTING_MESSAGE)
                 
             else: 
                 internal.sendMidiMessage(status, eventprocessor.convertPadMapping(eventconsts.Pads[x][y]), -state)
-                internal.debugLog("Sent light flash (InControl Disabled)", internalconstants.DEBUG_LIGHTING_MESSAGE)
+                internal.debugLog("Sent light flash command [" + str(x) + ", " + str(y) + "] (InControl Disabled)", internalconstants.DEBUG_LIGHTING_MESSAGE)
     
     # Sets colours based on state of LightMap object
     def setFromMap(self, map):

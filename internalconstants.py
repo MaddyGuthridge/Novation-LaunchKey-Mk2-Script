@@ -48,9 +48,9 @@ CHANNEL_PAN_SNAP_TO = 0.0 # Snap channel pans to Centred
 # Debug level constants
 #---------------------------------
 
-DEBUG_ERROR = 0
-DEBUG_PROCESSOR_PERFORMANCE = 1
-DEBUG_LIGHTING_RESET = 2
-DEBUG_LIGHTING_MESSAGE = 3
-DEBUG_DISPATCH_EVENT = 4
-DEBUG_IDLE_PERFORMANCE = 5
+DEBUG_ERROR = "Errors"
+DEBUG_PROCESSOR_PERFORMANCE = "Processor performance"
+DEBUG_LIGHTING_RESET = "Lighting reset"
+DEBUG_LIGHTING_MESSAGE = "Lighting message"
+DEBUG_DISPATCH_EVENT = "Dispatch event"
+DEBUG_IDLE_PERFORMANCE = "Idle Performance"

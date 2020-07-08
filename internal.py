@@ -54,7 +54,7 @@ def sharedInit():
     print("")
     print("Running in FL Studio Version: " + ui.getVersion())
 
-    # Check for script updates
+    # Check for script updates - UNCOMMENT THIS WHEN MODULES ADDED
     # updatecheck.check()
     if SCRIPT_UPDATE_AVAILABLE:
         printLineBreak()
@@ -62,15 +62,17 @@ def sharedInit():
         print("Follow this link to download it: " + internalconstants.SCRIPT_URL)
         printLineBreak()
 
-
+    # Check FL Scripting version
     midi_script_version = general.getVersion()
     print("FL Studio Scripting version: " + str(midi_script_version) + ". Minimum recommended version: " + str(MIN_FL_SCRIPT_VERSION))
-
+    # Outdated FL version
     if midi_script_version < MIN_FL_SCRIPT_VERSION:
         print("You may encounter issues using this script. Consider updating to the latest version FL Studio.")
     else: SHARED_INIT_OK = True
+
+    # Check debug mode
     if config.CONSOLE_DEBUG_MODE != []:
-        print("Advanced debugging is enabled.")
+        print("Advanced debugging is enabled:", config.CONSOLE_DEBUG_MODE)
     print("")
 
     beat.refresh() # Update beat indicator
