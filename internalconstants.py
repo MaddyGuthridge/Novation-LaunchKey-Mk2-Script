@@ -34,6 +34,11 @@ DEVICE_KEYS_61 = 61
 
 DEVICE_ENQUIRY_MESSAGE = bytes([0xF0, 0x7E, 0x7F, 0x06, 0x01, 0xF7])
 
+DEVICE_RESPONSE_FIRST = bytes([0xF0, 0x7E, 0x00, 0x06, 0x02, 0x00, 0x20, 0x29])
+DEVICE_RESPONSE_25 = 123
+DEVICE_RESPONSE_49 = 124
+DEVICE_RESPONSE_61 = 125
+
 #---------------------------------
 # Initialisation states
 #---------------------------------

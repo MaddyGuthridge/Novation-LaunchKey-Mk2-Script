@@ -171,7 +171,9 @@ class processedEvent:
                     internal.shift.use_sticky()
                     self.shifted = True
 
-            
+        # Process sysex events
+        if self.type is eventconsts.TYPE_SYSEX_EVENT:
+            internal.processSysEx(self)
 
         elif internal.shift.getDown():
             self.shifted = internal.shift.use()

@@ -32,7 +32,31 @@ PORT = -1 # Set in initialisation function then left constant
 SHARED_INIT_STATE = internalconstants.INIT_INCOMPLETE
 
 def processSysEx(event):
-    print(event.sysex)
+    global DEVICE_TYPE
+    
+    # Check if it matches device specifications
+    if event.sysex[:8] == internalconstants.DEVICE_RESPONSE_FIRST:
+        if event.sysex[8] == internalconstants.DEVICE_RESPONSE_25:
+            DEVICE_TYPE = internalconstants.DEVICE_KEYS_25
+            print("Running on 25-Key Model")
+
+        elif event.sysex[8] == internalconstants.DEVICE_RESPONSE_49:
+            DEVICE_TYPE = internalconstants.DEVICE_KEYS_49
+            print("Running on 49-Key Model")
+
+        elif event.sysex[8] == internalconstants.DEVICE_RESPONSE_61:
+            DEVICE_TYPE = internalconstants.DEVICE_KEYS_61
+            print("Running on 61-Key Model")
+        else:
+            DEVICE_TYPE = internalconstants.DEVICE_UNRECOGNISED
+            print("If you're seeing this, create an issue on GitHub. Make sure to tell me your device info.")
+    else:
+        print("ERROR - DEVICE NOT RECOGNISED")
+        DEVICE_TYPE = internalconstants.DEVICE_UNRECOGNISED
+
+    printLineBreak()
+    printLineBreak()
+    print("")
 
 def sendUniversalDeviceEnquiry():
     device.midiOutSysex(internalconstants.DEVICE_ENQUIRY_MESSAGE)
