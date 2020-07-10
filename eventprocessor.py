@@ -142,6 +142,9 @@ class processedEvent:
         self.status_nibble = event.status >> 4              # Get first half of status byte
         self.channel = event.status & int('00001111', 2)    # Get 2nd half of status byte
         
+        # Add sysex information
+        self.sysex = event.sysex
+
         # Bit-shift status and data bytes to get event ID
         self.id = (self.status + (self.note << 8))
 
@@ -184,7 +187,10 @@ class processedEvent:
 
         # If using basic port, check for notes
 
-        if self.id in eventconsts.InControlButtons: 
+        if self.status == eventconsts.SYSEX:
+            self.type = eventconsts.TYPE_SYSEX_EVENT
+
+        elif self.id in eventconsts.InControlButtons: 
             self.type = eventconsts.TYPE_INCONTROL
             self.isBinary = True
 
@@ -338,6 +344,8 @@ class processedEvent:
         b = ""
         if self.type is eventconsts.TYPE_UNRECOGNISED: 
             a = "Unrecognised"
+        elif self.type is eventconsts.TYPE_SYSEX_EVENT:
+            a = "Sysex"
         elif self.type is eventconsts.TYPE_NOTE:
             a = "Note"
             b = utils.GetNoteName(self.note) + " (Ch. " + str(self.channel) + ')'
@@ -489,6 +497,10 @@ class processedEvent:
 
     # Returns string with (formatted) hex of event
     def getDataString(self):
+
+        if self.type is eventconsts.TYPE_SYSEX_EVENT:
+            return str(self.sysex)
+
         # Append hex value of ID
         a = str(hex(self.id + (self.value << 16)))
         # If string requires leading zeros

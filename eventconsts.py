@@ -28,6 +28,8 @@ TYPE_BASIC_PAD = 16
 TYPE_NOTE = 20
 TYPE_BASIC_EVENT = 21
 
+TYPE_SYSEX_EVENT = 30
+
 
 NOTE_ON = 0x9 # Shortened as data1 also contains note channel
 NOTE_OFF = 0x8
@@ -39,6 +41,9 @@ PITCH_BEND = 0x00E0
 MOD_WHEEL = 0x01B0
 
 BasicEvents = [PEDAL, PITCH_BEND, MOD_WHEEL]
+
+# Define sysex events
+SYSEX = 0xF0
 
 # Define System Message
 SYSTEM_EXTENDED = 0x0C9F
