@@ -49,10 +49,14 @@ def processSysEx(event):
             print("Running on 61-Key Model")
         else:
             DEVICE_TYPE = internalconstants.DEVICE_UNRECOGNISED
-            print("If you're seeing this, create an issue on GitHub. Make sure to tell me your device info.")
+            print("If you're seeing this, create an issue on GitHub. ")
+            print("Make sure to tell me your device info, and include a copy of the Syxex Event below.")
+            print("Link to GitHub Page: " + internalconstants.SCRIPT_URL)
+
     else:
-        print("ERROR - DEVICE NOT RECOGNISED")
         DEVICE_TYPE = internalconstants.DEVICE_UNRECOGNISED
+        print("ERROR - DEVICE NOT RECOGNISED")
+        
 
     printLineBreak()
     printLineBreak()
