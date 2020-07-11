@@ -20,7 +20,7 @@ in_popup = False
 def redraw(lights):
     global in_popup
     # In Popup Menu
-    if ui.isInPopupMenu() and (internal.window.active_plugin != internalconstants.WINDOW_SCRIPT_OUTPUT):
+    if ui.isInPopupMenu() and not (internal.window.active_plugin == internalconstants.WINDOW_SCRIPT_OUTPUT and internal.window.plugin_focused):
         if not in_popup:
             internal.window.reset_animation_tick()
             in_popup = True

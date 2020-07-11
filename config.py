@@ -18,6 +18,11 @@ SHIFT_BUTTON = eventconsts.TRANSPORT_LOOP
 # Check for updates online. Change to False if you don't want to be notified or something
 CHECK_UPDATES = True
 
+# Enable idle light show
+IDLE_LIGHTS_ENABLED = True
+# Time to wait before entering idle light show = 1156 * number of minutes
+IDLE_WAIT_TIME = 1156 * 5
+
 # Port values. Change these to match the ports for each device set in FL Studio
 DEVICE_PORT_BASIC = 220
 DEVICE_PORT_EXTENDED = 225

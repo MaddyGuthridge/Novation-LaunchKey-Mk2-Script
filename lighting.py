@@ -4,6 +4,14 @@ This file contains functions and constants related to controlling lights on the 
 
 """
 
+IDLE_ANIMATION_SPEED = 1
+IDLE_ANIMATION_STRETCH = 2
+IDLE_ANIMATION_DO_TRAILS = True
+IDLE_ANIMATION_TRAIL_SPEED_MODIFIER = 1
+IDLE_ANIMATION_TRAIL_SPEED = 2
+IDLE_ANIMATION_TRAIL_LENGTH = 6
+IDLE_ANIMATION_TRAIL_INFREQUENCY = 37
+IDLE_ANIMATION_TRAIL_Y_OFFSET = 13
 
 import time
 
@@ -11,6 +19,7 @@ import internal
 import eventconsts
 import eventprocessor
 import internalconstants
+import config
 
 # LightMap is sent around to collect colours on UI redraws
 class LightMap:
@@ -284,7 +293,37 @@ def lightShow():
 
     state.reset()
 
+def idle_lightshow(lights):
+    if internal.window.get_idle_tick() > config.IDLE_WAIT_TIME and config.IDLE_LIGHTS_ENABLED:
+        tick_num = internal.window.get_idle_tick() - int(config.IDLE_WAIT_TIME) + IDLE_ANIMATION_TRAIL_LENGTH * IDLE_ANIMATION_TRAIL_SPEED
 
+        for x in range(9):
+            for y in range(2):
+                # Generate colours
+                if IDLE_ANIMATION_DO_TRAILS:
+                    animation_speed = IDLE_ANIMATION_SPEED * IDLE_ANIMATION_TRAIL_SPEED_MODIFIER
+                else:
+                    animation_speed = IDLE_ANIMATION_SPEED
+                colour = ((tick_num // animation_speed) + x - y) // IDLE_ANIMATION_STRETCH % 128
+
+                light_mode = 1
+
+                # Set off to on
+                if colour == 0:
+                    colour = 1
+
+                if IDLE_ANIMATION_DO_TRAILS:
+                    if not (((tick_num // IDLE_ANIMATION_TRAIL_SPEED) + x + IDLE_ANIMATION_TRAIL_Y_OFFSET*y) % IDLE_ANIMATION_TRAIL_INFREQUENCY < IDLE_ANIMATION_TRAIL_LENGTH):
+                        colour = COLOUR_OFF
+
+                lights.setPadColour(x, y, colour, light_mode)
+
+def idle_show_active():
+    if internal.window.get_idle_tick() > config.IDLE_WAIT_TIME and config.IDLE_LIGHTS_ENABLED:
+        return True
+
+    else:
+        return False
 
 # Define colour codes
 COLOUR_TRANSPARENT = -1
