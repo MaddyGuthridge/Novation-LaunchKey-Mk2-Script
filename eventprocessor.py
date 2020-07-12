@@ -47,8 +47,8 @@ def process(command):
         if command.handled is False:
             processdefault.process(command)
 
-    except:
-        internal.errors.triggerError()
+    except Exception as e:
+        internal.errors.triggerError(e)
 
 
 # Called after a window is activated
