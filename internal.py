@@ -25,7 +25,7 @@ import lighting
 import WindowProcessors.processwindows as processwindows
 import PluginProcessors.processplugins as processplugins
 
-MIN_FL_SCRIPT_VERSION = 4
+MIN_FL_SCRIPT_VERSION = 5
 
 PORT = -1 # Set in initialisation function then left constant
 
@@ -222,19 +222,12 @@ class windowMgr:
                 special_flag = True
 
             if not special_flag:
-                last = -1
-                length = len(new_plugin)
-                for y in range(length):
-                    if new_plugin[y] is '(':
-                        last = y + 1
-                if last == -1 or last > length: # If no brackets found
-                    return False
-                
-                # Trim string
-                new_plugin = new_plugin[last: -2]
+                new_plugin = ui.getFocusedPluginName()
+
+            if new_plugin == "":
+                return False
 
             # If window changed
-            
             if new_plugin != self.active_plugin or self.plugin_focused == False:
 
                 # End active plugin

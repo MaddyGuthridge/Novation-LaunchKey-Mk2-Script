@@ -31,6 +31,7 @@ WINDOW_BROWSER = midi.widBrowser
 
 WINDOW_SCRIPT_OUTPUT = "Script output"
 WINDOW_COLOUR_PICKER = "Color selector"
+FL_WINDOW_LIST = ["Playlist", "Channel rack", "Piano roll", "Mixer", "Browser"]
 #---------------------------------
 # Snapping constants
 #---------------------------------
