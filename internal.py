@@ -293,6 +293,8 @@ def printCommandOutput(command):
 # Handles extended mode state
 class extended:
     def __init__(self):
+        self.ignore_all = False
+
         self.extendedMode = False
         self.inControl_Knobs = False
         self.inControl_Faders = False
@@ -311,6 +313,9 @@ class extended:
         elif option == eventconsts.INCONTROL_PADS: return self.inControl_Pads
 
     def revert(self, option = eventconsts.SYSTEM_EXTENDED):
+        if self.ignore_all:
+            return
+        
         # Set all
         if option == eventconsts.SYSTEM_EXTENDED:
             
@@ -351,6 +356,9 @@ class extended:
 
     # Sets extended mode on the device, use inControl constants to choose which
     def setVal(self, newMode, option = eventconsts.SYSTEM_EXTENDED):
+        if self.ignore_all:
+            return
+        
         # Set all
         if option == eventconsts.SYSTEM_EXTENDED:
             if newMode is True and self.extendedMode is False:
@@ -398,6 +406,9 @@ class extended:
 
     # Processes extended mode messages from device
     def recieve(self, newMode, option = eventconsts.SYSTEM_EXTENDED):
+        if self.ignore_all:
+            return
+        
         # Set all
         if option == eventconsts.SYSTEM_EXTENDED:
             # Process variables for previous states
@@ -446,6 +457,14 @@ class extended:
                 self.inControl_Pads = False
             else: debugLog("New mode mode not boolean")
             lighting.state.reset()
+
+    # Forces out of extended mode and prevents further changes
+    def forceEnd(self):
+        self.setVal(False)
+        self.recieve(False)
+        self.ignore_all = True
+        
+
 
 extendedMode = extended()
 
@@ -617,9 +636,29 @@ class ErrorState:
 
     def triggerError(self, e):
         self.error = True
+
+        # Force remove from in-control mode
+        extendedMode.forceEnd()
+
+        # Set pad lights
         lightMap = lighting.LightMap()
         lightMap.setFromMatrix(lighting.ERROR_COLOURS, 2)
         lighting.state.setFromMap(lightMap)
+
+        # Print error message
+        print("")
+        print("")
+        printLineBreak()
+        printLineBreak()
+        print("Unfortunately, an error occurred, and the script has crashed.")
+        print("Please save a copy of this output to a text file, and create an issue on the project's GitHub page:")
+        print("          " + internalconstants.SCRIPT_URL)
+        print("Then, please restart the script by clicking `Reload script` in the Script output window.")
+        printLineBreak()
+        printLineBreak()
+        print("")
+        print("")
+
         raise e
 
     def getError(self):
