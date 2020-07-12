@@ -41,8 +41,6 @@ class TGeneric():
         return
 
     def OnInit(self):
-        # Set port to basic
-        internal.PORT = config.DEVICE_PORT_BASIC
 
         # Run shared init functions
         internal.sharedInit()
@@ -60,6 +58,8 @@ class TGeneric():
 
     def OnMidiIn(self, event):
         event.handled = False
+
+        
         
         # Process the event into processedEvent format
         command = eventprocessor.processedEvent(event)

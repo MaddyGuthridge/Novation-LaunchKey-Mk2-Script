@@ -16,8 +16,37 @@ SCRIPT_AUTHOR = "Miguel Guthridge"
 SCRIPT_VERSION_MAJOR = 1
 SCRIPT_VERSION_MINOR = 2
 SCRIPT_VERSION_REVISION = 2
+MIN_FL_SCRIPT_VERSION = 4
 SCRIPT_URL = "https://github.com/MiguelGuthridge/Novation-LaunchKey-Mk2-Script"
 UPDATE_JSON_URL = "https://api.github.com/repos/MiguelGuthridge/Novation-LaunchKey-Mk2-Script/tags"
+
+#---------------------------------
+# Device constants
+#---------------------------------
+
+DEVICE_UNRECOGNISED = -1
+DEVICE_NOT_SET = 0
+DEVICE_KEYS_25 = 25
+DEVICE_KEYS_49 = 49
+DEVICE_KEYS_61 = 61
+
+#---------------------------------
+
+DEVICE_ENQUIRY_MESSAGE = bytes([0xF0, 0x7E, 0x7F, 0x06, 0x01, 0xF7])
+
+DEVICE_RESPONSE_FIRST = bytes([0xF0, 0x7E, 0x00, 0x06, 0x02, 0x00, 0x20, 0x29])
+DEVICE_RESPONSE_25 = 123
+DEVICE_RESPONSE_49 = 124
+DEVICE_RESPONSE_61 = 125
+
+#---------------------------------
+# Initialisation states
+#---------------------------------
+INIT_INCOMPLETE = -1
+INIT_OK = 0
+INIT_UPDATE_AVAILABLE = 1
+INIT_API_OUTDATED = 2
+INIT_PORT_MISMATCH = 3
 
 #---------------------------------
 # Window constants

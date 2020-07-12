@@ -51,9 +51,6 @@ class TGeneric():
 
     def OnInit(self):
 
-        # Set port to extended
-        internal.PORT = config.DEVICE_PORT_EXTENDED
-
         # Run shared init functions
         internal.sharedInit()
 

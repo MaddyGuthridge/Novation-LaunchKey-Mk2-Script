@@ -25,28 +25,59 @@ import lighting
 import WindowProcessors.processwindows as processwindows
 import PluginProcessors.processplugins as processplugins
 
-MIN_FL_SCRIPT_VERSION = 4
+DEVICE_TYPE = internalconstants.DEVICE_NOT_SET
 
 PORT = -1 # Set in initialisation function then left constant
 
-SHARED_INIT_OK = False
-SCRIPT_UPDATE_AVAILABLE = False
+SHARED_INIT_STATE = internalconstants.INIT_INCOMPLETE
 
+def processSysEx(event):
+    global DEVICE_TYPE
+    
+    # Check if it matches device specifications
+    if event.sysex[:8] == internalconstants.DEVICE_RESPONSE_FIRST:
+        if event.sysex[8] == internalconstants.DEVICE_RESPONSE_25:
+            DEVICE_TYPE = internalconstants.DEVICE_KEYS_25
+            print("Running on 25-Key Model")
 
-""" # Inactive code... delete soon
+        elif event.sysex[8] == internalconstants.DEVICE_RESPONSE_49:
+            DEVICE_TYPE = internalconstants.DEVICE_KEYS_49
+            print("Running on 49-Key Model")
 
-ActiveWindow = "Nil"
+        elif event.sysex[8] == internalconstants.DEVICE_RESPONSE_61:
+            DEVICE_TYPE = internalconstants.DEVICE_KEYS_61
+            print("Running on 61-Key Model")
+        else:
+            DEVICE_TYPE = internalconstants.DEVICE_UNRECOGNISED
+            print("If you're seeing this, create an issue on GitHub. ")
+            print("Make sure to tell me your device info, and include a copy of the Syxex Event below.")
+            print("Link to GitHub Page: " + internalconstants.SCRIPT_URL)
 
-# The previous mesage sent to the MIDI out device
-previous_event_out = 0
-"""
+    else:
+        DEVICE_TYPE = internalconstants.DEVICE_UNRECOGNISED
+        print("ERROR - DEVICE NOT RECOGNISED")
+        
+
+    printLineBreak()
+    printLineBreak()
+    print("")
+
+def sendUniversalDeviceEnquiry():
+    device.midiOutSysex(internalconstants.DEVICE_ENQUIRY_MESSAGE)
 
 def getVersionStr():
     return str(internalconstants.SCRIPT_VERSION_MAJOR) + '.' + str(internalconstants.SCRIPT_VERSION_MINOR) + '.' + str(internalconstants.SCRIPT_VERSION_REVISION)
 
 def sharedInit():
-    global SHARED_INIT_OK
-    global SCRIPT_UPDATE_AVAILABLE
+    global PORT
+    global SHARED_INIT_STATE
+
+    SHARED_INIT_STATE = internalconstants.INIT_OK
+
+    PORT = device.getPortNumber()
+
+    sendUniversalDeviceEnquiry()
+
     printLineBreak()
 
     print(internalconstants.SCRIPT_NAME + " - Version: " + getVersionStr())
@@ -54,21 +85,28 @@ def sharedInit():
     print("")
     print("Running in FL Studio Version: " + ui.getVersion())
 
+
     # Check for script updates - UNCOMMENT THIS WHEN MODULES ADDED
-    # updatecheck.check()
-    if SCRIPT_UPDATE_AVAILABLE:
+    """
+    if updatecheck.check():
+        SHARED_INIT_STATE = internalconstants.INIT_UPDATE_AVAILABLE
         printLineBreak()
         print("An update to this script is available!")
         print("Follow this link to download it: " + internalconstants.SCRIPT_URL)
         printLineBreak()
+    """
+    
+    if PORT != config.DEVICE_PORT_BASIC and PORT != config.DEVICE_PORT_EXTENDED:
+        print("It appears that the device ports are not configured correctly. Please edit config.py to rectify this.")
+        SHARED_INIT_STATE = internalconstants.INIT_PORT_MISMATCH
 
     # Check FL Scripting version
     midi_script_version = general.getVersion()
-    print("FL Studio Scripting version: " + str(midi_script_version) + ". Minimum recommended version: " + str(MIN_FL_SCRIPT_VERSION))
+    print("FL Studio Scripting version: " + str(midi_script_version) + ". Minimum recommended version: " + str(internalconstants.MIN_FL_SCRIPT_VERSION))
     # Outdated FL version
-    if midi_script_version < MIN_FL_SCRIPT_VERSION:
+    if midi_script_version < internalconstants.MIN_FL_SCRIPT_VERSION:
         print("You may encounter issues using this script. Consider updating to the latest version FL Studio.")
-    else: SHARED_INIT_OK = True
+        SHARED_INIT_STATE = internalconstants.INIT_API_OUTDATED
 
     # Check debug mode
     if config.CONSOLE_DEBUG_MODE != []:
