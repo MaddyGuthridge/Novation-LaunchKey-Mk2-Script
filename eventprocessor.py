@@ -26,6 +26,13 @@ import PluginProcessors.processplugins as processplugins
 def process(command):
 
     try:
+
+        # Reset idle timer
+        if not ((command.type is eventconsts.TYPE_BASIC_PAD or command.type is eventconsts.TYPE_PAD or command.type is eventconsts.TYPE_TRANSPORT) and not command.is_lift):
+            if lighting.idle_show_active():
+                command.handle("End Idle Light Show")
+            internal.window.reset_idle_tick()
+
         # If basic processor, don't bother for note events
         if internal.PORT == config.DEVICE_PORT_BASIC and command.type == eventconsts.TYPE_NOTE:
             return
@@ -77,6 +84,10 @@ def redraw():
 
         # Error handling: set controller into an error state
         try:
+
+            # Draws idle thing if idle
+            lighting.idle_lightshow(lights)
+
             # Get UI from primary processor
             processfirst.redraw(lights)
 

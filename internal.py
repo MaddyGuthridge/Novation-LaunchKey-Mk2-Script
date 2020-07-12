@@ -88,6 +88,10 @@ def idleProcessor():
     # Increment animation tick
     window.incr_animation_tick()
 
+    debugLog(newGetTab("Animation Tick:", 2) + str(window.get_animation_tick()), internalconstants.DEBUG_ANIMATION_IDLE_TIMERS)
+    debugLog(newGetTab("Idle Tick:", 2) + str(window.get_idle_tick()), internalconstants.DEBUG_ANIMATION_IDLE_TIMERS)
+    debugLog("", internalconstants.DEBUG_ANIMATION_IDLE_TIMERS)
+
     # Update active window
     window.update()
 
@@ -149,18 +153,31 @@ class windowMgr:
         self.active_plugin = ""
         self.active_fl_window = -1
         self.animation_tick_number = 0
+        self.idle_tick_number = 0
     
     # Reset tick number to zero
     def reset_animation_tick(self):
+        debugLog("Reset animation timer", internalconstants.DEBUG_LIGHTING_RESET)
         self.animation_tick_number = 0
+
+    # Reset idle tick numbr to zero
+    def reset_idle_tick(self):
+        debugLog("Reset idle timer", internalconstants.DEBUG_LIGHTING_RESET)
+        self.idle_tick_number = 0
 
     # Called on idle to increase tick number
     def incr_animation_tick(self):
+        
         self.animation_tick_number += 1
+        self.idle_tick_number += 1
 
     # Get number of ticks since window update
     def get_animation_tick(self):
         return self.animation_tick_number
+
+    # Get number of ticks since last event
+    def get_idle_tick(self):
+        return self.idle_tick_number
 
     # Update active window
     def update(self):
@@ -209,6 +226,10 @@ class windowMgr:
 
             # Start new window active
             eventprocessor.activeStart()
+
+            if not shift.getDown():   
+                self.reset_animation_tick()
+            self.reset_idle_tick()
             return True
         
         else: # Check for changes to Plugin
@@ -259,6 +280,10 @@ class windowMgr:
 
                 # Start new plugin active
                 eventprocessor.activeStart()
+
+                if not shift.getDown():   
+                    self.reset_animation_tick()
+                self.reset_idle_tick()
                 return True
             else: return False
 
