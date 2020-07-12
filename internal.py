@@ -612,4 +612,17 @@ class beatMgr:
 beat = beatMgr()
 
 
+class ErrorState:
+    error = False
 
+    def triggerError(self, e):
+        self.error = True
+        lightMap = lighting.LightMap()
+        lightMap.setFromMatrix(lighting.ERROR_COLOURS, 2)
+        lighting.state.setFromMap(lightMap)
+        raise e
+
+    def getError(self):
+        return self.error
+
+errors = ErrorState()

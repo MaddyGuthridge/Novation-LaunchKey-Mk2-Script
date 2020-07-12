@@ -12,6 +12,7 @@ import utils
 
 import eventconsts
 import internal
+import internalconstants
 import config
 import processdefault
 import processfirst
@@ -23,27 +24,32 @@ import PluginProcessors.processplugins as processplugins
 
 # Recieve event and forward onto relative processors
 def process(command):
-    
-    # If basic processor, don't bother for note events
-    if internal.PORT == config.DEVICE_PORT_BASIC and command.type == eventconsts.TYPE_NOTE:
-        return
-    
-    # Call primary processor
-    processfirst.process(command)
 
-    if command.handled: return
+    try:
+        # If basic processor, don't bother for note events
+        if internal.PORT == config.DEVICE_PORT_BASIC and command.type == eventconsts.TYPE_NOTE:
+            return
+        
+        # Call primary processor
+        processfirst.process(command)
 
-    # Attempt to process event using custom processors for plugins
-    processplugins.process(command)
+        if command.handled: return
 
-    if command.handled: return
+        # Attempt to process event using custom processors for plugins
+        processplugins.process(command)
 
-    # Process content from windows
-    processwindows.process(command)
+        if command.handled: return
 
-    # If command hasn't been handled by any above uses, use the default controls
-    if command.handled is False:
-        processdefault.process(command)
+        # Process content from windows
+        processwindows.process(command)
+
+        # If command hasn't been handled by any above uses, use the default controls
+        if command.handled is False:
+            processdefault.process(command)
+
+    except:
+        internal.errors.triggerError()
+
 
 # Called after a window is activated
 def activeStart():
@@ -66,20 +72,26 @@ def activeEnd():
 def redraw():
     # Only in extended mode:
     if internal.PORT == config.DEVICE_PORT_EXTENDED:
-
+        
         lights = lighting.LightMap()
 
-        # Get UI from primary processor
-        processfirst.redraw(lights)
+        # Error handling: set controller into an error state
+        try:
+            # Get UI from primary processor
+            processfirst.redraw(lights)
 
-        # Get UI drawn from plugins
-        processplugins.redraw(lights)
+            # Get UI drawn from plugins
+            processplugins.redraw(lights)
 
-        # Get UI drawn from windows
-        processwindows.redraw(lights)
+            # Get UI drawn from windows
+            processwindows.redraw(lights)
 
-        # Get UI drawn from default processor
-        processdefault.redraw(lights)
+            # Get UI drawn from default processor
+            processdefault.redraw(lights)
+
+        except Exception as e:
+            internal.errors.triggerError(e)
+
 
         # Call pads refresh function
         lighting.state.setFromMap(lights)

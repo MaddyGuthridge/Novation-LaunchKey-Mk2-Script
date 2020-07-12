@@ -74,7 +74,7 @@ class LightMap:
         for x in range(len(self.FrozenMap)):
             for y in range(len(self.FrozenMap[x])):
                 if self.FrozenMap[x][y] == 0 or override:
-                    self.setPadColour(x, y, map[x][y], state)
+                    self.setPadColour(x, y, map[x][y], state, override)
         return
 
 
@@ -352,3 +352,16 @@ BEAT_SONG_BEAT = COLOUR_GREEN
 
 TEMPO_TAP = COLOUR_PINK
 METRONOME = COLOUR_DARK_GREY
+
+# Colour Matrix for errors
+ERROR_COLOURS = [
+    [COLOUR_RED, COLOUR_RED],
+    [COLOUR_RED, COLOUR_RED],
+    [COLOUR_RED, COLOUR_RED],
+    [COLOUR_RED, COLOUR_RED],
+    [COLOUR_RED, COLOUR_RED],
+    [COLOUR_RED, COLOUR_RED],
+    [COLOUR_RED, COLOUR_RED],
+    [COLOUR_RED, COLOUR_RED],
+    [COLOUR_RED, COLOUR_RED]
+]
