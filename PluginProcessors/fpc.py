@@ -33,8 +33,7 @@ COLOUR_MAP = [
     [lighting.COLOUR_YELLOW, lighting.COLOUR_ORANGE],
     [lighting.COLOUR_YELLOW, lighting.COLOUR_ORANGE],
     [lighting.COLOUR_LIGHT_BLUE, lighting.COLOUR_ORANGE],
-    [lighting.COLOUR_LIGHT_BLUE, lighting.COLOUR_ORANGE],
-    [-1, -1]
+    [lighting.COLOUR_LIGHT_BLUE, lighting.COLOUR_ORANGE]
 ]
 
 

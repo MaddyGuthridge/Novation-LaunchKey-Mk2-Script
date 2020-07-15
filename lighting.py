@@ -74,13 +74,14 @@ class LightMap:
         if self.FrozenMap[x][y] == 0 or override: # If pad available to map
             self.PadColours[x][y] = colour
             self.PadStates[x][y] = state
-            self.solidifyPad(x, y)
+            if colour != -1:
+                self.solidifyPad(x, y)
             return True
         else: return False
     
     # Sets colours based on state of LightMap object
     def setFromMatrix(self, map, state=3, override = False):
-        for x in range(len(self.FrozenMap)):
+        for x in range(len(self.FrozenMap) - 1): # Don't modify round pads
             for y in range(len(self.FrozenMap[x])):
                 if self.FrozenMap[x][y] == 0 or override:
                     self.setPadColour(x, y, map[x][y], state, override)
@@ -94,7 +95,7 @@ class LightMap:
     
     # Prevents row from being overwritten
     def solidifyRow(self, y):
-        for x in range(len(self.FrozenMap)):
+        for x in range(len(self.FrozenMap) - 1): # Don't solidify round pads
             if self.FrozenMap[x][y] == 0: self.FrozenMap[x][y] = 1
     
     # Prevents column from being overwritten
@@ -104,7 +105,7 @@ class LightMap:
 
     # Prevents all pads from being overwritten
     def solidifyAll(self):
-        for x in range(len(self.FrozenMap)):
+        for x in range(len(self.FrozenMap) - 1): # Don't solidify round pads
             for y in range(len(self.FrozenMap[x])):
                 self.solidifyPad(x, y)
 
