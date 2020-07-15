@@ -604,37 +604,36 @@ pads = padMgr()
 class shiftMgr:
     is_down = False
     used = False
-    sticky = False
+    sustained = False
 
-    def press(self):
+    def press(self, double_click):
         self.is_down = True
         self.used = False
         window.reset_animation_tick()
     
-    def lift(self):
+    def lift(self, double_click):
+
+        if self.sustained:
+            self.sustained = False
+            self.used = True
+
+        if double_click and config.ENABLE_SUSTAINED_SHIFT:
+            self.sustained = True
         self.is_down = False
         window.reset_animation_tick()
         return self.used
 
-    def use(self):
-        if self.is_down:
+    def use(self, lift = False):
+        if self.is_down or self.sustained:
             self.used = True
+            if lift and config.AUTOCANCEL_SUSTAINED_SHIFT:
+                self.sustained = False
             return True
         else: return False
 
-    # Sets shift key to be down until pressed again
-    def set_sticky(self):
-        self.press()
-        self.sticky = True
-
-    def use_sticky(self):
-        self.lift()
-        self.sticky = False
-
-    def get_sticky(self):
-        return self.sticky
-
     def getDown(self):
+        if self.sustained:
+            return self.sustained
         return self.is_down
     
     def getUsed(self):

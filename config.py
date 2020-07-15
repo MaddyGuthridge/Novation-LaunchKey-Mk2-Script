@@ -34,7 +34,9 @@ ENABLE_SNAPPING = True # Change to False to prevent faders and knobs from snappi
 SNAP_RANGE = 0.05 # Will snap if within this disatnce of snap value
 
 # If enabled, double pressing shift key keeps the shift button enabled until it is used, or pressed again.
-ENABLE_STICKY_SHIFT = True
+ENABLE_SUSTAINED_SHIFT = True
+# If enabled, sustained shifts will automatically lift when you press a button.
+AUTOCANCEL_SUSTAINED_SHIFT = False
 
 # These values determine whether the controller will start with inControl modes enabled for each type
 START_IN_INCONTROL_KNOBS = True
