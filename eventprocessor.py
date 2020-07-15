@@ -253,13 +253,14 @@ class processedEvent:
             else:
                 self.type = eventconsts.TYPE_NOTE
 
-
-        # And also different signals for the mixer buttons in basic mode
-        # TODO: FIX THIS
-        elif self.status == 0xB0 and self.note in eventconsts.BasicPads:
+        # Detect basic circular pads
+        elif self.status == 0xB0 and self.note in eventconsts.BasicPads[8]:
             self.type = eventconsts.TYPE_BASIC_PAD
+            self.padX = 8
+            self.padY = eventconsts.BasicPads[8].index(self.note)
             self.isBinary = True
         
+        # Also check for basic mode buttons
         
         # Check if buttons were lifted
         if self.value is 0: 
