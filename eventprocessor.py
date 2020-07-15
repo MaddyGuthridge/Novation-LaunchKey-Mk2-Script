@@ -16,6 +16,7 @@ import internalconstants
 import config
 import processdefault
 import processfirst
+import processfirst_basic
 import lighting
 import WindowProcessors.processwindows as processwindows
 import PluginProcessors.processplugins as processplugins
@@ -23,7 +24,7 @@ import PluginProcessors.processplugins as processplugins
 
 
 # Recieve event and forward onto relative processors
-def process(command):
+def processExtended(command):
 
     try:
 
@@ -33,19 +34,17 @@ def process(command):
                 command.handle("End Idle Light Show")
             internal.window.reset_idle_tick()
 
-        # If basic processor, don't bother for note events
-        if internal.PORT == config.DEVICE_PORT_BASIC and command.type == eventconsts.TYPE_NOTE:
-            return
         
         # Call primary processor
         processfirst.process(command)
 
         if command.handled: return
 
-        # Attempt to process event using custom processors for plugins
+        # Shouldn't be called in extended mode
+        """ # Attempt to process event using custom processors for plugins
         processplugins.process(command)
 
-        if command.handled: return
+        if command.handled: return"""
 
         # Process content from windows
         processwindows.process(command)
@@ -53,6 +52,27 @@ def process(command):
         # If command hasn't been handled by any above uses, use the default controls
         if command.handled is False:
             processdefault.process(command)
+
+    except Exception as e:
+        internal.errors.triggerError(e)
+
+def processBasic(command):
+
+    try:
+
+        # If basic processor, don't bother for note events
+        if command.type == eventconsts.TYPE_NOTE:
+            return
+        
+        # Call primary processor
+        processfirst_basic.process(command)
+
+        if command.handled: return
+
+        # Attempt to process event using custom processors for plugins
+        processplugins.process(command)
+
+        if command.handled: return
 
     except Exception as e:
         internal.errors.triggerError(e)

@@ -101,7 +101,7 @@ class TGeneric():
             return
 
         # Process command
-        eventprocessor.process(command)
+        eventprocessor.processExtended(command)
 
         # If command was edited, update event object
         if command.edited:

@@ -68,7 +68,7 @@ class TGeneric():
         internal.printCommand(command)
 
         # Process event
-        eventprocessor.process(command)
+        eventprocessor.processBasic(command)
         
         # If command was edited, update event object
         if command.edited:
