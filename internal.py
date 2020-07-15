@@ -277,7 +277,7 @@ class windowMgr:
             special_flag = False
 
             # Check for special windows
-            if new_plugin == internalconstants.WINDOW_COLOUR_PICKER or new_plugin == internalconstants.WINDOW_SCRIPT_OUTPUT:
+            if new_plugin == internalconstants.WINDOW_STR_COLOUR_PICKER or new_plugin == internalconstants.WINDOW_STR_SCRIPT_OUTPUT:
                 special_flag = True
 
             if not special_flag:
@@ -325,6 +325,13 @@ class windowMgr:
                 return True
             else: return False
 
+    def getString(self):
+        if self.plugin_focused:
+            return self.active_plugin
+
+        else:
+            return get_fl_window_string(self.active_fl_window)
+
     # Revert to previous plugin
     def revertPlugin(self):
         self.active_plugin = self.previous_plugin
@@ -335,11 +342,11 @@ window = windowMgr()
 # Gets string for FL Window
 def get_fl_window_string(index):
     if index == -1: return "NONE"
-    if index == internalconstants.WINDOW_MIXER: return "Mixer"
-    if index == internalconstants.WINDOW_PLAYLIST: return "Playlist"
-    if index == internalconstants.WINDOW_CHANNEL_RACK: return "Channel Rack"
-    if index == internalconstants.WINDOW_PIANO_ROLL: return "Piano Roll"
-    if index == internalconstants.WINDOW_BROWSER: return "Browser"
+    if index == internalconstants.WINDOW_MIXER: return internalconstants.WINDOW_STR_MIXER
+    if index == internalconstants.WINDOW_PLAYLIST: return internalconstants.WINDOW_STR_PLAYLIST
+    if index == internalconstants.WINDOW_CHANNEL_RACK: return internalconstants.WINDOW_STR_CHANNEL_RACK
+    if index == internalconstants.WINDOW_PIANO_ROLL: return internalconstants.WINDOW_STR_PIANO_ROLL
+    if index == internalconstants.WINDOW_BROWSER: return internalconstants.WINDOW_STR_BROWSER
 
 # Print command data
 def printCommand(command):

@@ -20,10 +20,27 @@ in_popup = False
 def redraw(lights):
     global in_popup
     # In Popup Menu
-    if ui.isInPopupMenu() and not (internal.window.active_plugin == internalconstants.WINDOW_SCRIPT_OUTPUT and internal.window.plugin_focused):
+    if ui.isInPopupMenu():
         if not in_popup:
             internal.window.reset_animation_tick()
             in_popup = True
+        redrawPopup(lights)
+
+    else:
+        if in_popup:
+            internal.window.reset_animation_tick()
+            in_popup = False
+
+    # Shift key triggers window switcher
+    if internal.shift.getDown():
+        redrawShift(lights)
+
+
+
+    return
+
+def redrawPopup(lights):
+    if not (internal.window.active_plugin == internalconstants.WINDOW_STR_SCRIPT_OUTPUT and internal.window.plugin_focused):
         
         if internal.window.get_animation_tick() > 0:
             lights.setPadColour(1, 1, lighting.UI_NAV_VERTICAL)         # Down
@@ -41,34 +58,78 @@ def redraw(lights):
         
         lights.solidifyAll()
 
-    else:
-        if in_popup:
-            internal.window.reset_animation_tick()
-            in_popup = False
+def redrawShift(lights):
 
-    # Shift key triggers window switcher
-    if internal.shift.getDown():
+    UNDO_LAST = 1
+    UNDO_MIDDLE = 0
+    UNDO_FIRST = -1
+
+    undo_position = general.getUndoHistoryLast()
+    undo_length = general.getUndoHistoryCount()
+    
+    if undo_position == 0:
+        undo_type = UNDO_LAST
+    elif undo_position + 1 == undo_length:
+        undo_type = UNDO_FIRST
+    else:
+        undo_type = UNDO_MIDDLE
+
+    if internal.window.get_animation_tick() > 0:
+        # Playlist
+        if internal.window.getString() == internalconstants.WINDOW_STR_PLAYLIST:
+            lights.setPadColour(0, 1, lighting.COLOUR_DARK_GREY)
+        else:
+            lights.setPadColour(0, 1, lighting.WINDOW_PLAYLIST)
+
+    if internal.window.get_animation_tick() > 1:
+        # Channel Rack
+        if internal.window.getString() == internalconstants.WINDOW_STR_CHANNEL_RACK:
+            lights.setPadColour(1, 1, lighting.COLOUR_DARK_GREY)
+        else:
+            lights.setPadColour(1, 1, lighting.WINDOW_CHANNEL_RACK)
+
+        # Undo
+        if undo_type  == UNDO_FIRST:
+            lights.setPadColour(0, 0, lighting.COLOUR_DARK_GREY)
+        else:
+            lights.setPadColour(0, 0, lighting.UI_UNDO)
+
+    if internal.window.get_animation_tick() > 2:
+        # Piano roll
+        if internal.window.getString() == internalconstants.WINDOW_STR_PIANO_ROLL:
+            lights.setPadColour(2, 1, lighting.COLOUR_DARK_GREY)
+        else:
+            lights.setPadColour(2, 1, lighting.WINDOW_PIANO_ROLL)
+
+        # Redo
+        if undo_type == UNDO_LAST:
+            lights.setPadColour(1, 0, lighting.COLOUR_DARK_GREY)
+        else:
+            lights.setPadColour(1, 0, lighting.UI_REDO)
+
+    if internal.window.get_animation_tick() > 3:
+        # Mixer
+        if internal.window.getString() == internalconstants.WINDOW_STR_MIXER:
+            lights.setPadColour(3, 1, lighting.COLOUR_DARK_GREY)
+        else:
+            lights.setPadColour(3, 1, lighting.WINDOW_MIXER)
+
+        # Next plugin
+        lights.setPadColour(7, 0, lighting.UI_NAV_HORIZONTAL)
         
-        if internal.window.get_animation_tick() > 0:
-            lights.setPadColour(0, 1, lighting.WINDOW_PLAYLIST)         # Playlist
-        if internal.window.get_animation_tick() > 1:
-            lights.setPadColour(1, 1, lighting.WINDOW_CHANNEL_RACK)     # Channel rack
-            lights.setPadColour(0, 0, lighting.UI_UNDO)                 # Undo
-        if internal.window.get_animation_tick() > 2:
-            lights.setPadColour(2, 1, lighting.WINDOW_PIANO_ROLL)       # Piano roll
-            lights.setPadColour(1, 0, lighting.UI_REDO)                 # Redo
-        if internal.window.get_animation_tick() > 3:
-            lights.setPadColour(3, 1, lighting.WINDOW_MIXER)            # Mixer
-            lights.setPadColour(7, 0, lighting.UI_NAV_HORIZONTAL)       # Next plugin
-        if internal.window.get_animation_tick() > 4:
-            lights.setPadColour(4, 1, lighting.WINDOW_BROWSER)          # Browser
-            lights.setPadColour(6, 0, lighting.UI_NAV_HORIZONTAL)       # Prev plugin
+    if internal.window.get_animation_tick() > 4:
+        # Browser
+        if internal.window.getString() == internalconstants.WINDOW_STR_BROWSER:
+            lights.setPadColour(4, 1, lighting.COLOUR_DARK_GREY)
+        else:
+            lights.setPadColour(4, 1, lighting.WINDOW_BROWSER)
+
+        # Prev plugin
+        lights.setPadColour(6, 0, lighting.UI_NAV_HORIZONTAL)
             
 
-        lights.solidifyAll()
+    lights.solidifyAll()
 
-
-    return
 
 def process(command):
 
@@ -94,82 +155,14 @@ def process(command):
         # Shift down - Window switcher
         if command.shifted and command.type == eventconsts.TYPE_PAD and command.is_lift:
             
-            if command.note == eventconsts.Pads[0][1]: 
-                ui.showWindow(internalconstants.WINDOW_PLAYLIST)
-                command.actions.appendAction("Switched window to Playlist")
-                command.handled = True
-
-            if command.note == eventconsts.Pads[1][1]: 
-                ui.showWindow(internalconstants.WINDOW_CHANNEL_RACK)
-                command.actions.appendAction("Switched window to Channel rack")
-                command.handled = True
-
-            if command.note == eventconsts.Pads[2][1]: 
-                ui.showWindow(internalconstants.WINDOW_PIANO_ROLL)
-                command.actions.appendAction("Switched window to Piano roll")
-                command.handled = True
-            
-            if command.note == eventconsts.Pads[3][1]: 
-                ui.showWindow(internalconstants.WINDOW_MIXER)
-                command.actions.appendAction("Switched window to Mixer")
-                command.handled = True
-            
-            if command.note == eventconsts.Pads[4][1]: 
-                ui.showWindow(internalconstants.WINDOW_BROWSER)
-                command.actions.appendAction("Switched window to Browser")
-                command.handled = True
-            
-            if command.note == eventconsts.Pads[6][0]: 
-                ui.selectWindow(True)
-                command.actions.appendAction("Previous window")
-                command.handled = True
-            
-            if command.note == eventconsts.Pads[7][0]: 
-                ui.selectWindow(False)
-                command.actions.appendAction("Next window")
-                command.handled = True
-
-            if command.note == eventconsts.Pads[0][0]: 
-                general.undoUp()
-                command.actions.appendAction("Undo")
-                command.handled = True
-            
-            if command.note == eventconsts.Pads[1][0]: 
-                general.undoDown()
-                command.actions.appendAction("Redo")
-                command.handled = True
+            processShift(command)
 
             
 
         # Right click menu
-        if ui.isInPopupMenu() and command.type == eventconsts.TYPE_PAD and command.is_lift and (internal.window.active_plugin != internalconstants.WINDOW_SCRIPT_OUTPUT):
+        if ui.isInPopupMenu() and command.type == eventconsts.TYPE_PAD and command.is_lift and (internal.window.getString() != internalconstants.WINDOW_STR_SCRIPT_OUTPUT):
             
-            # Always handle all presses
-            command.handled = True
-
-            if command.note == eventconsts.Pads[1][0]:
-                ui.up()
-                command.actions.appendAction("UI Up")
-
-            if command.note == eventconsts.Pads[1][1]:
-                ui.down()
-                command.actions.appendAction("UI Down")
-
-            if command.note == eventconsts.Pads[0][1]:
-                ui.left()
-                command.actions.appendAction("UI Left")
-            
-            if command.note == eventconsts.Pads[2][1]:
-                ui.right()
-                command.actions.appendAction("UI Right")
-
-            if command.note == eventconsts.Pads[3][1]:
-                ui.escape()
-                command.actions.appendAction("UI Escape")
-
-            if command.note == eventconsts.Pads[4][1]:
-                ui.enter()
-                command.actions.appendAction("UI Enter")
+            processPopup(command)
 
         #
         # Extended Mode signals
@@ -207,3 +200,71 @@ def process(command):
     if command.handled is False: 
         command.actions.appendAction("[Did not handle]")
 
+def processShift(command):
+    if command.note == eventconsts.Pads[0][1]: 
+        ui.showWindow(internalconstants.WINDOW_PLAYLIST)
+        command.handle("Switched window to Playlist")
+        
+    elif command.note == eventconsts.Pads[1][1]: 
+        ui.showWindow(internalconstants.WINDOW_CHANNEL_RACK)
+        command.handle("Switched window to Channel rack")
+        
+    elif command.note == eventconsts.Pads[2][1]: 
+        ui.showWindow(internalconstants.WINDOW_PIANO_ROLL)
+        command.handle("Switched window to Piano roll")
+        
+    elif command.note == eventconsts.Pads[3][1]: 
+        ui.showWindow(internalconstants.WINDOW_MIXER)
+        command.handle("Switched window to Mixer")
+        
+    elif command.note == eventconsts.Pads[4][1]: 
+        ui.showWindow(internalconstants.WINDOW_BROWSER)
+        command.handle("Switched window to Browser")
+        
+    elif command.note == eventconsts.Pads[6][0]: 
+        ui.selectWindow(True)
+        command.handle("Previous window")
+    
+    elif command.note == eventconsts.Pads[7][0]: 
+        ui.selectWindow(False)
+        command.handle("Next window")
+        
+    elif command.note == eventconsts.Pads[0][0]: 
+        general.undoUp()
+        command.handle("Undo")
+        
+    elif command.note == eventconsts.Pads[1][0]: 
+        general.undoDown()
+        command.handle("Redo")
+
+    else:
+        command.handle("Shift menu catch-all")
+
+def processPopup(command):
+    # Always handle all presses
+    if command.note == eventconsts.Pads[1][0]:
+        ui.up()
+        command.handle("UI Up")
+
+    elif command.note == eventconsts.Pads[1][1]:
+        ui.down()
+        command.handle("UI Down")
+
+    elif command.note == eventconsts.Pads[0][1]:
+        ui.left()
+        command.handle("UI Left")
+    
+    elif command.note == eventconsts.Pads[2][1]:
+        ui.right()
+        command.handle("UI Right")
+
+    elif command.note == eventconsts.Pads[3][1]:
+        ui.escape()
+        command.handle("UI Escape")
+
+    elif command.note == eventconsts.Pads[4][1]:
+        ui.enter()
+        command.handle("UI Enter")
+
+    else:
+        command.handle("Right click menu catch-all")

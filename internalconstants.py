@@ -58,8 +58,14 @@ WINDOW_CHANNEL_RACK = midi.widChannelRack
 WINDOW_MIXER = midi.widMixer
 WINDOW_BROWSER = midi.widBrowser
 
-WINDOW_SCRIPT_OUTPUT = "Script output"
-WINDOW_COLOUR_PICKER = "Color selector"
+WINDOW_STR_PLAYLIST = "Playlist"
+WINDOW_STR_PIANO_ROLL = "Piano roll"
+WINDOW_STR_CHANNEL_RACK = "Channel Rack"
+WINDOW_STR_MIXER = "Mixer"
+WINDOW_STR_BROWSER = "Browser"
+
+WINDOW_STR_SCRIPT_OUTPUT = "Script output"
+WINDOW_STR_COLOUR_PICKER = "Color selector"
 #---------------------------------
 # Snapping constants
 #---------------------------------
