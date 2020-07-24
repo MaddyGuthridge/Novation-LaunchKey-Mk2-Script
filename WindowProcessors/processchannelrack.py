@@ -140,30 +140,35 @@ def process_menu_mode(command):
         ui.previous()
         command.actions.appendAction("Channel Rack: Previous channel")
         command.handled = True
-    if coord == [1, 1]:
+    elif coord == [1, 1]:
         ui.next()
         command.actions.appendAction("Channel Rack: Next channel")
         command.handled = True
 
     # Cut, Copy, Paste
-    if coord == [3, 0]:
+    elif coord == [3, 0]:
         ui.cut()
         command.actions.appendAction("UI: Cut")
         command.handled = True
-    if coord == [4, 0]:
+    elif coord == [4, 0]:
         ui.copy()
         command.actions.appendAction("UI: Copy")
         command.handled = True
-    if coord == [5, 0]:
+    elif coord == [5, 0]:
         ui.paste()
         command.actions.appendAction("UI: Paste")
         command.handled = True
 
     # To piano roll
-    if coord == [7, 1]:
+    elif coord == [7, 1]:
         ui.showWindow(internalconstants.WINDOW_PIANO_ROLL)
         command.actions.appendAction("Sent to pianoroll")
         command.handled = True
+
+    # Plugin window
+    elif coord == [6, 1]:
+        channels.showEditor(channels.channelNumber())
+        command.handle("Opened plugin window")
 
 def redraw(lights):
     if internal.extendedMode.query(eventconsts.INCONTROL_PADS):
@@ -199,7 +204,8 @@ def redraw_menu_mode(lights):
     if internal.window.get_animation_tick() >= 4:
         lights.setPadColour(5, 0, lighting.UI_PASTE)            # Paste
 
-
+    if internal.window.get_animation_tick() >= 2:
+        lights.setPadColour(6, 1, lighting.UI_CHOOSE)
     if internal.window.get_animation_tick() >= 3:
         lights.setPadColour(7, 1, lighting.UI_ACCEPT, 2)           # To piano roll
 
