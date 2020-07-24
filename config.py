@@ -46,6 +46,6 @@ START_IN_INCONTROL_PADS = True
 TAB_LENGTH = 16 # How much spacing to add in console output
 
 # Controls which console messages are printed. Add things from internalconstants
-CONSOLE_DEBUG_MODE = []
+CONSOLE_DEBUG_MODE = [internalconstants.DEBUG_EVENT_DATA]
 
 

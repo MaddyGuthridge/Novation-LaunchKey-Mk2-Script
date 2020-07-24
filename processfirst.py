@@ -141,9 +141,9 @@ def process(command):
         # Pads down (white light)
         if command.type == eventconsts.TYPE_BASIC_PAD or command.type == eventconsts.TYPE_PAD:
             if command.value: # Press down
-                internal.pads.press(command.padX, command.padY)
+                internal.pads.press(command.coord_X, command.coord_Y)
             else:
-                internal.pads.lift(command.padX, command.padY)
+                internal.pads.lift(command.coord_X, command.coord_Y)
 
         # Shift button (in control for pads (window switcher))
         if command.id == config.SHIFT_BUTTON:

@@ -44,7 +44,7 @@ def process(command):
     command.actions.addProcessor("Browser Processor")
 
     if command.type == eventconsts.TYPE_PAD and command.is_lift:
-        coord = [command.padX, command.padY]
+        coord = [command.coord_X, command.coord_Y]
         
         # Previous
         if coord == [3, 0]:
