@@ -116,6 +116,9 @@ def redrawShift(lights):
 
         # Next plugin
         lights.setPadColour(7, 0, lighting.UI_NAV_HORIZONTAL)
+
+        # Save
+        lights.setPadColour(3, 0, lighting.UI_SAVE)
         
     if internal.window.get_animation_tick() > 4:
         # Browser
@@ -126,6 +129,9 @@ def redrawShift(lights):
 
         # Prev plugin
         lights.setPadColour(6, 0, lighting.UI_NAV_HORIZONTAL)
+
+        # Plugin picker
+        lights.setPadColour(7, 1, lighting.WINDOW_PLUGIN_PICKER)
             
 
     lights.solidifyAll()
@@ -236,6 +242,14 @@ def processShift(command):
     elif command.note == eventconsts.Pads[1][0]: 
         general.undoDown()
         command.handle("Redo")
+
+    elif command.note == eventconsts.Pads[7][1]:
+        transport.globalTransport(eventconsts.midi.FPT_F8, 1)
+        command.handle("Launch Plugin Picker")
+
+    elif command.note == eventconsts.Pads[3][0]:
+        transport.globalTransport(eventconsts.midi.FPT_Save, 1)
+        command.handle("Save project")
 
     else:
         command.handle("Shift menu catch-all")
