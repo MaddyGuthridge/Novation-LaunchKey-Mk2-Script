@@ -26,7 +26,8 @@ def process(command):
 
     command.actions.addProcessor("Channel rack Processor")
 
-    
+    current_channel = channels.channelNumber()
+
     #---------------------------------
     # Pads
     #---------------------------------
@@ -48,156 +49,41 @@ def process(command):
     # Faders
     #---------------------------------
     if command.type == eventconsts.TYPE_FADER:
-        # Fader 1
-        if command.id == eventconsts.FADER_1: 
-            setVolume(command, 0, command.value)
-            command.handled = True
-        
-        # Fader 2
-        if command.id == eventconsts.FADER_2: 
-            setVolume(command, 1, command.value)
-            command.handled = True
+        fader_num = command.coord_X
 
-        # Fader 3
-        if command.id == eventconsts.FADER_3: 
-            setVolume(command, 2, command.value)
-            command.handled = True
-        
-        # Fader 4
-        if command.id == eventconsts.FADER_4: 
-            setVolume(command, 3, command.value)
-            command.handled = True
+        if fader_num == 8 and not command.shifted:
+            channel_num = current_channel
+        else:
+            channel_num = fader_num
 
-        # Fader 5
-        if command.id == eventconsts.FADER_5: 
-            setVolume(command, 4, command.value)
-            command.handled = True
-        
-        # Fader 6
-        if command.id == eventconsts.FADER_6: 
-            setVolume(command, 5, command.value)
-            command.handled = True
-        
-        # Fader 7
-        if command.id == eventconsts.FADER_7: 
-            setVolume(command, 6, command.value)
-            command.handled = True
-
-        # Fader 8
-        if command.id == eventconsts.FADER_8: 
-            setVolume(command, 7, command.value)
-            command.handled = True
-
-        # Fader 9
-        if command.id == eventconsts.FADER_9: 
-            # If shift key held, change master track
-            if command.shifted:
-                setVolume(command, 8, command.value)
-                command.handled = True
-            # Otherwise change current track
-            else:
-                # Get current track number
-                track = channels.channelNumber()
-                setVolume(command, track, command.value)
-                command.handled = True
+        setVolume(command, channel_num, command.value)
 
     #---------------------------------
     # Knobs
     #---------------------------------
     if command.type == eventconsts.TYPE_KNOB:
-        # Knob 1
-        if command.id == eventconsts.KNOB_1: 
-            setPan(command, 0, command.value)
-            command.handled = True
-        
-        # Knob 2
-        if command.id == eventconsts.KNOB_2: 
-            setPan(command, 1, command.value)
-            command.handled = True
+        knob_num = command.coord_X
 
-        # Knob 3
-        if command.id == eventconsts.KNOB_3: 
-            setPan(command, 2, command.value)
-            command.handled = True
-        
-        # Knob 4
-        if command.id == eventconsts.KNOB_4: 
-            setPan(command, 3, command.value)
-            command.handled = True
+        if knob_num == 7 and not command.shifted:
+            channel_num = current_channel
+        else:
+            channel_num = knob_num
 
-        # Knob 5
-        if command.id == eventconsts.KNOB_5: 
-            setPan(command, 4, command.value)
-            command.handled = True
-        
-        # Knob 6
-        if command.id == eventconsts.KNOB_6: 
-            setPan(command, 5, command.value)
-            command.handled = True
-        
-        # Knob 7
-        if command.id == eventconsts.KNOB_7: 
-            setPan(command, 6, command.value)
-            command.handled = True
-
-        # Knob 8
-        if command.id == eventconsts.KNOB_8: 
-            # If shift key held, change track 7
-            if command.shifted:
-                setPan(command, 7, command.value)
-                command.handled = True
-            # Otherwise change current track
-            else:
-                # Get current track number
-                track = channels.channelNumber()
-                setPan(command, track, command.value)
-                command.handled = True
+        setPan(command, channel_num, command.value)
 
 
     #---------------------------------
     # Mixer Buttons - mute/solo tracks
     #---------------------------------
     if command.type == eventconsts.TYPE_FADER_BUTTON:
-        if command.id == eventconsts.FADER_BUTTON_1:
-            processMuteSolo(0, command)
-            command.handled = True
+        fader_num = command.coord_X
+        print(fader_num)
+        if fader_num == 8 and not command.shifted:
+            channel_num = current_channel
+        else:
+            channel_num = fader_num
 
-        if command.id == eventconsts.FADER_BUTTON_2:
-            processMuteSolo(1, command)
-            command.handled = True
-
-        if command.id == eventconsts.FADER_BUTTON_3:
-            processMuteSolo(2, command)
-            command.handled = True
-
-        if command.id == eventconsts.FADER_BUTTON_4:
-            processMuteSolo(3, command)
-            command.handled = True
-
-        if command.id == eventconsts.FADER_BUTTON_5:
-            processMuteSolo(4, command)
-            command.handled = True
-
-        if command.id == eventconsts.FADER_BUTTON_6:
-            processMuteSolo(5, command)
-            command.handled = True
-
-        if command.id == eventconsts.FADER_BUTTON_7:
-            processMuteSolo(6, command)
-            command.handled = True
-
-        if command.id == eventconsts.FADER_BUTTON_8:
-            processMuteSolo(7, command)
-            command.handled = True
-
-        if command.id == eventconsts.FADER_BUTTON_9:
-            # If shift key held, change 9th track
-            if command.shifted:
-                processMuteSolo(8, command)
-                command.handled = True
-            else:
-                processMuteSolo(channels.channelNumber(), command)
-                command.handled = True
+        processMuteSolo(channel_num, command)
 
     return
 
