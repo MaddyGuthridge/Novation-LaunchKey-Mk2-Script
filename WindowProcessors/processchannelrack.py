@@ -36,8 +36,7 @@ def process(command):
         if command.coord_Y == 1 and command.coord_X == 0:
             ui_mode.nextMode()
             internal.window.reset_animation_tick()
-            command.actions.appendAction("Channel Rack: Next UI mode")
-            command.handled = True
+            command.handle("Channel Rack: Next UI mode")
 
         elif ui_mode.getMode() == 1:
             process_bit_mode(command)
@@ -319,27 +318,52 @@ def setGridBits(lights):
     return
 
 def processMuteSolo(channel, command):
-    if command.value == 0: return
-    if channels.isChannelSolo(channel):
-        channels.soloChannel(channel)
-        command.actions.appendAction("Unsolo channel " + str(channel))
-        return
-    channels.muteChannel(channel)
-    if command.is_double_click:
-        channels.soloChannel(channel)
-        command.actions.appendAction("Solo channel " + str(channel))
-    else: 
-        if channels.isChannelMuted(channel):
-            command.actions.appendAction("Mute channel " + str(channel))
-        else: 
-            command.actions.appendAction("Unmute channel " + str(channel))
 
-def setVolume(command, track, value):
+    if channels.channelCount() <= channel:
+        command.handle("Channel out of range. Couldn't process mute")
+        return
+
+    if command.value == 0: return
+    if channels.isChannelSolo(channel) and channels.channelCount() != 1:
+        channels.soloChannel(channel)
+        action = "Unsolo channel"
+        
+    elif command.is_double_click:
+        channels.soloChannel(channel)
+        action = "Solo channel"
+    else: 
+        channels.muteChannel(channel)
+        if channels.isChannelMuted(channel):
+            action = "Mute channel"
+        else: 
+            action = "Unmute channel"
+
+    command.handle(action)
+
+def setVolume(command, channel, value):
+
+    if channels.channelCount() <= channel:
+        command.handle("Channel out of range. Couldn't set volume")
+        return
+
     volume = getVolumeSend(value)
-    channels.setChannelVolume(track, volume)
-    command.actions.appendAction("Set " + channels.getChannelName(track) + " volume to " + getVolumeValue(value))
+    channels.setChannelVolume(channel, volume)
+    action = "Set " + channels.getChannelName(channel) + " volume to " + getVolumeValue(value)
     if internal.didSnap(internal.toFloat(value), internalconstants.CHANNEL_VOLUME_SNAP_TO):
-        command.actions.appendAction("[Snapped]")
+        action += " [Snapped]"
+    command.handle(action)
+
+def setPan(command, channel, value):
+    if channels.channelCount() <= channel:
+        command.handle("Channel out of range. Couldn't setpan")
+        return
+
+    volume = getPanSend(value)
+    channels.setChannelPan(channel, volume)
+    action = "Set " + channels.getChannelName(channel) + " pan to " + getPanValue(value)
+    if internal.didSnap(internal.toFloat(value, -1), internalconstants.CHANNEL_PAN_SNAP_TO):
+        action = "[Snapped]"
+    command.handle(action)
 
 # Returns volume value set to send to FL Studio
 def getVolumeSend(inVal):
@@ -352,12 +376,7 @@ def getVolumeValue(inVal):
     
     return str(round(getVolumeSend(inVal) * 100)) + "%"
 
-def setPan(command, track, value):
-    volume = getPanSend(value)
-    channels.setChannelPan(track, volume)
-    command.actions.appendAction("Set " + channels.getChannelName(track) + " pan to " + getPanValue(value))
-    if internal.didSnap(internal.toFloat(value, -1), internalconstants.CHANNEL_PAN_SNAP_TO):
-        command.actions.appendAction("[Snapped]")
+
 
 # Returns volume value set to send to FL Studio
 def getPanSend(inVal):
