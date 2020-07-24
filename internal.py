@@ -58,8 +58,8 @@ def processSysEx(event):
         print("ERROR - DEVICE NOT RECOGNISED")
         
 
-    printLineBreak()
-    printLineBreak()
+    getLineBreak()
+    getLineBreak()
     print("")
 
 def sendUniversalDeviceEnquiry():
@@ -78,7 +78,7 @@ def sharedInit():
 
     sendUniversalDeviceEnquiry()
 
-    printLineBreak()
+    print(getLineBreak())
 
     print(internalconstants.SCRIPT_NAME + " - Version: " + getVersionStr())
     print(" - " + internalconstants.SCRIPT_AUTHOR)
@@ -137,8 +137,8 @@ def idleProcessor():
     idleClock.stop()
 
 # Prints a line break
-def printLineBreak():
-    print("————————————————————————————————————————————————————")
+def getLineBreak():
+    return "————————————————————————————————————————————————————"
 
 # Returns string with tab characters at the end
 def newGetTab(string, multiplier = 1, length = config.TAB_LENGTH):
@@ -170,11 +170,11 @@ class performanceMonitor:
         self.total_time += process_time
         self.num_events += 1
         if self.debug_level in config.CONSOLE_DEBUG_MODE:
-            printLineBreak()
+            getLineBreak()
             print(self.name)
             print("Processed in:", round(process_time, 4), "seconds")
             print("Average processing time:", round(self.total() / self.num_events, 4), "seconds")
-            printLineBreak()
+            getLineBreak()
         return process_time
     
     def total(self):
@@ -254,9 +254,9 @@ class windowMgr:
             self.active_fl_window = new_fl_window
             self.plugin_focused =  False
 
-            print("Active Window: ", get_fl_window_string(self.active_fl_window))
-            print("[Background: ", self.active_plugin, "]")
-            printLineBreak()
+            debugLog("Active Window: " + get_fl_window_string(self.active_fl_window), internalconstants.DEBUG_WINDOW_CHANGES)
+            debugLog("[Background: " + self.active_plugin + "]", internalconstants.DEBUG_WINDOW_CHANGES)
+            debugLog(getLineBreak())
 
             # Start new window
             if new_fl_window != old_window:
@@ -308,9 +308,9 @@ class windowMgr:
                 self.plugin_focused = True
                 self.active_plugin = new_plugin
 
-                print("Active Window: ", self.active_plugin)
-                print("[Background: ", get_fl_window_string(self.active_fl_window), "]")
-                printLineBreak()
+                debugLog("Active Window: " + self.active_plugin, internalconstants.DEBUG_WINDOW_CHANGES)
+                debugLog("[Background: " + get_fl_window_string(self.active_fl_window) + "]", internalconstants.DEBUG_WINDOW_CHANGES)
+                debugLog(getLineBreak(), internalconstants.DEBUG_WINDOW_CHANGES)
 
                 # Start new plugin
                 if new_plugin != old_plugin:
@@ -357,8 +357,8 @@ def printCommand(command):
 def printCommandOutput(command):
     command.printOutput()
     processTime = eventClock.stop()
-    printLineBreak()
-    print("")
+    debugLog(getLineBreak(), internalconstants.DEBUG_EVENT_DATA)
+    debugLog("", internalconstants.DEBUG_EVENT_DATA)
 
 # Handles extended mode state
 class extended:
@@ -717,14 +717,14 @@ class ErrorState:
         # Print error message
         print("")
         print("")
-        printLineBreak()
-        printLineBreak()
+        getLineBreak()
+        getLineBreak()
         print("Unfortunately, an error occurred, and the script has crashed.")
         print("Please save a copy of this output to a text file, and create an issue on the project's GitHub page:")
         print("          " + internalconstants.SCRIPT_URL)
         print("Then, please restart the script by clicking `Reload script` in the Script output window.")
-        printLineBreak()
-        printLineBreak()
+        getLineBreak()
+        getLineBreak()
         print("")
         print("")
 
@@ -732,5 +732,12 @@ class ErrorState:
 
     def getError(self):
         return self.error
+
+    def redrawError(self, lights):
+        lights.setFromMatrix(lighting.ERROR_COLOURS)
+        lights.solidifyAll()
+
+    def eventProcessError(self, command):
+        command.handle("Device in error state")
 
 errors = ErrorState()

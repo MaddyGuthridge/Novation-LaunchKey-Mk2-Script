@@ -46,8 +46,8 @@ class TGeneric():
         internal.sharedInit()
 
         print('Initialisation complete')
-        internal.printLineBreak()
-        internal.printLineBreak()
+        print(internal.getLineBreak())
+        print(internal.getLineBreak())
         print("")
         print("")
 

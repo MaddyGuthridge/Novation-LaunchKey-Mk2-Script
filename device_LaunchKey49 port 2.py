@@ -67,8 +67,8 @@ class TGeneric():
         
 
         print('Initialisation complete')
-        internal.printLineBreak()
-        internal.printLineBreak()
+        print(internal.getLineBreak())
+        print(internal.getLineBreak())
         print("")
         print("")
 
@@ -77,8 +77,8 @@ class TGeneric():
         # Return the device into Basic Mode
         internal.extendedMode.setVal(False)
         print('Deinitialisation complete')
-        internal.printLineBreak()
-        internal.printLineBreak()
+        print(internal.getLineBreak())
+        print(internal.getLineBreak())
         print("")
         print("")
         
