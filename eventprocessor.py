@@ -22,7 +22,6 @@ import WindowProcessors.processwindows as processwindows
 import PluginProcessors.processplugins as processplugins
 
 
-
 # Recieve event and forward onto relative processors
 def processExtended(command):
 
@@ -31,6 +30,10 @@ def processExtended(command):
         return
 
     try:
+
+        if command.recieved_internal:
+            processReceived(command)
+            return
 
         # Reset idle timer
         if not ((command.type is eventconsts.TYPE_BASIC_PAD or command.type is eventconsts.TYPE_PAD or command.type is eventconsts.TYPE_TRANSPORT) and not command.is_lift):
@@ -62,11 +65,18 @@ def processExtended(command):
 
 def processBasic(command):
 
+    # Send event to reset other controller
+    internal.sendCompleteInternalMidiMessage(internalconstants.MESSAGE_RESET_INTERNAL_CONTROLLER)
+
     if internal.errors.getError():
         internal.errors.eventProcessError(command)
         return
 
     try:
+
+        if command.recieved_internal:
+            processReceived(command)
+            return
 
         # If basic processor, don't bother for note events
         if command.type == eventconsts.TYPE_NOTE:
@@ -85,6 +95,17 @@ def processBasic(command):
     except Exception as e:
         internal.errors.triggerError(e)
 
+# Processes events received internally
+def processReceived(command):
+    command.actions.addProcessor("Internal event processor")
+
+    if command.getDataMIDI() == internalconstants.MESSAGE_RESET_INTERNAL_CONTROLLER:
+        internal.window.reset_idle_tick()
+        command.handle("Reset idle tick")
+
+    if command.getDataMIDI() == internalconstants.MESSAGE_ERROR_CRASH:
+        internal.errors.triggerErrorFromOtherScript()
+        command.handle("Trigger error state")
 
 # Called after a window is activated
 def activeStart():
@@ -185,6 +206,7 @@ class rawEvent:
 # Stores useful data about processed event
 class processedEvent:
     def __init__(self, event):
+        self.recieved_internal = False
         self.edited = False
         self.actions = actionPrinter()
 
@@ -196,6 +218,12 @@ class processedEvent:
         self.status_nibble = event.status >> 4              # Get first half of status byte
         self.channel = event.status & int('00001111', 2)    # Get 2nd half of status byte
         
+        if self.channel == 14:
+            self.recieved_internal = True
+
+        # PME Flags to make sure errors don't happen or something
+        self.flags = event.pmeFlags
+
         # Add sysex information
         self.sysex = event.sysex
 
@@ -219,9 +247,7 @@ class processedEvent:
         if self.type is eventconsts.TYPE_SYSEX_EVENT:
             internal.processSysEx(self)
 
-        
-
-                                                                                                                                     
+                                                                                                                               
 
     def parse(self):
         # Indicates whether to consider as a value or as an on/off
@@ -564,7 +590,7 @@ class processedEvent:
 
     # Returns int with hex of event
     def getDataMIDI(self):
-        return hex(self.id + (self.value << 16))
+        return internal.toMidiMessage(self.status, self.note, self.value)
 
 
     

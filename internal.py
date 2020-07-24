@@ -547,16 +547,31 @@ def compareEvent(event):
 EventNameT = ['Note Off', 'Note On ', 'Key Aftertouch', 'Control Change','Program Change',  'Channel Aftertouch', 'Pitch Bend', 'System Message' ]
 """
 
-# Sends message to the default MIDI out device
+# Sends message to controller
 def sendMidiMessage(status, data1, data2):
     event_out  = toMidiMessage(status, data1, data2)
     str_event_out = str(status) + " " + str(data1) + " " + str(data2)
     if PORT == config.DEVICE_PORT_EXTENDED:
-        debugLog("Dispatched external MIDI message " + str_event_out, internalconstants.DEBUG_DISPATCH_EVENT)
-        device.midiOutMsg(event_out)
+        sendCompleteMidiMessage(event_out, str_event_out)
     else:
-        debugLog("Dispatched internal MIDI message" + str_event_out, internalconstants.DEBUG_DISPATCH_EVENT)
-        device.dispatch(0, event_out)
+        debugLog("Dispatched event through sendMidiMessage (depreciated)", internalconstants.DEBUG_WARNING_DEPRECIATED_FEATURE)
+        sendCompleteInternalMidiMessage(event_out, str_event_out)
+
+# Sends message to linked script
+def sendInternalMidiMessage(status, data1, data2):
+    event_out  = toMidiMessage(status, data1, data2)
+    str_event_out = str(status) + " " + str(data1) + " " + str(data2)
+    sendCompleteInternalMidiMessage(event_out, str_event_out)
+
+# Sends complete message to controller
+def sendCompleteMidiMessage(message, str_event_out = ""):
+    debugLog("Dispatched external MIDI message " + str_event_out + " (" + str(message) + ")", internalconstants.DEBUG_DISPATCH_EVENT)
+    device.midiOutMsg(message)
+
+# Sends complete message to linked script
+def sendCompleteInternalMidiMessage(message, str_event_out = ""):
+    debugLog("Dispatched internal MIDI message: " + str_event_out + " (" + str(message) + ")", internalconstants.DEBUG_DISPATCH_EVENT)
+    device.dispatch(0, message)
 
 # Generates a MIDI message given arguments
 def toMidiMessage(status, data1, data2):
@@ -706,29 +721,58 @@ class ErrorState:
     def triggerError(self, e):
         self.error = True
 
-        # Force remove from in-control mode
-        extendedMode.forceEnd()
+        # Set other script into error state too
+        sendCompleteInternalMidiMessage(internalconstants.MESSAGE_ERROR_CRASH)
 
-        # Set pad lights
-        lightMap = lighting.LightMap()
-        lightMap.setFromMatrix(lighting.ERROR_COLOURS, 2)
-        lighting.state.setFromMap(lightMap)
+        if PORT == config.DEVICE_PORT_EXTENDED:
+            # Force remove from in-control mode
+            extendedMode.forceEnd()
+
+            # Set pad lights
+            lightMap = lighting.LightMap()
+            lightMap.setFromMatrix(lighting.ERROR_COLOURS, 2)
+            lighting.state.setFromMap(lightMap)
 
         # Print error message
         print("")
         print("")
-        getLineBreak()
-        getLineBreak()
+        print(getLineBreak())
+        print(getLineBreak())
         print("Unfortunately, an error occurred, and the script has crashed.")
         print("Please save a copy of this output to a text file, and create an issue on the project's GitHub page:")
         print("          " + internalconstants.SCRIPT_URL)
-        print("Then, please restart the script by clicking `Reload script` in the Script output window.")
-        getLineBreak()
-        getLineBreak()
+        print("Then, please restart both scripts by clicking `Reload script` in the Script output window.")
+        print(getLineBreak())
+        print(getLineBreak())
         print("")
         print("")
 
         raise e
+
+    def triggerErrorFromOtherScript(self):
+        self.error = True
+
+        if PORT == config.DEVICE_PORT_EXTENDED:
+            # Force remove from in-control mode
+            extendedMode.forceEnd()
+
+            # Set pad lights
+            lightMap = lighting.LightMap()
+            lightMap.setFromMatrix(lighting.ERROR_COLOURS, 2)
+            lighting.state.setFromMap(lightMap)
+
+        # Print error message
+        print("")
+        print("")
+        print(getLineBreak())
+        print(getLineBreak())
+        print("Unfortunately, an error occurred, and the script has crashed.")
+        print("Please refer to the other script output for the error info and instructions to report the error, ", end="")
+        print("then restart both scripts by clicking `Reload script` in the Script output window.")
+        print(getLineBreak())
+        print(getLineBreak())
+        print("")
+        print("")
 
     def getError(self):
         return self.error

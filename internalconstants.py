@@ -93,3 +93,12 @@ DEBUG_ANIMATION_IDLE_TIMERS = "Timers"
 DEBUG_EVENT_DATA = "Event data"
 DEBUG_EVENT_ACTIONS = "Event actions"
 DEBUG_WINDOW_CHANGES = "Window changed"
+DEBUG_WARNING_DEPRECIATED_FEATURE = "Depreciated feature"
+
+
+#---------------------------------
+# Data for internal communication
+#---------------------------------
+
+MESSAGE_RESET_INTERNAL_CONTROLLER = 0x7F009E
+MESSAGE_ERROR_CRASH = 0x7F7F9E

@@ -61,6 +61,7 @@ def process(command):
         # Dispatch event to extended mode
         internal.sendMidiMessage(command.status, command.note, command.value)
 
+        
         if command.padY == 1:
             # Use padX number for keyswitch number
             keyswitchNum = command.padX
