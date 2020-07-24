@@ -249,22 +249,30 @@ class processedEvent:
 
         elif self.id in eventconsts.Knobs: 
             self.type = eventconsts.TYPE_KNOB
+            self.coord_X = self.note - 0x15
 
         elif self.id in eventconsts.BasicKnobs: 
             self.type = eventconsts.TYPE_BASIC_KNOB
+            self.coord_X = self.note - 0x15
 
         elif self.id in eventconsts.Faders: 
             self.type = eventconsts.TYPE_FADER
+            self.coord_X = self.note - 0x29
+            if self.note == 0x07: self.coord_X = 8
 
         elif self.id in eventconsts.BasicFaders: 
             self.type = eventconsts.TYPE_BASIC_FADER
+            self.coord_X = self.note - 0x29
+            if self.note == 0x07: self.coord_X = 8
 
         elif self.id in eventconsts.FaderButtons: 
             self.type = eventconsts.TYPE_FADER_BUTTON
+            self.coord_X = self.note - 0x33
             self.isBinary = True
 
         elif self.id in eventconsts.BasicFaderButtons: 
             self.type = eventconsts.TYPE_BASIC_FADER_BUTTON
+            self.coord_X = self.note - 0x33
             self.isBinary = True
         
         elif self.id in eventconsts.BasicEvents:
@@ -278,8 +286,8 @@ class processedEvent:
                 x, y = self.getPadCoord()
                 if x != -1 and y != -1:
                     # Is a pad
-                    self.padX = x
-                    self.padY = y
+                    self.coord_X = x
+                    self.coord_Y = y
                     self.isBinary = True
                     if self.isPadExtendedMode():
                         self.type = eventconsts.TYPE_PAD
@@ -291,8 +299,8 @@ class processedEvent:
         # Detect basic circular pads
         elif self.status == 0xB0 and self.note in eventconsts.BasicPads[8]:
             self.type = eventconsts.TYPE_BASIC_PAD
-            self.padX = 8
-            self.padY = eventconsts.BasicPads[8].index(self.note)
+            self.coord_X = 8
+            self.coord_Y = eventconsts.BasicPads[8].index(self.note)
             self.isBinary = True
         
         # Also check for basic mode buttons
@@ -479,39 +487,14 @@ class processedEvent:
     
     # Returns string eventID for fader events
     def getID_Fader(self):
-        if   self.id == eventconsts.FADER_1 or self.id == eventconsts.BASIC_FADER_1: return "1"
-        elif self.id == eventconsts.FADER_2 or self.id == eventconsts.BASIC_FADER_2: return "2"
-        elif self.id == eventconsts.FADER_3 or self.id == eventconsts.BASIC_FADER_3: return "3"
-        elif self.id == eventconsts.FADER_4 or self.id == eventconsts.BASIC_FADER_4: return "4"
-        elif self.id == eventconsts.FADER_5 or self.id == eventconsts.BASIC_FADER_5: return "5"
-        elif self.id == eventconsts.FADER_6 or self.id == eventconsts.BASIC_FADER_6: return "6"
-        elif self.id == eventconsts.FADER_7 or self.id == eventconsts.BASIC_FADER_7: return "7"
-        elif self.id == eventconsts.FADER_8 or self.id == eventconsts.BASIC_FADER_8: return "8"
-        elif self.id == eventconsts.FADER_9 or self.id == eventconsts.BASIC_FADER_9: return "9 / Master"
-        else: return "ERROR"
+        return str(self.coord_X + 1)
 
     # Returns string eventID for fader events
     def getID_FaderButton(self):
-        if   self.id == eventconsts.FADER_BUTTON_1 or self.id == eventconsts.BASIC_FADER_BUTTON_1: return "1"
-        elif self.id == eventconsts.FADER_BUTTON_2 or self.id == eventconsts.BASIC_FADER_BUTTON_2: return "2"
-        elif self.id == eventconsts.FADER_BUTTON_3 or self.id == eventconsts.BASIC_FADER_BUTTON_3: return "3"
-        elif self.id == eventconsts.FADER_BUTTON_4 or self.id == eventconsts.BASIC_FADER_BUTTON_4: return "4"
-        elif self.id == eventconsts.FADER_BUTTON_5 or self.id == eventconsts.BASIC_FADER_BUTTON_5: return "5"
-        elif self.id == eventconsts.FADER_BUTTON_6 or self.id == eventconsts.BASIC_FADER_BUTTON_6: return "6"
-        elif self.id == eventconsts.FADER_BUTTON_7 or self.id == eventconsts.BASIC_FADER_BUTTON_7: return "7"
-        elif self.id == eventconsts.FADER_BUTTON_8 or self.id == eventconsts.BASIC_FADER_BUTTON_8: return "8"
-        elif self.id == eventconsts.FADER_BUTTON_9 or self.id == eventconsts.BASIC_FADER_BUTTON_9: return "9 / Master"
-        else: return "ERROR"
+        return str(self.coord_X + 1)
     
     def getID_Knobs(self):
-        if   self.id == eventconsts.KNOB_1 or self.id == eventconsts.BASIC_KNOB_1: return "1"
-        elif self.id == eventconsts.KNOB_2 or self.id == eventconsts.BASIC_KNOB_2: return "2"
-        elif self.id == eventconsts.KNOB_3 or self.id == eventconsts.BASIC_KNOB_3: return "3"
-        elif self.id == eventconsts.KNOB_4 or self.id == eventconsts.BASIC_KNOB_4: return "4"
-        elif self.id == eventconsts.KNOB_5 or self.id == eventconsts.BASIC_KNOB_5: return "5"
-        elif self.id == eventconsts.KNOB_6 or self.id == eventconsts.BASIC_KNOB_6: return "6"
-        elif self.id == eventconsts.KNOB_7 or self.id == eventconsts.BASIC_KNOB_7: return "7"
-        elif self.id == eventconsts.KNOB_8 or self.id == eventconsts.BASIC_KNOB_8: return "8"
+        return str(self.coord_X + 1)
     
     # Returns X and Y tuple for pads
     def getPadCoord(self):
@@ -530,8 +513,8 @@ class processedEvent:
 
     # Returns True if Pad is Extended
     def isPadExtendedMode(self):
-        if self.note == eventconsts.Pads[self.padX][self.padY]: return True
-        elif self.note == eventconsts.BasicPads[self.padX][self.padY]: return False
+        if self.note == eventconsts.Pads[self.coord_X][self.coord_Y]: return True
+        elif self.note == eventconsts.BasicPads[self.coord_X][self.coord_Y]: return False
         else: print("ERROR!!?")
 
     # Returns (formatted) value

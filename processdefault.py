@@ -34,7 +34,7 @@ def process(command):
     # Tempo button
     #---------------------------------
     if (command.type == eventconsts.TYPE_PAD or command.type == eventconsts.TYPE_BASIC_PAD) and command.is_lift:
-        if command.padX == 8 and command.padY == 0:
+        if command.coord_X == 8 and command.coord_Y == 0:
 
             # Double press: tap tempo
             if command.is_double_click:

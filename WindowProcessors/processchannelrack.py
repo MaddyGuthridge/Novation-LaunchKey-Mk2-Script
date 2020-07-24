@@ -32,7 +32,7 @@ def process(command):
     #---------------------------------
     if command.type == eventconsts.TYPE_PAD and command.is_lift:
         # UI Mode
-        if command.padY == 1 and command.padX == 0:
+        if command.coord_Y == 1 and command.coord_X == 0:
             ui_mode.nextMode()
             internal.window.reset_animation_tick()
             command.actions.appendAction("Channel Rack: Next UI mode")
@@ -209,13 +209,13 @@ def process_bit_mode(command):
     #---------------------------------
     if command.type == eventconsts.TYPE_PAD and command.is_lift:
         # Grid bits
-        if command.padY == 0 and command.padX != 8:
+        if command.coord_Y == 0 and command.coord_X != 8:
             command.handled = True
 
-            gridBits.toggleBit(current_track, command.padX)
+            gridBits.toggleBit(current_track, command.coord_X)
             command.actions.appendAction("Grid Bits: Toggle bit")
         
-        coord = [command.padX, command.padY]
+        coord = [command.coord_X, command.coord_Y]
 
 
         # Scroll grid bits
@@ -248,7 +248,7 @@ def process_bit_mode(command):
 
 # Process when in menu
 def process_menu_mode(command):
-    coord = [command.padX, command.padY]
+    coord = [command.coord_X, command.coord_Y]
 
     # Next/prev track
     if coord == [1, 0]:

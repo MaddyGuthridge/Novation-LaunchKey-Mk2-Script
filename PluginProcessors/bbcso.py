@@ -61,9 +61,9 @@ def process(command):
         # Dispatch event to extended mode
         internal.sendMidiMessage(command.status, command.note, command.value)
 
-        if command.padY == 1:
-            # Use padX number for keyswitch number
-            keyswitchNum = command.padX
+        if command.coord_Y == 1:
+            # Use coord_X number for keyswitch number
+            keyswitchNum = command.coord_X
 
             command.edit(eventprocessor.rawEvent(0x90, keyswitchNum, command.value))
 
