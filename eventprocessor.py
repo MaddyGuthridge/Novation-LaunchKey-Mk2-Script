@@ -262,6 +262,10 @@ class processedEvent:
         elif self.id in eventconsts.FaderButtons: 
             self.type = eventconsts.TYPE_FADER_BUTTON
             self.isBinary = True
+
+        elif self.id in eventconsts.BasicFaderButtons: 
+            self.type = eventconsts.TYPE_BASIC_FADER_BUTTON
+            self.isBinary = True
         
         elif self.id in eventconsts.BasicEvents:
             self.type = eventconsts.TYPE_BASIC_EVENT
