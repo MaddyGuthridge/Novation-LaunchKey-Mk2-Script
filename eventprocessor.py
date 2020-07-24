@@ -26,6 +26,10 @@ import PluginProcessors.processplugins as processplugins
 # Recieve event and forward onto relative processors
 def processExtended(command):
 
+    if internal.errors.getError():
+        internal.errors.eventProcessError(command)
+        return
+
     try:
 
         # Reset idle timer
@@ -57,6 +61,10 @@ def processExtended(command):
         internal.errors.triggerError(e)
 
 def processBasic(command):
+
+    if internal.errors.getError():
+        internal.errors.eventProcessError(command)
+        return
 
     try:
 
@@ -97,35 +105,38 @@ def activeEnd():
             processwindows.activeEnd()
 
 def redraw():
-    # Only in extended mode:
-    if internal.PORT == config.DEVICE_PORT_EXTENDED:
         
-        lights = lighting.LightMap()
+    lights = lighting.LightMap()
 
-        # Error handling: set controller into an error state
-        try:
-
-            # Draws idle thing if idle
-            lighting.idle_lightshow(lights)
-
-            # Get UI from primary processor
-            processfirst.redraw(lights)
-
-            # Get UI drawn from plugins
-            processplugins.redraw(lights)
-
-            # Get UI drawn from windows
-            processwindows.redraw(lights)
-
-            # Get UI drawn from default processor
-            processdefault.redraw(lights)
-
-        except Exception as e:
-            internal.errors.triggerError(e)
-
-
-        # Call pads refresh function
+    if internal.errors.getError():
+        internal.errors.redrawError(lights)
         lighting.state.setFromMap(lights)
+        return
+
+    # Error handling: set controller into an error state
+    try:
+
+        # Draws idle thing if idle
+        lighting.idle_lightshow(lights)
+
+        # Get UI from primary processor
+        processfirst.redraw(lights)
+
+        # Get UI drawn from plugins
+        processplugins.redraw(lights)
+
+        # Get UI drawn from windows
+        processwindows.redraw(lights)
+
+        # Get UI drawn from default processor
+        processdefault.redraw(lights)
+
+    except Exception as e:
+        internal.errors.triggerError(e)
+
+
+    # Call pads refresh function
+    lighting.state.setFromMap(lights)
 
 # Stores actions taken by various processor modules
 class actionPrinter:
@@ -156,7 +167,7 @@ class actionPrinter:
             out = self.eventProcessors[x]
             out = internal.newGetTab(out, 2)
             out += self.eventActions[x]
-            print(out)
+            internal.debugLog(out, internalconstants.DEBUG_EVENT_ACTIONS)
             if self.eventActions[x] != "" and not "[Did not handle]" in self.eventActions[x]:
                 ui.setHintMsg(self.eventActions[x])
 
@@ -361,17 +372,17 @@ class processedEvent:
 
     # Prints event info
     def printInfo(self):
-        print(self.getInfo())
+        internal.debugLog(self.getInfo(), internalconstants.DEBUG_EVENT_DATA)
     
     # Prints event output
     def printOutput(self):
 
-        print("")
+        internal.debugLog("", internalconstants.DEBUG_EVENT_ACTIONS)
         self.actions.flush()
         if self.handled:
-            print("[Event was handled]")
+            internal.debugLog("[Event was handled]", internalconstants.DEBUG_EVENT_ACTIONS)
         else: 
-            print("[Event wasn't handled]")
+            internal.debugLog("[Event wasn't handled]", internalconstants.DEBUG_EVENT_ACTIONS)
 
     # Returns string with type and ID of event
     def getType(self):
