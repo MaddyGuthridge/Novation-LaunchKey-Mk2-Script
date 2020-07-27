@@ -325,6 +325,9 @@ def idle_show_active():
     else:
         return False
 
+def trigger_idle_show():
+    internal.window.idle_tick_number = config.IDLE_WAIT_TIME
+
 # Define colour codes
 COLOUR_TRANSPARENT = -1
 COLOUR_OFF = 0

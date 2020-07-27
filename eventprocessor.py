@@ -253,6 +253,8 @@ class processedEvent:
         # Indicates whether to consider as a value or as an on/off
         self.isBinary = False
 
+        
+
         # Determine type of event | unrecognised by default
         self.type = eventconsts.TYPE_UNRECOGNISED
 

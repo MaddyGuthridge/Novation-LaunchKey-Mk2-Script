@@ -55,10 +55,10 @@ class TGeneric():
         internal.sharedInit()
 
         # Set the device into Extended Mode
-        
-        lighting.lightShow()
         internal.extendedMode.setVal(True)
         
+        # Run light show
+        lighting.lightShow()
 
         # Process inControl preferences
         if config.START_IN_INCONTROL_KNOBS == False: internal.extendedMode.setVal(False, eventconsts.INCONTROL_KNOBS) 
