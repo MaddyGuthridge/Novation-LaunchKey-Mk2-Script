@@ -26,14 +26,18 @@ import NoteProcessors.processnotes as processnotes
 # Recieve event and forward onto relative processors
 def processExtended(command):
 
-    if internal.errors.getError():
-        internal.errors.eventProcessError(command)
-        return
+    
 
     try:
 
+        # Process internal commands
         if command.recieved_internal:
             processReceived(command)
+            return
+
+        # Process error events
+        if internal.errors.getError():
+            internal.errors.eventProcessError(command)
             return
 
         # Reset idle timer
@@ -69,10 +73,6 @@ def processBasic(command):
     # Send event to reset other controller
     internal.sendCompleteInternalMidiMessage(internalconstants.MESSAGE_RESET_INTERNAL_CONTROLLER)
 
-    if internal.errors.getError():
-        internal.errors.eventProcessError(command)
-        return
-
     try:
 
         if command.recieved_internal:
@@ -82,6 +82,11 @@ def processBasic(command):
         # For note events, use note processors
         if command.type == eventconsts.TYPE_NOTE:
             processnotes.process(command)
+            return
+
+        # Now process other events for errors.
+        if internal.errors.getError():
+            internal.errors.eventProcessError(command)
             return
         
         # Call primary processor
@@ -103,7 +108,7 @@ def processReceived(command):
 
     if command.getDataMIDI() == internalconstants.MESSAGE_RESET_INTERNAL_CONTROLLER:
         internal.window.reset_idle_tick()
-        command.handle("Reset idle tick")
+        command.handle("Reset idle tick", True)
 
     if command.getDataMIDI() == internalconstants.MESSAGE_ERROR_CRASH:
         internal.errors.triggerErrorFromOtherScript()
@@ -161,40 +166,71 @@ def redraw():
     # Call pads refresh function
     lighting.state.setFromMap(lights)
 
+# Stores a single action as a string
+class Action:
+    def __init__(self, act, silent):
+        self.act = act
+        self.silent = silent
+
+class ActionList:
+    def __init__(self, name):
+        self.name = name
+        self.list = []
+        self.didHandle = False
+
+    def appendAction(self, action, silent):
+        self.list.append(Action(action, silent))
+
+    def getString(self):
+        if len(self.list) == 0:
+            return internal.newGetTab(self.name + ":", 2) + "[No actions]"
+        elif len(self.list) == 1:
+            return internal.newGetTab(self.name + ":", 2) + self.list[0].act
+        else:
+            out = self.name + ":"
+            for i in range(len(self.list)):
+                out += '\n' + internal.newGetTab("") + self.list[i].act
+            return out
+
+    def getHintMsg(self):
+        ret = ""
+        for i in range(len(self.list)):
+            if self.list[i].silent == False:
+                ret = self.list[i].act
+        return ret
+
 # Stores actions taken by various processor modules
 class actionPrinter:
     
 
     def __init__(self):
         # String that is output after each event is processed
-        self.eventActions = [""]
-        self.eventProcessors = [""]
+        self.eventProcessors = []
 
     # Set event processor
-    def addProcessor(self, string):
-        if self.eventProcessors[0] == "":
-            self.eventProcessors[0] = string
-        else:
-            if self.eventActions[len(self.eventActions) - 1] == "":
-                self.eventActions[len(self.eventActions) - 1] = "[Did not handle]"
-            self.eventProcessors.append(string)
-            self.eventActions.append("")
+    def addProcessor(self, name):
+        self.eventProcessors.append(ActionList(name))
 
     # Add to event action
-    def appendAction(self, string):
-        self.eventActions[len(self.eventProcessors) - 1] += string
-        self.eventActions[len(self.eventProcessors) - 1] = internal.newGetTab(self.eventActions[len(self.eventProcessors) - 1])
+    def appendAction(self, act, silent=False):
+
+        if len(self.eventProcessors) == 0:
+            self.addProcessor("No Processor")
+
+        self.eventProcessors[len(self.eventProcessors) - 1].appendAction(act, silent)
 
     def flush(self):
         for x in range(len(self.eventProcessors)):
-            out = self.eventProcessors[x]
-            out = internal.newGetTab(out, 2)
-            out += self.eventActions[x]
-            internal.debugLog(out, internalconstants.DEBUG_EVENT_ACTIONS)
-            if self.eventActions[x] != "" and not "[Did not handle]" in self.eventActions[x]:
-                ui.setHintMsg(self.eventActions[x])
+            internal.debugLog(self.eventProcessors[x].getString(), internalconstants.DEBUG_EVENT_ACTIONS)
 
-        self.eventActions.clear()
+        hint_msg = ""
+        for x in range(len(self.eventProcessors)):
+            cur_msg = self.eventProcessors[x].getHintMsg()
+            if cur_msg != "":
+                hint_msg = cur_msg
+
+        if hint_msg != "":
+            ui.setHintMsg(hint_msg)
         self.eventProcessors.clear()
 
 # Stores event in raw form. Used to edit events
@@ -370,9 +406,9 @@ class processedEvent:
 
         self.actions.appendAction(newEventStr)
     
-    def handle(self, action):
+    def handle(self, action, silent=False):
         self.handled = True
-        self.actions.appendAction(action)
+        self.actions.appendAction(action, silent)
 
     # Returns event info as string
     def getInfo(self):

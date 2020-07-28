@@ -9,7 +9,7 @@ THIS PART CURRENTLY DOESN'T WORK :(
 #
 # Add custom event processors to this list
 #
-imports = []
+imports = ["default", "error"]
 #
 #
 #

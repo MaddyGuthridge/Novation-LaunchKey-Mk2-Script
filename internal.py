@@ -724,6 +724,8 @@ class ErrorState:
         # Set other script into error state too
         sendCompleteInternalMidiMessage(internalconstants.MESSAGE_ERROR_CRASH)
 
+        noteMode.setState(internalconstants.NOTE_STATE_ERROR)
+
         if PORT == config.DEVICE_PORT_EXTENDED:
             # Force remove from in-control mode
             extendedMode.forceEnd()
@@ -751,6 +753,8 @@ class ErrorState:
 
     def triggerErrorFromOtherScript(self):
         self.error = True
+
+        noteMode.setState(internalconstants.NOTE_STATE_ERROR)
 
         if PORT == config.DEVICE_PORT_EXTENDED:
             # Force remove from in-control mode

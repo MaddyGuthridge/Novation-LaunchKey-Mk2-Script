@@ -109,4 +109,5 @@ MESSAGE_ERROR_CRASH = 0x7F7F9E
 #---------------------------------
 
 NOTE_STATE_NORMAL = 0
+NOTE_STATE_ERROR = -1
 
