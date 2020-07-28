@@ -178,20 +178,34 @@ class ActionList:
         self.list = []
         self.didHandle = False
 
-    def appendAction(self, action, silent):
+    # Append action to the list
+    def appendAction(self, action, silent, handle):
         self.list.append(Action(action, silent))
 
+        # Set flag indicating that this processor handled the event
+        if handle:
+            self.didHandle = True
+
     def getString(self):
+        # Return that no action was taken if list is empty
         if len(self.list) == 0:
             return internal.newGetTab(self.name + ":", 2) + "[No actions]"
-        elif len(self.list) == 1:
-            return internal.newGetTab(self.name + ":", 2) + self.list[0].act
-        else:
-            out = self.name + ":"
-            for i in range(len(self.list)):
-                out += '\n' + internal.newGetTab("") + self.list[i].act
-            return out
 
+        # No indentation required if there was only one action
+        elif len(self.list) == 1:
+            ret = internal.newGetTab(self.name + ":", 2) + self.list[0].act
+
+        # If there are multiple actions, indent them
+        else:
+            ret = self.name + ":"
+            for i in range(len(self.list)):
+                ret += '\n' + internal.newGetTab("") + self.list[i].act
+
+        if self.didHandle:
+            ret += '\n' + internal.newGetTab("") + "[Handled]"
+        return ret
+
+    # Returns the latest non-silent action to set as the hint message
     def getHintMsg(self):
         ret = ""
         for i in range(len(self.list)):
@@ -207,26 +221,32 @@ class actionPrinter:
         # String that is output after each event is processed
         self.eventProcessors = []
 
-    # Set event processor
+    # Add an event processor object
     def addProcessor(self, name):
         self.eventProcessors.append(ActionList(name))
 
     # Add to event action
-    def appendAction(self, act, silent=False):
+    def appendAction(self, act, silent=False, handled=False):
 
+        # Add some random processor if a processor doesn't exist for some reason
         if len(self.eventProcessors) == 0:
-            self.addProcessor("No Processor")
-
-        self.eventProcessors[len(self.eventProcessors) - 1].appendAction(act, silent)
+            self.addProcessor("NoProcessor")
+            internal.debugLog("Added NoProcessor Processor", internalconstants.DEBUG_WARNING_DEPRECIATED_FEATURE)
+        # Append the action
+        self.eventProcessors[len(self.eventProcessors) - 1].appendAction(act, silent, handled)
 
     def flush(self):
+        # Log all actions taken
         for x in range(len(self.eventProcessors)):
             internal.debugLog(self.eventProcessors[x].getString(), internalconstants.DEBUG_EVENT_ACTIONS)
 
+        # Get hint message to set (ignores silent messages)
         hint_msg = ""
         for x in range(len(self.eventProcessors)):
             cur_msg = self.eventProcessors[x].getHintMsg()
-            if cur_msg != "":
+
+            # Might want to fix this some time, some handler modules append this manually
+            if cur_msg != "" and cur_msg != "[Did not handle]":
                 hint_msg = cur_msg
 
         if hint_msg != "":
@@ -408,7 +428,7 @@ class processedEvent:
     
     def handle(self, action, silent=False):
         self.handled = True
-        self.actions.appendAction(action, silent)
+        self.actions.appendAction(action, silent, True)
 
     # Returns event info as string
     def getInfo(self):
