@@ -425,7 +425,7 @@ class extended:
 
 
     # Sets extended mode on the device, use inControl constants to choose which
-    def setVal(self, newMode, option = eventconsts.SYSTEM_EXTENDED):
+    def setVal(self, newMode, option = eventconsts.SYSTEM_EXTENDED, force=False):
         if self.ignore_all:
             return
         
@@ -473,6 +473,9 @@ class extended:
                 sendMidiMessage(0x9F, 0x0F, 0x00)
             elif newMode is False and self.inControl_Pads is False: # Doesn't send event but still add it to history
                 self.prev_inControl_Pads = False
+
+        if force:
+            self.recieve(newMode, option)
 
     # Processes extended mode messages from device
     def recieve(self, newMode, option = eventconsts.SYSTEM_EXTENDED):

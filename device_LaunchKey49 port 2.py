@@ -55,8 +55,8 @@ class TGeneric():
         internal.sharedInit()
 
         # Set the device into Extended Mode
-        internal.extendedMode.setVal(True)
-        
+        internal.extendedMode.setVal(True, force=True)
+
         # Run light show
         lighting.lightShow()
 
