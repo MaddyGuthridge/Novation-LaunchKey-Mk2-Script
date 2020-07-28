@@ -785,3 +785,15 @@ class ErrorState:
         command.handle("Device in error state")
 
 errors = ErrorState()
+
+class NoteModeState:
+    current_state = internalconstants.NOTE_STATE_NORMAL
+
+    def getState(self):
+        return self.current_state
+
+    def setState(self, newState):
+        # Add some checks to ensure not setting into a bad state
+        self.current_state = newState
+
+noteMode = NoteModeState()

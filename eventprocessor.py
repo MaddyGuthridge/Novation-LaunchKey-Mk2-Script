@@ -20,6 +20,7 @@ import processfirst_basic
 import lighting
 import WindowProcessors.processwindows as processwindows
 import PluginProcessors.processplugins as processplugins
+import NoteProcessors.processnotes as processnotes
 
 
 # Recieve event and forward onto relative processors
@@ -78,8 +79,9 @@ def processBasic(command):
             processReceived(command)
             return
 
-        # If basic processor, don't bother for note events
+        # For note events, use note processors
         if command.type == eventconsts.TYPE_NOTE:
+            processnotes.process(command)
             return
         
         # Call primary processor
