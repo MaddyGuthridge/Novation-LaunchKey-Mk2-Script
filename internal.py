@@ -126,8 +126,8 @@ def idleProcessor():
     # Increment animation tick
     window.incr_animation_tick()
 
-    debugLog(newGetTab("Animation Tick:", 2) + str(window.get_animation_tick()), internalconstants.DEBUG_ANIMATION_IDLE_TIMERS)
-    debugLog(newGetTab("Idle Tick:", 2) + str(window.get_idle_tick()), internalconstants.DEBUG_ANIMATION_IDLE_TIMERS)
+    debugLog(getTab("Animation Tick:", 2) + str(window.get_animation_tick()), internalconstants.DEBUG_ANIMATION_IDLE_TIMERS)
+    debugLog(getTab("Idle Tick:", 2) + str(window.get_idle_tick()), internalconstants.DEBUG_ANIMATION_IDLE_TIMERS)
     debugLog("", internalconstants.DEBUG_ANIMATION_IDLE_TIMERS)
 
     # Update active window
@@ -141,7 +141,7 @@ def getLineBreak():
     return "————————————————————————————————————————————————————"
 
 # Returns string with tab characters at the end
-def newGetTab(string, multiplier = 1, length = config.TAB_LENGTH):
+def getTab(string, multiplier = 1, length = config.TAB_LENGTH):
     string += " "
     toAdd = (length * multiplier) - len(string) % (length * multiplier)
 

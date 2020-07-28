@@ -189,20 +189,20 @@ class ActionList:
     def getString(self):
         # Return that no action was taken if list is empty
         if len(self.list) == 0:
-            return internal.newGetTab(self.name + ":", 2) + "[No actions]"
+            return internal.getTab(self.name + ":", 2) + "[No actions]"
 
         # No indentation required if there was only one action
         elif len(self.list) == 1:
-            ret = internal.newGetTab(self.name + ":", 2) + self.list[0].act
+            ret = internal.getTab(self.name + ":", 2) + self.list[0].act
 
         # If there are multiple actions, indent them
         else:
             ret = self.name + ":"
             for i in range(len(self.list)):
-                ret += '\n' + internal.newGetTab("") + self.list[i].act
+                ret += '\n' + internal.getTab("") + self.list[i].act
 
         if self.didHandle:
-            ret += '\n' + internal.newGetTab("") + "[Handled]"
+            ret += '\n' + internal.getTab("") + "[Handled]"
         return ret
 
     # Returns the latest non-silent action to set as the hint message
@@ -433,38 +433,38 @@ class processedEvent:
     # Returns event info as string
     def getInfo(self):
         out = "Event:"
-        out = internal.newGetTab(out)
+        out = internal.getTab(out)
 
         # Event type and ID
         temp = self.getType()
         out += temp
-        out = internal.newGetTab(out)
+        out = internal.getTab(out)
 
         # Event value
         temp = self.getValue()
         out += temp
-        out = internal.newGetTab(out)
+        out = internal.getTab(out)
 
         # Event full data
         temp = self.getDataString()
         out += temp
-        out = internal.newGetTab(out)
+        out = internal.getTab(out)
 
         if self.is_double_click:
             out += "[Double Click]"
-            out = internal.newGetTab(out)
+            out = internal.getTab(out)
         
         if self.is_long_press:
             out += "[Long Press]"
-            out = internal.newGetTab(out)
+            out = internal.getTab(out)
         
         if self.shifted:
             out += "[Shifted]"
-            out = internal.newGetTab(out)
+            out = internal.getTab(out)
         
         if self.id == config.SHIFT_BUTTON:
             out += "[Shift Key]"
-            out = internal.newGetTab(out)
+            out = internal.getTab(out)
 
         return out
 
@@ -520,7 +520,7 @@ class processedEvent:
         else: 
             internal.debugLog("Bad event type")
             a = "ERROR!!!"
-        a = internal.newGetTab(a)
+        a = internal.getTab(a)
         return a + b
 
     # Returns string event ID for system events
@@ -611,7 +611,7 @@ class processedEvent:
             if self.value == 0:
                 b = "(Off)"
             else: b = "(On)"
-        a = internal.newGetTab(a, length=5)
+        a = internal.getTab(a, length=5)
         return a + b
 
     # Returns string with (formatted) hex of event
