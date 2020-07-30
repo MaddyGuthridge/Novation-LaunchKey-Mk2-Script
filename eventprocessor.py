@@ -20,19 +20,24 @@ import processfirst_basic
 import lighting
 import WindowProcessors.processwindows as processwindows
 import PluginProcessors.processplugins as processplugins
+import NoteProcessors.processnotes as processnotes
 
 
 # Recieve event and forward onto relative processors
 def processExtended(command):
 
-    if internal.errors.getError():
-        internal.errors.eventProcessError(command)
-        return
+    
 
     try:
 
+        # Process internal commands
         if command.recieved_internal:
             processReceived(command)
+            return
+
+        # Process error events
+        if internal.errors.getError():
+            internal.errors.eventProcessError(command)
             return
 
         # Reset idle timer
@@ -68,18 +73,20 @@ def processBasic(command):
     # Send event to reset other controller
     internal.sendCompleteInternalMidiMessage(internalconstants.MESSAGE_RESET_INTERNAL_CONTROLLER)
 
-    if internal.errors.getError():
-        internal.errors.eventProcessError(command)
-        return
-
     try:
 
         if command.recieved_internal:
             processReceived(command)
             return
 
-        # If basic processor, don't bother for note events
+        # For note events, use note processors
         if command.type == eventconsts.TYPE_NOTE:
+            processnotes.process(command)
+            return
+
+        # Now process other events for errors.
+        if internal.errors.getError():
+            internal.errors.eventProcessError(command)
             return
         
         # Call primary processor
@@ -101,7 +108,7 @@ def processReceived(command):
 
     if command.getDataMIDI() == internalconstants.MESSAGE_RESET_INTERNAL_CONTROLLER:
         internal.window.reset_idle_tick()
-        command.handle("Reset idle tick")
+        command.handle("Reset idle tick", True)
 
     if command.getDataMIDI() == internalconstants.MESSAGE_ERROR_CRASH:
         internal.errors.triggerErrorFromOtherScript()
@@ -159,40 +166,91 @@ def redraw():
     # Call pads refresh function
     lighting.state.setFromMap(lights)
 
+# Stores a single action as a string
+class Action:
+    def __init__(self, act, silent):
+        self.act = act
+        self.silent = silent
+
+class ActionList:
+    def __init__(self, name):
+        self.name = name
+        self.list = []
+        self.didHandle = False
+
+    # Append action to the list
+    def appendAction(self, action, silent, handle):
+        self.list.append(Action(action, silent))
+
+        # Set flag indicating that this processor handled the event
+        if handle:
+            self.didHandle = True
+
+    def getString(self):
+        # Return that no action was taken if list is empty
+        if len(self.list) == 0:
+            return internal.getTab(self.name + ":", 2) + "[No actions]"
+
+        # No indentation required if there was only one action
+        elif len(self.list) == 1:
+            ret = internal.getTab(self.name + ":", 2) + self.list[0].act
+
+        # If there are multiple actions, indent them
+        else:
+            ret = self.name + ":"
+            for i in range(len(self.list)):
+                ret += '\n' + internal.getTab("") + self.list[i].act
+
+        if self.didHandle:
+            ret += '\n' + internal.getTab("") + "[Handled]"
+        return ret
+
+    # Returns the latest non-silent action to set as the hint message
+    def getHintMsg(self):
+        ret = ""
+        for i in range(len(self.list)):
+            if self.list[i].silent == False:
+                ret = self.list[i].act
+        return ret
+
 # Stores actions taken by various processor modules
 class actionPrinter:
     
 
     def __init__(self):
         # String that is output after each event is processed
-        self.eventActions = [""]
-        self.eventProcessors = [""]
+        self.eventProcessors = []
 
-    # Set event processor
-    def addProcessor(self, string):
-        if self.eventProcessors[0] == "":
-            self.eventProcessors[0] = string
-        else:
-            if self.eventActions[len(self.eventActions) - 1] == "":
-                self.eventActions[len(self.eventActions) - 1] = "[Did not handle]"
-            self.eventProcessors.append(string)
-            self.eventActions.append("")
+    # Add an event processor object
+    def addProcessor(self, name):
+        self.eventProcessors.append(ActionList(name))
 
     # Add to event action
-    def appendAction(self, string):
-        self.eventActions[len(self.eventProcessors) - 1] += string
-        self.eventActions[len(self.eventProcessors) - 1] = internal.newGetTab(self.eventActions[len(self.eventProcessors) - 1])
+    def appendAction(self, act, silent=False, handled=False):
+
+        # Add some random processor if a processor doesn't exist for some reason
+        if len(self.eventProcessors) == 0:
+            self.addProcessor("NoProcessor")
+            internal.debugLog("Added NoProcessor Processor", internalconstants.DEBUG_WARNING_DEPRECIATED_FEATURE)
+        # Append the action
+        self.eventProcessors[len(self.eventProcessors) - 1].appendAction(act, silent, handled)
 
     def flush(self):
+        # Log all actions taken
         for x in range(len(self.eventProcessors)):
-            out = self.eventProcessors[x]
-            out = internal.newGetTab(out, 2)
-            out += self.eventActions[x]
-            internal.debugLog(out, internalconstants.DEBUG_EVENT_ACTIONS)
-            if self.eventActions[x] != "" and not "[Did not handle]" in self.eventActions[x]:
-                ui.setHintMsg(self.eventActions[x])
+            internal.debugLog(self.eventProcessors[x].getString(), internalconstants.DEBUG_EVENT_ACTIONS)
 
-        self.eventActions.clear()
+        # Get hint message to set (ignores silent messages)
+        hint_msg = ""
+        for x in range(len(self.eventProcessors)):
+            cur_msg = self.eventProcessors[x].getHintMsg()
+
+            # Might want to fix this some time, some handler modules append this manually
+            if cur_msg != "" and cur_msg != "[Did not handle]":
+                hint_msg = cur_msg
+
+        if hint_msg != "":
+            ui.setHintMsg(hint_msg)
         self.eventProcessors.clear()
 
 # Stores event in raw form. Used to edit events
@@ -213,8 +271,13 @@ class processedEvent:
         self.handled = False
 
         self.status = event.status
+        
         self.note = event.data1
+        self.data1 = event.data1
+        
         self.value = event.data2
+        self.data2 = event.data2
+        
         self.status_nibble = event.status >> 4              # Get first half of status byte
         self.channel = event.status & int('00001111', 2)    # Get 2nd half of status byte
         
@@ -323,6 +386,7 @@ class processedEvent:
                         self.type = eventconsts.TYPE_BASIC_PAD
             else:
                 self.type = eventconsts.TYPE_NOTE
+                self.isBinary = True
 
         # Detect basic circular pads
         elif self.status == 0xB0 and self.note in eventconsts.BasicPads[8]:
@@ -368,45 +432,45 @@ class processedEvent:
 
         self.actions.appendAction(newEventStr)
     
-    def handle(self, action):
+    def handle(self, action, silent=False):
         self.handled = True
-        self.actions.appendAction(action)
+        self.actions.appendAction(action, silent, True)
 
     # Returns event info as string
     def getInfo(self):
         out = "Event:"
-        out = internal.newGetTab(out)
+        out = internal.getTab(out)
 
         # Event type and ID
         temp = self.getType()
         out += temp
-        out = internal.newGetTab(out)
+        out = internal.getTab(out)
 
         # Event value
         temp = self.getValue()
         out += temp
-        out = internal.newGetTab(out)
+        out = internal.getTab(out)
 
         # Event full data
         temp = self.getDataString()
         out += temp
-        out = internal.newGetTab(out)
+        out = internal.getTab(out)
 
         if self.is_double_click:
             out += "[Double Click]"
-            out = internal.newGetTab(out)
+            out = internal.getTab(out)
         
         if self.is_long_press:
             out += "[Long Press]"
-            out = internal.newGetTab(out)
+            out = internal.getTab(out)
         
         if self.shifted:
             out += "[Shifted]"
-            out = internal.newGetTab(out)
+            out = internal.getTab(out)
         
         if self.id == config.SHIFT_BUTTON:
             out += "[Shift Key]"
-            out = internal.newGetTab(out)
+            out = internal.getTab(out)
 
         return out
 
@@ -462,7 +526,7 @@ class processedEvent:
         else: 
             internal.debugLog("Bad event type")
             a = "ERROR!!!"
-        a = internal.newGetTab(a)
+        a = internal.getTab(a)
         return a + b
 
     # Returns string event ID for system events
@@ -553,7 +617,7 @@ class processedEvent:
             if self.value == 0:
                 b = "(Off)"
             else: b = "(On)"
-        a = internal.newGetTab(a, length=5)
+        a = internal.getTab(a, length=5)
         return a + b
 
     # Returns string with (formatted) hex of event

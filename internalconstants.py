@@ -102,3 +102,12 @@ DEBUG_WARNING_DEPRECIATED_FEATURE = "Depreciated feature"
 
 MESSAGE_RESET_INTERNAL_CONTROLLER = 0x7F009E
 MESSAGE_ERROR_CRASH = 0x7F7F9E
+
+
+#---------------------------------
+# Note States
+#---------------------------------
+
+NOTE_STATE_NORMAL = 0
+NOTE_STATE_ERROR = -1
+

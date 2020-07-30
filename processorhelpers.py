@@ -44,3 +44,9 @@ def didSnap(value, snapTo):
 def toFloat(value, min = 0, max = 1):
     return (value / 127) * (max - min) + min
 
+# Allows fancy note stuff like chord mode and the like
+class ExtensibleNote():
+    
+    def __init__(self, root_note, extended_notes):
+        self.root = root_note
+        self.extended_notes = extended_notes
