@@ -38,6 +38,11 @@ ENABLE_SUSTAINED_SHIFT = True
 # If enabled, sustained shifts will automatically lift when you press a button.
 AUTOCANCEL_SUSTAINED_SHIFT = False
 
+# Controls the frequency at which the script executes a full redraw (to fix dud lights)
+LIGHTS_FULL_REDRAW_FREQUENCY = 5
+# If enabled, animations will be disabled
+LIGHTS_REDUCE_MOTION = False
+
 # These values determine whether the controller will start with inControl modes enabled for each type
 START_IN_INCONTROL_KNOBS = True
 START_IN_INCONTROL_FADERS = True

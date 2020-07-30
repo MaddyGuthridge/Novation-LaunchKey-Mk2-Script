@@ -193,6 +193,7 @@ class windowMgr:
         self.active_fl_window = -1
         self.animation_tick_number = 0
         self.idle_tick_number = 0
+        self.absolute_tick_number = 0
     
     # Reset tick number to zero
     def reset_animation_tick(self):
@@ -209,14 +210,22 @@ class windowMgr:
         
         self.animation_tick_number += 1
         self.idle_tick_number += 1
+        self.absolute_tick_number += 1
 
     # Get number of ticks since window update
     def get_animation_tick(self):
-        return self.animation_tick_number
+        if config.LIGHTS_REDUCE_MOTION:
+            return config.IDLE_WAIT_TIME - 1
+        else:
+            return self.animation_tick_number
 
     # Get number of ticks since last event
     def get_idle_tick(self):
         return self.idle_tick_number
+
+    # Get number of ticks since script started
+    def get_absolute_tick(self):
+        return self.absolute_tick_number
 
     # Update active window
     def update(self):
@@ -386,7 +395,6 @@ class extended:
     def revert(self, option = eventconsts.SYSTEM_EXTENDED):
         if self.ignore_all:
             return
-        print("reverting")
         # Set all
         if option == eventconsts.SYSTEM_EXTENDED:
             self.setVal(self.prev_extendedMode.pop())

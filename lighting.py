@@ -148,7 +148,12 @@ class Lights:
 
     # Set the colour of a pad
     def setPadColour(self, x, y, colour, state = 3, override = False):
-
+        if internal.window.get_absolute_tick() % config.LIGHTS_FULL_REDRAW_FREQUENCY == 0:
+            full_redraw = True
+        else:
+            full_redraw = False
+            
+        
         # Handle light offs
         if colour == 0 and state == 3:
             state = 0
@@ -161,7 +166,7 @@ class Lights:
             colour = 0
 
         # Check if pad is already in that state - don't bother with event if so
-        if self.PadColours[x][y] == colour and self.PadStates[x][y] == state and not override:
+        if self.PadColours[x][y] == colour and self.PadStates[x][y] == state and not override and not full_redraw:
             return
 
         # Set state variables
