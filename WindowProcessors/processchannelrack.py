@@ -228,34 +228,28 @@ def redraw_bit_mode(lights):
 
 
 def activeStart():
-
     internal.extendedMode.setVal(True, eventconsts.INCONTROL_PADS)
-
     return
 
 def activeEnd():
-
-    # Reset Grid Bit controller
-    gridBits.resetZoom()
-    gridBits.resetScroll()
-    ui_mode.resetMode()
-
+    
+    
     internal.extendedMode.revert(eventconsts.INCONTROL_PADS)
-
     return
 
 def topWindowStart():
     
-
     return
 
 def topWindowEnd():
-    
-
+    # Reset Grid Bit controller
+    gridBits.resetZoom()
+    gridBits.resetScroll()
+    ui_mode.resetMode()
     return
 
 
-    # Internal functions
+# Internal functions
 
 class gridBitMgr:
     scroll = 0

@@ -14,17 +14,19 @@ import config
 import lighting
 
 def activeStart():
-    internal.extendedMode.setVal(True, eventconsts.INCONTROL_PADS)
+    
     return
 
 def activeEnd():
-    internal.extendedMode.revert(eventconsts.INCONTROL_PADS)
+    
     return
 
 def topWindowStart():
+    internal.extendedMode.setVal(True, eventconsts.INCONTROL_PADS)
     return
 
 def topWindowEnd():
+    internal.extendedMode.revert(eventconsts.INCONTROL_PADS)
     return
 
 def redraw(lights):

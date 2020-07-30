@@ -371,10 +371,10 @@ class extended:
         self.inControl_Faders = False
         self.inControl_Pads = False
 
-        self.prev_extendedMode = False
-        self.prev_inControl_Knobs = False
-        self.prev_inControl_Faders = False
-        self.prev_inControl_Pads = False
+        self.prev_extendedMode = [False]
+        self.prev_inControl_Knobs = [False]
+        self.prev_inControl_Faders = [False]
+        self.prev_inControl_Pads = [False]
 
     # Queries whether extended mode is active. Only accessible from extended port
     def query(self, option = eventconsts.SYSTEM_EXTENDED):
@@ -386,94 +386,67 @@ class extended:
     def revert(self, option = eventconsts.SYSTEM_EXTENDED):
         if self.ignore_all:
             return
-        
+        print("reverting")
         # Set all
         if option == eventconsts.SYSTEM_EXTENDED:
-            
-            if self.prev_extendedMode is True:
-                self.setVal(True)
-            elif self.prev_extendedMode is False:
-                self.setVal(False)
-            else: debugLog("New mode mode not boolean")
+            self.setVal(self.prev_extendedMode.pop())
+            if len(self.prev_extendedMode) == 0:
+                self.prev_extendedMode.append(False)
 
             
 
         # Set knobs
         elif option == eventconsts.INCONTROL_KNOBS:
-            
-            if self.prev_inControl_Knobs is True:
-                self.setVal(True, eventconsts.INCONTROL_KNOBS)
-            elif self.prev_inControl_Knobs is False:
-                self.setVal(False, eventconsts.INCONTROL_KNOBS)
-            else: debugLog("New mode mode not boolean")
+            self.setVal(self.prev_inControl_Knobs.pop(), eventconsts.INCONTROL_KNOBS)
+            if len(self.prev_inControl_Knobs) == 0:
+                self.prev_inControl_Knobs.append(config.START_IN_INCONTROL_KNOBS)
         
         # Set faders
         elif option == eventconsts.INCONTROL_FADERS:
-            if self.prev_inControl_Faders is True:
-                self.setVal(True, eventconsts.INCONTROL_FADERS)
-            elif self.prev_inControl_Faders is False:
-                self.setVal(False, eventconsts.INCONTROL_FADERS)
-            else: debugLog("New mode mode not boolean")
+            self.setVal(self.prev_inControl_Faders.pop(), eventconsts.INCONTROL_FADERS)
+            if len(self.prev_inControl_Faders) == 0:
+                self.prev_inControl_Faders.append(config.START_IN_INCONTROL_FADERS)
         
         # Set pads
         elif option == eventconsts.INCONTROL_PADS:
-           
-            if self.prev_inControl_Pads is True:
-                self.setVal(True, eventconsts.INCONTROL_PADS)
-            elif self.prev_inControl_Pads is False:
-                self.setVal(False, eventconsts.INCONTROL_PADS)
-            else: debugLog("New mode mode not boolean")
+            self.setVal(self.prev_inControl_Pads.pop(), eventconsts.INCONTROL_PADS)
+            if len(self.prev_inControl_Pads) == 0:
+                self.prev_inControl_Pads.append(config.START_IN_INCONTROL_PADS)
 
 
     # Sets extended mode on the device, use inControl constants to choose which
     def setVal(self, newMode, option = eventconsts.SYSTEM_EXTENDED, force=False):
-        if self.ignore_all:
+        if self.ignore_all and not force:
             return
         
         # Set all
         if option == eventconsts.SYSTEM_EXTENDED:
-            if newMode is True and self.extendedMode is False:
+            if newMode is True:
                 sendMidiMessage(0x9F, 0x0C, 0x7F)
-            elif newMode is True and self.extendedMode is True: # Doesn't send event but still add it to history
-                self.prev_extendedMode = True
-            elif newMode is False and self.extendedMode is True:
+            elif newMode is False:
                 sendMidiMessage(0x9F, 0x0C, 0x00)
-            elif newMode is False and self.extendedMode is False: # Doesn't send event but still add it to history
-                self.prev_extendedMode = False
             
         
         # Set knobs
         elif option == eventconsts.INCONTROL_KNOBS:
-            if newMode is True and self.inControl_Knobs is False:
+            if newMode is True:
                 sendMidiMessage(0x9F, 0x0D, 0x7F)
-            elif newMode is True and self.inControl_Knobs is True: # Doesn't send event but still add it to history
-                self.prev_inControl_Knobs = True
-            elif newMode is False and self.inControl_Knobs is True:
+            elif newMode is False:
                 sendMidiMessage(0x9F, 0x0D, 0x00)
-            elif newMode is False and self.inControl_Knobs is False: # Doesn't send event but still add it to history
-                self.prev_inControl_Knobs = False
         
         # Set faders
         elif option == eventconsts.INCONTROL_FADERS:
-            if newMode is True and self.inControl_Faders is False:
+            if newMode is True:
                 sendMidiMessage(0x9F, 0x0E, 0x7F)
-            elif newMode is True and self.inControl_Faders is True: # Doesn't send event but still add it to history
-                self.prev_inControl_Faders = True
-            elif newMode is False and self.inControl_Faders is True:
+            elif newMode is False:
                 sendMidiMessage(0x9F, 0x0E, 0x00)
-            elif newMode is False and self.inControl_Faders is False: # Doesn't send event but still add it to history
-                self.prev_inControl_Faders = False
         
         # Set pads
         elif option == eventconsts.INCONTROL_PADS:
-            if newMode is True and self.inControl_Pads is False:
+            if newMode is True:
                 sendMidiMessage(0x9F, 0x0F, 0x7F)
-            elif newMode is True and self.inControl_Pads is True: # Doesn't send event but still add it to history
-                self.prev_inControl_Pads = True
-            elif newMode is False and self.inControl_Pads is True:
+            elif newMode is False:
                 sendMidiMessage(0x9F, 0x0F, 0x00)
-            elif newMode is False and self.inControl_Pads is False: # Doesn't send event but still add it to history
-                self.prev_inControl_Pads = False
 
         if force:
             self.recieve(newMode, option)
@@ -486,10 +459,10 @@ class extended:
         # Set all
         if option == eventconsts.SYSTEM_EXTENDED:
             # Process variables for previous states
-            self.prev_extendedMode = self.extendedMode
-            self.prev_inControl_Knobs = config.START_IN_INCONTROL_KNOBS    # Set to default because otherwise 
-            self.prev_inControl_Faders = config.START_IN_INCONTROL_FADERS  # they'll revert badly sometimes
-            self.prev_inControl_Pads = config.START_IN_INCONTROL_PADS      #
+            self.prev_extendedMode.append(self.extendedMode)
+            self.prev_inControl_Knobs = [config.START_IN_INCONTROL_KNOBS]    # Set to default because otherwise 
+            self.prev_inControl_Faders = [config.START_IN_INCONTROL_FADERS]  # they'll revert badly sometimes
+            self.prev_inControl_Pads = [config.START_IN_INCONTROL_PADS]      #
             if newMode is True:
                 self.extendedMode = True
                 self.inControl_Knobs = True
@@ -505,7 +478,7 @@ class extended:
 
         # Set knobs
         elif option == eventconsts.INCONTROL_KNOBS:
-            self.prev_inControl_Knobs = self.inControl_Knobs
+            self.prev_inControl_Knobs.append(self.inControl_Knobs)
             if newMode is True:
                 self.inControl_Knobs = True
             elif newMode is False:
@@ -514,7 +487,7 @@ class extended:
         
         # Set faders
         elif option == eventconsts.INCONTROL_FADERS:
-            self.prev_inControl_Faders = self.inControl_Faders
+            self.prev_inControl_Faders.append(self.inControl_Faders)
             if newMode is True:
                 self.inControl_Faders = True
             elif newMode is False:
@@ -523,7 +496,7 @@ class extended:
         
         # Set pads
         elif option == eventconsts.INCONTROL_PADS:
-            self.prev_inControl_Pads = self.inControl_Pads
+            self.prev_inControl_Pads.append(self.inControl_Pads)
             window.reset_animation_tick()
             if newMode is True:
                 self.inControl_Pads = True
