@@ -46,7 +46,7 @@ START_IN_INCONTROL_PADS = True
 TAB_LENGTH = 16 # How much spacing to add in console output
 
 # For fun when the script crashes
-CHAOTIC_EVIL_ERROR_NOTE_HANDLER = False
+CHAOTIC_EVIL_ERROR_NOTE_HANDLER = True
 
 # Controls which console messages are printed. Add things from internalconstants
 CONSOLE_DEBUG_MODE = [internalconstants.DEBUG_WARNING_DEPRECIATED_FEATURE, internalconstants.DEBUG_EVENT_ACTIONS, internalconstants.DEBUG_EVENT_DATA]

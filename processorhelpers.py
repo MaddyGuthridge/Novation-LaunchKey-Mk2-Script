@@ -27,4 +27,8 @@ class UI_mode_handler:
         return self.mode
 
 
-
+class ExtensibleNote():
+    
+    def __init__(self, root_note, extended_notes):
+        self.root = root_note
+        self.extended_notes = extended_notes

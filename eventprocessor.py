@@ -271,8 +271,13 @@ class processedEvent:
         self.handled = False
 
         self.status = event.status
+        
         self.note = event.data1
+        self.data1 = event.data1
+        
         self.value = event.data2
+        self.data2 = event.data2
+        
         self.status_nibble = event.status >> 4              # Get first half of status byte
         self.channel = event.status & int('00001111', 2)    # Get 2nd half of status byte
         
@@ -381,6 +386,7 @@ class processedEvent:
                         self.type = eventconsts.TYPE_BASIC_PAD
             else:
                 self.type = eventconsts.TYPE_NOTE
+                self.isBinary = True
 
         # Detect basic circular pads
         elif self.status == 0xB0 and self.note in eventconsts.BasicPads[8]:
