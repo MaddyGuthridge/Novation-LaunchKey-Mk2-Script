@@ -355,7 +355,7 @@ def setVolume(command, channel, value):
     volume = getVolumeSend(value)
     channels.setChannelVolume(channel, volume)
     action = "Set " + channels.getChannelName(channel) + " volume to " + getVolumeValue(value)
-    if internal.didSnap(internal.toFloat(value), internalconstants.CHANNEL_VOLUME_SNAP_TO):
+    if processorhelpers.didSnap(processorhelpers.toFloat(value), internalconstants.CHANNEL_VOLUME_SNAP_TO):
         action += " [Snapped]"
     command.handle(action)
 
@@ -367,15 +367,15 @@ def setPan(command, channel, value):
     volume = getPanSend(value)
     channels.setChannelPan(channel, volume)
     action = "Set " + channels.getChannelName(channel) + " pan to " + getPanValue(value)
-    if internal.didSnap(internal.toFloat(value, -1), internalconstants.CHANNEL_PAN_SNAP_TO):
+    if processorhelpers.didSnap(processorhelpers.toFloat(value, -1), internalconstants.CHANNEL_PAN_SNAP_TO):
         action = "[Snapped]"
     command.handle(action)
 
 # Returns volume value set to send to FL Studio
 def getVolumeSend(inVal):
     if config.ENABLE_SNAPPING:
-        return internal.snap(internal.toFloat(inVal), internalconstants.CHANNEL_VOLUME_SNAP_TO)
-    else: return internal.toFloat(inVal)
+        return processorhelpers.snap(processorhelpers.toFloat(inVal), internalconstants.CHANNEL_VOLUME_SNAP_TO)
+    else: return processorhelpers.toFloat(inVal)
 
 
 def getVolumeValue(inVal):
@@ -387,8 +387,8 @@ def getVolumeValue(inVal):
 # Returns volume value set to send to FL Studio
 def getPanSend(inVal):
     if config.ENABLE_SNAPPING:
-        return internal.snap(internal.toFloat(inVal, -1), internalconstants.CHANNEL_PAN_SNAP_TO)
-    else: return internal.toFloat(inVal, -1)
+        return processorhelpers.snap(processorhelpers.toFloat(inVal, -1), internalconstants.CHANNEL_PAN_SNAP_TO)
+    else: return processorhelpers.toFloat(inVal, -1)
 
 
 def getPanValue(inVal):

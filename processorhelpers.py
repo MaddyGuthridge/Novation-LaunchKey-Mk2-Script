@@ -3,6 +3,8 @@ processorhelpers.py
 This script includes objects useful for event processors
 """
 
+import config
+
 # Use for creating multiple UIs, which can be switched through. 
 # Create instances in handler scripts
 class UI_mode_handler: 
@@ -26,5 +28,19 @@ class UI_mode_handler:
     def getMode(self):
         return self.mode
 
+# Returns snap value
+def snap(value, snapTo):
+    if abs(value - snapTo) <= config.SNAP_RANGE:
+        return snapTo
+    else: return value
 
+# Returns snap value
+def didSnap(value, snapTo):
+    if abs(value - snapTo) <= config.SNAP_RANGE:
+        return True
+    else: return False
+
+# Converts MIDI event range to float for use in volume, pan, etc functions
+def toFloat(value, min = 0, max = 1):
+    return (value / 127) * (max - min) + min
 

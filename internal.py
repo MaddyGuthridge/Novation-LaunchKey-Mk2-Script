@@ -580,22 +580,6 @@ def sendCompleteInternalMidiMessage(message, str_event_out = ""):
 def toMidiMessage(status, data1, data2):
     return status + (data1 << 8) + (data2 << 16)
 
-# Returns snap value
-def snap(value, snapTo):
-    if abs(value - snapTo) <= config.SNAP_RANGE:
-        return snapTo
-    else: return value
-
-# Returns snap value
-def didSnap(value, snapTo):
-    if abs(value - snapTo) <= config.SNAP_RANGE:
-        return True
-    else: return False
-
-# Converts MIDI event range to float for use in volume, pan, etc functions
-def toFloat(value, min = 0, max = 1):
-    return (value / 127) * (max - min) + min
-
 # Print out error message
 def debugLog(message, level = 0):
     if level in config.CONSOLE_DEBUG_MODE or level == internalconstants.DEBUG_ERROR:

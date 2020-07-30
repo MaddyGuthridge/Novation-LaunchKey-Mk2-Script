@@ -12,6 +12,7 @@ import internal
 import internalconstants
 import config
 import lighting
+import processorhelpers
 
 
 # Process is called to handle events
@@ -167,14 +168,14 @@ def setVolume(command, track, value):
     volume = getVolumeSend(value)
     mixer.setTrackVolume(track, volume)
     command.actions.appendAction("Set " + mixer.getTrackName(track) + " volume to " + getVolumeValue(value))
-    if internal.didSnap(internal.toFloat(value), internalconstants.MIXER_VOLUME_SNAP_TO):
+    if processorhelpers.didSnap(processorhelpers.toFloat(value), internalconstants.MIXER_VOLUME_SNAP_TO):
         command.actions.appendAction("[Snapped]")
 
 # Returns volume value set to send to FL Studio
 def getVolumeSend(inVal):
     if config.ENABLE_SNAPPING:
-        return internal.snap(internal.toFloat(inVal), internalconstants.MIXER_VOLUME_SNAP_TO)
-    else: return internal.toFloat(inVal)
+        return processorhelpers.snap(processorhelpers.toFloat(inVal), internalconstants.MIXER_VOLUME_SNAP_TO)
+    else: return processorhelpers.toFloat(inVal)
 
 
 def getVolumeValue(inVal):
@@ -185,14 +186,14 @@ def setPan(command, track, value):
     volume = getPanSend(value)
     mixer.setTrackPan(track, volume)
     command.actions.appendAction("Set " + mixer.getTrackName(track) + " pan to " + getPanValue(value))
-    if internal.didSnap(internal.toFloat(value, -1), internalconstants.MIXER_PAN_SNAP_TO):
+    if processorhelpers.didSnap(processorhelpers.toFloat(value, -1), internalconstants.MIXER_PAN_SNAP_TO):
         command.actions.appendAction("[Snapped]")
 
 # Returns volume value set to send to FL Studio
 def getPanSend(inVal):
     if config.ENABLE_SNAPPING:
-        return internal.snap(internal.toFloat(inVal, -1), internalconstants.MIXER_PAN_SNAP_TO)
-    else: return internal.toFloat(inVal, -1)
+        return processorhelpers.snap(processorhelpers.toFloat(inVal, -1), internalconstants.MIXER_PAN_SNAP_TO)
+    else: return processorhelpers.toFloat(inVal, -1)
 
 
 def getPanValue(inVal):
