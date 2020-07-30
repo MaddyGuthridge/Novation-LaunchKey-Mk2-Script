@@ -26,7 +26,7 @@ def process(command):
 
     command.actions.addProcessor("Channel rack Processor")
 
-    current_channel = channels.channelNumber()
+    current_channel = channels.selectedChannel()
 
     #---------------------------------
     # Pads
@@ -88,7 +88,7 @@ def process(command):
 
 # Process when in grid bits
 def process_bit_mode(command):
-    current_track = channels.channelNumber()
+    current_track = channels.selectedChannel()
     #---------------------------------
     # Pads
     #---------------------------------
@@ -290,7 +290,7 @@ class gridBitMgr:
 gridBits = gridBitMgr()
 
 def setGridBits(lights):
-    current_track = channels.channelNumber()
+    current_track = channels.selectedChannel()
 
     if channels.channelCount() <= current_track:
         return
@@ -299,7 +299,7 @@ def setGridBits(lights):
     light_num_scroll = gridBits.scroll
     if light_num_scroll < 8:
 
-        if not gridBits.getBit(channels.channelNumber(), light_num_scroll):
+        if not gridBits.getBit(current_track, light_num_scroll):
             lights.setPadColour(light_num_scroll, 0, lighting.COLOUR_LIGHT_LILAC)
         else:
             lights.setPadColour(light_num_scroll, 0, lighting.COLOUR_PINK, 2)
@@ -307,14 +307,14 @@ def setGridBits(lights):
     # Set zoom indicator
     light_num_zoom = 7 - int(math.log(gridBits.zoom, 2))
     if light_num_zoom >= 0 and internal.window.get_animation_tick() > 7:
-        if not gridBits.getBit(channels.channelNumber(), light_num_zoom):
+        if not gridBits.getBit(current_track, light_num_zoom):
             lights.setPadColour(light_num_zoom, 0, lighting.COLOUR_LIGHT_LIGHT_BLUE)
         else:
             lights.setPadColour(light_num_zoom, 0, lighting.COLOUR_BLUE, 2)
 
     # If zoom and scroll lie on same pad
     if light_num_scroll == light_num_zoom:
-        if not gridBits.getBit(channels.channelNumber(), light_num_zoom):
+        if not gridBits.getBit(current_track, light_num_zoom):
             lights.setPadColour(light_num_zoom, 0, lighting.COLOUR_LIGHT_YELLOW)
         else:
             lights.setPadColour(light_num_zoom, 0, lighting.COLOUR_PINK, 2)
