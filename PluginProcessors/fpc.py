@@ -72,7 +72,7 @@ def process(command):
                 command.edit(eventprocessor.rawEvent(0x99, eventconsts.BasicPads[1][1], command.value))
 
         # Dispatch event to extended mode
-        internal.sendMidiMessage(command.status, command.note, command.value)
+        internal.sendInternalMidiMessage(command.status, command.note, command.value)
 
         # Map drums to match FPC default layout
         change_pads(command)
