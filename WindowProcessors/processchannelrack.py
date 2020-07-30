@@ -95,10 +95,13 @@ def process_bit_mode(command):
     if command.type == eventconsts.TYPE_PAD and command.is_lift:
         # Grid bits
         if command.coord_Y == 0 and command.coord_X != 8:
-            command.handled = True
-
+            
+            if channels.channelCount() <= current_track:
+                command.handle("Channel out of range")
+                return
+            
             gridBits.toggleBit(current_track, command.coord_X)
-            command.actions.appendAction("Grid Bits: Toggle bit")
+            command.handle("Grid Bits: Toggle bit")
         
         coord = [command.coord_X, command.coord_Y]
 
@@ -288,6 +291,9 @@ gridBits = gridBitMgr()
 
 def setGridBits(lights):
     current_track = channels.channelNumber()
+
+    if channels.channelCount() <= current_track:
+        return
 
     # Set scroll indicator
     light_num_scroll = gridBits.scroll
