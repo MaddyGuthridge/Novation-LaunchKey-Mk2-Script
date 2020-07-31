@@ -37,6 +37,8 @@ def process(command):
             ui_mode.nextMode()
             internal.window.reset_animation_tick()
             command.handle("Channel Rack: Next UI mode")
+            if ui_mode.getMode():
+                gridBits.drawHighlight()
 
         elif ui_mode.getMode() == 1:
             process_bit_mode(command)
@@ -254,6 +256,16 @@ def topWindowEnd():
 class gridBitMgr:
     scroll = 0
     zoom = 1
+    
+    def drawHighlight(self):
+        current_ch = channels.channelNumber()
+        
+        left = 8*self.scroll
+        right = 8*self.zoom
+        top = current_ch
+        bottom = 1
+        
+        ui.crDisplayRect(left, top, right, bottom, 1000)
 
     def getBit(self, track, position):
         return channels.getGridBit(track, position*self.zoom + 8*self.scroll)
@@ -264,22 +276,28 @@ class gridBitMgr:
     
     def resetScroll(self):
         self.scroll = 0
+        self.drawHighlight()
 
     def scrollLeft(self):
         if self.scroll > 0:
             self.scroll -= 1
+        self.drawHighlight()
         
     def scrollRight(self):
         self.scroll += 1
+        self.drawHighlight()
 
     def zoomOut(self):
         self.zoom *= 2
+        self.drawHighlight()
     
     def zoomIn(self):
         if self.zoom > 1: self.zoom = int(self.zoom / 2)
+        self.drawHighlight()
 
     def resetZoom(self):
         self.zoom = 1
+        self.drawHighlight()
 
 gridBits = gridBitMgr()
 
