@@ -18,15 +18,15 @@ import processdefault
 import processfirst
 import processfirst_basic
 import lighting
+
 import WindowProcessors.processwindows as processwindows
 import PluginProcessors.processplugins as processplugins
 import NoteProcessors.processnotes as processnotes
+import ControllerProcessors.keys as keys
 
 
 # Recieve event and forward onto relative processors
 def processExtended(command):
-
-    
 
     try:
 
@@ -46,6 +46,8 @@ def processExtended(command):
                 command.handle("End Idle Light Show")
             internal.window.reset_idle_tick()
 
+        # Process key mappings
+        keys.process(command)
         
         # Call primary processor
         processfirst.process(command)

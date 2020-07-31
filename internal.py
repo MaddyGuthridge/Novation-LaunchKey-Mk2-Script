@@ -25,6 +25,7 @@ import lighting
 
 import WindowProcessors.processwindows as processwindows
 import PluginProcessors.processplugins as processplugins
+import ControllerProcessors.keys as keys
 
 DEVICE_TYPE = internalconstants.DEVICE_NOT_SET
 
@@ -39,21 +40,20 @@ def processSysEx(event):
     if event.sysex[:8] == internalconstants.DEVICE_RESPONSE_FIRST:
         if event.sysex[8] == internalconstants.DEVICE_RESPONSE_25:
             DEVICE_TYPE = internalconstants.DEVICE_KEYS_25
-            print("Running on 25-Key Model")
 
         elif event.sysex[8] == internalconstants.DEVICE_RESPONSE_49:
             DEVICE_TYPE = internalconstants.DEVICE_KEYS_49
-            print("Running on 49-Key Model")
 
         elif event.sysex[8] == internalconstants.DEVICE_RESPONSE_61:
             DEVICE_TYPE = internalconstants.DEVICE_KEYS_61
-            print("Running on 61-Key Model")
         else:
             DEVICE_TYPE = internalconstants.DEVICE_UNRECOGNISED
             print("If you're seeing this, create an issue on GitHub. ")
             print("Make sure to tell me your device info, and include a copy of the Syxex Event below.")
             print("Link to GitHub Page: " + internalconstants.SCRIPT_URL)
 
+        keys.onInit()
+        
     else:
         DEVICE_TYPE = internalconstants.DEVICE_UNRECOGNISED
         print("ERROR - DEVICE NOT RECOGNISED")

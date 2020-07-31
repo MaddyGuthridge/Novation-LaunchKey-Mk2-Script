@@ -94,6 +94,7 @@ DEBUG_EVENT_DATA = "Event data"
 DEBUG_EVENT_ACTIONS = "Event actions"
 DEBUG_WINDOW_CHANGES = "Window changed"
 DEBUG_WARNING_DEPRECIATED_FEATURE = "Depreciated feature"
+DEBUG_DEVICE_TYPE = "Device type"
 
 
 #---------------------------------
