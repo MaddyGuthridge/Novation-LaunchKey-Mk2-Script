@@ -1,8 +1,9 @@
-"""
-colourpicker.py
+"""PluginProcessors > colourpicker.py
+
 The file handles events when the colour picker window is active.
 Currently, this doesn't work in the playlist as there is no way to get selected track
 
+Author: Miguel Guthridge
 """
 
 plugins = ["Color selector"]

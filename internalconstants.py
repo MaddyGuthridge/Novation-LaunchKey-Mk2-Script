@@ -1,8 +1,9 @@
-"""
-internalconstants.py
+"""internalconstants.py
+
 This file contains constants used by the script to allow it to function properly.
 It is not recommended that the user modify these constants, as they may break the script.
 
+Author: Miguel Guthridge
 """
 
 import midi

@@ -1,7 +1,9 @@
-"""
-processdefault.py
-This file contains functions to process and act on events. It provides default functionality
+"""processdefault.py
 
+This script is the last to process events. It provides default functionality.
+Add things here when they are common throughout the entire script but can be overridden easily.
+
+Author: Miguel Guthridge
 """
 
 import time

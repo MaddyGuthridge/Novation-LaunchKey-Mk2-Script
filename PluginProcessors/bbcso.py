@@ -1,7 +1,9 @@
-"""
-bbcso.py
-this script processes events when the BBC Symphony Orchesra plugin is active
+"""PluginProcessors > bbcso.py
 
+This script processes events when the BBC Symphony Orchesra plugin is active.
+It allows the use of keyswitches, and maps faders to expression, dynamics and reverb.
+
+Author: Miguel Guthridge
 """
 
 plugins = ["BBC Symphony Orchestra"]
@@ -32,9 +34,9 @@ def topPluginStart():
 def topPluginEnd():
     # Only in extended mode:
     if internal.PORT == config.DEVICE_PORT_EXTENDED:
-       internal.extendedMode.setVal(True, eventconsts.INCONTROL_FADERS)
-       internal.extendedMode.setVal(True, eventconsts.INCONTROL_KNOBS)
-       internal.extendedMode.setVal(True, eventconsts.INCONTROL_PADS)
+       internal.extendedMode.revert(eventconsts.INCONTROL_FADERS)
+       internal.extendedMode.revert(eventconsts.INCONTROL_KNOBS)
+       internal.extendedMode.revert(eventconsts.INCONTROL_PADS)
     return
 
 # Called when plugin brought to foreground

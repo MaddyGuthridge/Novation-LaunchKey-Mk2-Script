@@ -1,7 +1,10 @@
-"""
-fpc.py
-This script is a custom processor module that can process events when the FPC plugin is active
+"""PluginProcessors > fpc.py
 
+This script is a custom processor module that can process events when the FPC plugin is active.
+It maps the pedal to the kick, and rearranges drums to match the FPC default layout, 
+as well as drawing pad colours to match the colours of the default note layout.
+
+Author: Miguel Guthridge
 """
 
 REMAP_DRUMS = True

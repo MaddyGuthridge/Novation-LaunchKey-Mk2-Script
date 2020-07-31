@@ -1,7 +1,9 @@
-"""
-processmixer.py
-This script processes events when the mixer window is active
+"""WindowProcessors > processmixer.py
 
+This script processes events when the mixer window is active. It provides functionality
+such as setting track volumes and visualising peak metres when transport is active.
+
+Author: Miguel Guthridge
 """
 
 import mixer

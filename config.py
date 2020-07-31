@@ -1,8 +1,10 @@
-"""
-config.py
-This file contains variables intended for the user to edit to suit their needs.
-All these variables should be safe to edit, but if things break, you might want to revert your changes here
+"""config.py
 
+This file contains variables intended for the user to edit to suit their needs.
+All these variables should be safe to edit, but if things break, you might want to revert your changes.
+Consider making a backup of this file before editing it.
+
+Author: Miguel Guthridge
 """
 import eventconsts
 import internalconstants

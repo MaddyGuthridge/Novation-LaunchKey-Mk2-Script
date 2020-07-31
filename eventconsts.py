@@ -1,5 +1,5 @@
-"""
-eventconsts.py
+"""eventconsts.py
+
 This file contains constants for buttons/faders/knobs sent from the controller.
 
 You shouldn't need to adjust these values, 
