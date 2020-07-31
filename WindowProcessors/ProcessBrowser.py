@@ -1,7 +1,9 @@
-"""
-processbrowser.py
-This script processes events when the browser window is active
+"""WindowProcessors > processbrowser.py
 
+This script processes events when the browser window is active.
+It provides functionality to navigate the browser and load files and plugins.
+
+Author: Miguel Guthridge
 """
 
 
@@ -14,19 +16,19 @@ import config
 import lighting
 
 def activeStart():
-    internal.extendedMode.setVal(True, eventconsts.INCONTROL_PADS)
+    
     return
 
 def activeEnd():
-    internal.extendedMode.revert(eventconsts.INCONTROL_PADS)
+    
     return
 
 def topWindowStart():
-    if not internal.shift.getDown():   
-        internal.window.reset_animation_tick()
+    internal.extendedMode.setVal(True, eventconsts.INCONTROL_PADS)
     return
 
 def topWindowEnd():
+    internal.extendedMode.revert(eventconsts.INCONTROL_PADS)
     return
 
 def redraw(lights):
@@ -46,7 +48,7 @@ def process(command):
     command.actions.addProcessor("Browser Processor")
 
     if command.type == eventconsts.TYPE_PAD and command.is_lift:
-        coord = [command.padX, command.padY]
+        coord = [command.coord_X, command.coord_Y]
         
         # Previous
         if coord == [3, 0]:

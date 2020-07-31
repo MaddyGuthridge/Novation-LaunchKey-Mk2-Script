@@ -1,9 +1,9 @@
-"""
-processwindowed.py
-This script forwards events to event processors for Plugins
+"""PluginProcessors > processplugins.py
 
-THIS PART CURRENTLY DOESN'T WORK :(
+This script forwards events to any plugin processors that can handle the currently active plugin.
+More plugin processors can be added by adding them to the import list.
 
+Author: Miguel Guthridge
 """
 
 #
@@ -19,13 +19,15 @@ import internal
 import PluginProcessors
 
 # Import custom processors specified in list above
+print("Importing Plguin Processors")
 customProcessors = []
 for x in range(len(imports)):
     try:
         customProcessors.append( __import__("PluginProcessors." + imports[x]) )
-        print ("Successfully imported: ", imports[x])
+        print (" - Successfully imported: " + imports[x])
     except ImportError:
-        print ("Error importing: ", imports[x])
+        print (" - Error importing: " + imports[x])
+print("Plugin Processor import complete")
 
 # Called when plugin is top plugin
 def topPluginStart():

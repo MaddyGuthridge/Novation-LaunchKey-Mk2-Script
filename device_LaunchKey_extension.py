@@ -51,17 +51,14 @@ class TGeneric():
 
     def OnInit(self):
 
-        # Set port to extended
-        internal.PORT = config.DEVICE_PORT_EXTENDED
-
         # Run shared init functions
         internal.sharedInit()
 
         # Set the device into Extended Mode
-        
+        internal.extendedMode.setVal(True, force=True)
+
+        # Run light show
         lighting.lightShow()
-        internal.extendedMode.setVal(True)
-        
 
         # Process inControl preferences
         if config.START_IN_INCONTROL_KNOBS == False: internal.extendedMode.setVal(False, eventconsts.INCONTROL_KNOBS) 
@@ -70,8 +67,8 @@ class TGeneric():
         
 
         print('Initialisation complete')
-        internal.printLineBreak()
-        internal.printLineBreak()
+        print(internal.getLineBreak())
+        print(internal.getLineBreak())
         print("")
         print("")
 
@@ -80,8 +77,8 @@ class TGeneric():
         # Return the device into Basic Mode
         internal.extendedMode.setVal(False)
         print('Deinitialisation complete')
-        internal.printLineBreak()
-        internal.printLineBreak()
+        print(internal.getLineBreak())
+        print(internal.getLineBreak())
         print("")
         print("")
         
@@ -104,7 +101,7 @@ class TGeneric():
             return
 
         # Process command
-        eventprocessor.process(command)
+        eventprocessor.processExtended(command)
 
         # If command was edited, update event object
         if command.edited:

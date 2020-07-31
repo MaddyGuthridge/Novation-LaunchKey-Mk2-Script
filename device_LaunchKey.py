@@ -1,5 +1,6 @@
 # name=LaunchKey Mk2
 # url=https://github.com/MiguelGuthridge/Novation-LaunchKey49-Mk2-Script
+# receiveFrom=LaunchKey Mk2 Extension
 
 """
 device_LaunchKey49.py
@@ -32,7 +33,6 @@ import config
 import internal
 import eventprocessor
 
-import processdefault
 
 # device.dispatch(2, 0x9F + (0x0C << 8) + (0x00 << 16))
 
@@ -41,15 +41,13 @@ class TGeneric():
         return
 
     def OnInit(self):
-        # Set port to basic
-        internal.PORT = config.DEVICE_PORT_BASIC
 
         # Run shared init functions
         internal.sharedInit()
 
         print('Initialisation complete')
-        internal.printLineBreak()
-        internal.printLineBreak()
+        print(internal.getLineBreak())
+        print(internal.getLineBreak())
         print("")
         print("")
 
@@ -60,6 +58,8 @@ class TGeneric():
 
     def OnMidiIn(self, event):
         event.handled = False
+
+        
         
         # Process the event into processedEvent format
         command = eventprocessor.processedEvent(event)
@@ -68,7 +68,7 @@ class TGeneric():
         internal.printCommand(command)
 
         # Process event
-        eventprocessor.process(command)
+        eventprocessor.processBasic(command)
         
         # If command was edited, update event object
         if command.edited:

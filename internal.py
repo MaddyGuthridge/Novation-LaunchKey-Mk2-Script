@@ -14,6 +14,7 @@ import device
 import ui
 import transport
 import general
+import channels
 
 import eventconsts
 import config
@@ -24,51 +25,90 @@ import lighting
 
 import WindowProcessors.processwindows as processwindows
 import PluginProcessors.processplugins as processplugins
+import ControllerProcessors.keys as keys
 
-MIN_FL_SCRIPT_VERSION = 5
+MIN_FL_SCRIPT_VERSION = 7
+DEVICE_TYPE = internalconstants.DEVICE_NOT_SET
 
 PORT = -1 # Set in initialisation function then left constant
 
-SHARED_INIT_OK = False
-SCRIPT_UPDATE_AVAILABLE = False
+SHARED_INIT_STATE = internalconstants.INIT_INCOMPLETE
 
+def processSysEx(event):
+    global DEVICE_TYPE
+    
+    # Check if it matches device specifications
+    if event.sysex[:8] == internalconstants.DEVICE_RESPONSE_FIRST:
+        if event.sysex[8] == internalconstants.DEVICE_RESPONSE_25:
+            DEVICE_TYPE = internalconstants.DEVICE_KEYS_25
 
-""" # Inactive code... delete soon
+        elif event.sysex[8] == internalconstants.DEVICE_RESPONSE_49:
+            DEVICE_TYPE = internalconstants.DEVICE_KEYS_49
 
-ActiveWindow = "Nil"
+        elif event.sysex[8] == internalconstants.DEVICE_RESPONSE_61:
+            DEVICE_TYPE = internalconstants.DEVICE_KEYS_61
+        else:
+            DEVICE_TYPE = internalconstants.DEVICE_UNRECOGNISED
+            print("If you're seeing this, create an issue on GitHub. ")
+            print("Make sure to tell me your device info, and include a copy of the Syxex Event below.")
+            print("Link to GitHub Page: " + internalconstants.SCRIPT_URL)
 
-# The previous mesage sent to the MIDI out device
-previous_event_out = 0
-"""
+        keys.onInit()
+        
+    else:
+        DEVICE_TYPE = internalconstants.DEVICE_UNRECOGNISED
+        print("ERROR - DEVICE NOT RECOGNISED")
+        
+
+    getLineBreak()
+    getLineBreak()
+    print("")
+
+def sendUniversalDeviceEnquiry():
+    device.midiOutSysex(internalconstants.DEVICE_ENQUIRY_MESSAGE)
 
 def getVersionStr():
     return str(internalconstants.SCRIPT_VERSION_MAJOR) + '.' + str(internalconstants.SCRIPT_VERSION_MINOR) + '.' + str(internalconstants.SCRIPT_VERSION_REVISION)
 
 def sharedInit():
-    global SHARED_INIT_OK
-    global SCRIPT_UPDATE_AVAILABLE
-    printLineBreak()
+    global PORT
+    global SHARED_INIT_STATE
+
+    SHARED_INIT_STATE = internalconstants.INIT_OK
+
+    PORT = device.getPortNumber()
+
+    sendUniversalDeviceEnquiry()
+
+    print(getLineBreak())
 
     print(internalconstants.SCRIPT_NAME + " - Version: " + getVersionStr())
     print(" - " + internalconstants.SCRIPT_AUTHOR)
     print("")
     print("Running in FL Studio Version: " + ui.getVersion())
 
+
     # Check for script updates - UNCOMMENT THIS WHEN MODULES ADDED
-    # updatecheck.check()
-    if SCRIPT_UPDATE_AVAILABLE:
+    """
+    if updatecheck.check():
+        SHARED_INIT_STATE = internalconstants.INIT_UPDATE_AVAILABLE
         printLineBreak()
         print("An update to this script is available!")
         print("Follow this link to download it: " + internalconstants.SCRIPT_URL)
         printLineBreak()
+    """
+    
+    if PORT != config.DEVICE_PORT_BASIC and PORT != config.DEVICE_PORT_EXTENDED:
+        print("It appears that the device ports are not configured correctly. Please edit config.py to rectify this.")
+        SHARED_INIT_STATE = internalconstants.INIT_PORT_MISMATCH
 
     # Check FL Scripting version
     midi_script_version = general.getVersion()
-    print("FL Studio Scripting version: " + str(midi_script_version) + ". Minimum recommended version: " + str(MIN_FL_SCRIPT_VERSION))
+    print("FL Studio Scripting version: " + str(midi_script_version) + ". Minimum recommended version: " + str(internalconstants.MIN_FL_SCRIPT_VERSION))
     # Outdated FL version
-    if midi_script_version < MIN_FL_SCRIPT_VERSION:
+    if midi_script_version < internalconstants.MIN_FL_SCRIPT_VERSION:
         print("You may encounter issues using this script. Consider updating to the latest version FL Studio.")
-    else: SHARED_INIT_OK = True
+        SHARED_INIT_STATE = internalconstants.INIT_API_OUTDATED
 
     # Check debug mode
     if config.CONSOLE_DEBUG_MODE != []:
@@ -88,6 +128,10 @@ def idleProcessor():
     # Increment animation tick
     window.incr_animation_tick()
 
+    debugLog(getTab("Animation Tick:", 2) + str(window.get_animation_tick()), internalconstants.DEBUG_ANIMATION_IDLE_TIMERS)
+    debugLog(getTab("Idle Tick:", 2) + str(window.get_idle_tick()), internalconstants.DEBUG_ANIMATION_IDLE_TIMERS)
+    debugLog("", internalconstants.DEBUG_ANIMATION_IDLE_TIMERS)
+
     # Update active window
     window.update()
 
@@ -95,11 +139,11 @@ def idleProcessor():
     idleClock.stop()
 
 # Prints a line break
-def printLineBreak():
-    print("————————————————————————————————————————————————————")
+def getLineBreak():
+    return "————————————————————————————————————————————————————"
 
 # Returns string with tab characters at the end
-def newGetTab(string, multiplier = 1, length = config.TAB_LENGTH):
+def getTab(string, multiplier = 1, length = config.TAB_LENGTH):
     string += " "
     toAdd = (length * multiplier) - len(string) % (length * multiplier)
 
@@ -128,11 +172,11 @@ class performanceMonitor:
         self.total_time += process_time
         self.num_events += 1
         if self.debug_level in config.CONSOLE_DEBUG_MODE:
-            printLineBreak()
+            getLineBreak()
             print(self.name)
             print("Processed in:", round(process_time, 4), "seconds")
             print("Average processing time:", round(self.total() / self.num_events, 4), "seconds")
-            printLineBreak()
+            getLineBreak()
         return process_time
     
     def total(self):
@@ -149,18 +193,40 @@ class windowMgr:
         self.active_plugin = ""
         self.active_fl_window = -1
         self.animation_tick_number = 0
+        self.idle_tick_number = 0
+        self.absolute_tick_number = 0
     
     # Reset tick number to zero
     def reset_animation_tick(self):
+        debugLog("Reset animation timer", internalconstants.DEBUG_LIGHTING_RESET)
         self.animation_tick_number = 0
+
+    # Reset idle tick numbr to zero
+    def reset_idle_tick(self):
+        debugLog("Reset idle timer", internalconstants.DEBUG_LIGHTING_RESET)
+        self.idle_tick_number = 0
 
     # Called on idle to increase tick number
     def incr_animation_tick(self):
+        
         self.animation_tick_number += 1
+        self.idle_tick_number += 1
+        self.absolute_tick_number += 1
 
     # Get number of ticks since window update
     def get_animation_tick(self):
-        return self.animation_tick_number
+        if config.LIGHTS_REDUCE_MOTION:
+            return config.IDLE_WAIT_TIME - 1
+        else:
+            return self.animation_tick_number
+
+    # Get number of ticks since last event
+    def get_idle_tick(self):
+        return self.idle_tick_number
+
+    # Get number of ticks since script started
+    def get_absolute_tick(self):
+        return self.absolute_tick_number
 
     # Update active window
     def update(self):
@@ -199,9 +265,9 @@ class windowMgr:
             self.active_fl_window = new_fl_window
             self.plugin_focused =  False
 
-            print("Active Window: ", get_fl_window_string(self.active_fl_window))
-            print("[Background: ", self.active_plugin, "]")
-            printLineBreak()
+            debugLog("Active Window: " + get_fl_window_string(self.active_fl_window), internalconstants.DEBUG_WINDOW_CHANGES)
+            debugLog("[Background: " + self.active_plugin + "]", internalconstants.DEBUG_WINDOW_CHANGES)
+            debugLog(getLineBreak())
 
             # Start new window
             if new_fl_window != old_window:
@@ -209,6 +275,10 @@ class windowMgr:
 
             # Start new window active
             eventprocessor.activeStart()
+
+            if not shift.getDown():   
+                self.reset_animation_tick()
+            self.reset_idle_tick()
             return True
         
         else: # Check for changes to Plugin
@@ -218,7 +288,7 @@ class windowMgr:
             special_flag = False
 
             # Check for special windows
-            if new_plugin == internalconstants.WINDOW_COLOUR_PICKER or new_plugin == internalconstants.WINDOW_SCRIPT_OUTPUT:
+            if new_plugin == internalconstants.WINDOW_STR_COLOUR_PICKER or new_plugin == internalconstants.WINDOW_STR_SCRIPT_OUTPUT:
                 special_flag = True
 
             if not special_flag:
@@ -242,9 +312,9 @@ class windowMgr:
                 self.plugin_focused = True
                 self.active_plugin = new_plugin
 
-                print("Active Window: ", self.active_plugin)
-                print("[Background: ", get_fl_window_string(self.active_fl_window), "]")
-                printLineBreak()
+                debugLog("Active Window: " + self.active_plugin, internalconstants.DEBUG_WINDOW_CHANGES)
+                debugLog("[Background: " + get_fl_window_string(self.active_fl_window) + "]", internalconstants.DEBUG_WINDOW_CHANGES)
+                debugLog(getLineBreak(), internalconstants.DEBUG_WINDOW_CHANGES)
 
                 # Start new plugin
                 if new_plugin != old_plugin:
@@ -252,8 +322,19 @@ class windowMgr:
 
                 # Start new plugin active
                 eventprocessor.activeStart()
+
+                if not shift.getDown():   
+                    self.reset_animation_tick()
+                self.reset_idle_tick()
                 return True
             else: return False
+
+    def getString(self):
+        if self.plugin_focused:
+            return self.active_plugin
+
+        else:
+            return get_fl_window_string(self.active_fl_window)
 
     # Revert to previous plugin
     def revertPlugin(self):
@@ -265,11 +346,7 @@ window = windowMgr()
 # Gets string for FL Window
 def get_fl_window_string(index):
     if index == -1: return "NONE"
-    if index == internalconstants.WINDOW_MIXER: return "Mixer"
-    if index == internalconstants.WINDOW_PLAYLIST: return "Playlist"
-    if index == internalconstants.WINDOW_CHANNEL_RACK: return "Channel Rack"
-    if index == internalconstants.WINDOW_PIANO_ROLL: return "Piano Roll"
-    if index == internalconstants.WINDOW_BROWSER: return "Browser"
+    return internalconstants.FL_WINDOW_LIST[index]
 
 # Print command data
 def printCommand(command):
@@ -280,21 +357,23 @@ def printCommand(command):
 def printCommandOutput(command):
     command.printOutput()
     processTime = eventClock.stop()
-    printLineBreak()
-    print("")
+    debugLog(getLineBreak(), internalconstants.DEBUG_EVENT_DATA)
+    debugLog("", internalconstants.DEBUG_EVENT_DATA)
 
 # Handles extended mode state
 class extended:
     def __init__(self):
+        self.ignore_all = False
+
         self.extendedMode = False
         self.inControl_Knobs = False
         self.inControl_Faders = False
         self.inControl_Pads = False
 
-        self.prev_extendedMode = False
-        self.prev_inControl_Knobs = False
-        self.prev_inControl_Faders = False
-        self.prev_inControl_Pads = False
+        self.prev_extendedMode = [False]
+        self.prev_inControl_Knobs = [False]
+        self.prev_inControl_Faders = [False]
+        self.prev_inControl_Pads = [False]
 
     # Queries whether extended mode is active. Only accessible from extended port
     def query(self, option = eventconsts.SYSTEM_EXTENDED):
@@ -304,100 +383,84 @@ class extended:
         elif option == eventconsts.INCONTROL_PADS: return self.inControl_Pads
 
     def revert(self, option = eventconsts.SYSTEM_EXTENDED):
+        if self.ignore_all:
+            return
         # Set all
         if option == eventconsts.SYSTEM_EXTENDED:
-            
-            if self.prev_extendedMode is True:
-                self.setVal(True)
-            elif self.prev_extendedMode is False:
-                self.setVal(False)
-            else: debugLog("New mode mode not boolean")
+            self.setVal(self.prev_extendedMode.pop())
+            if len(self.prev_extendedMode) == 0:
+                self.prev_extendedMode.append(False)
 
             
 
         # Set knobs
         elif option == eventconsts.INCONTROL_KNOBS:
-            
-            if self.prev_inControl_Knobs is True:
-                self.setVal(True, eventconsts.INCONTROL_KNOBS)
-            elif self.prev_inControl_Knobs is False:
-                self.setVal(False, eventconsts.INCONTROL_KNOBS)
-            else: debugLog("New mode mode not boolean")
+            self.setVal(self.prev_inControl_Knobs.pop(), eventconsts.INCONTROL_KNOBS)
+            if len(self.prev_inControl_Knobs) == 0:
+                self.prev_inControl_Knobs.append(config.START_IN_INCONTROL_KNOBS)
         
         # Set faders
         elif option == eventconsts.INCONTROL_FADERS:
-            if self.prev_inControl_Faders is True:
-                self.setVal(True, eventconsts.INCONTROL_FADERS)
-            elif self.prev_inControl_Faders is False:
-                self.setVal(False, eventconsts.INCONTROL_FADERS)
-            else: debugLog("New mode mode not boolean")
+            self.setVal(self.prev_inControl_Faders.pop(), eventconsts.INCONTROL_FADERS)
+            if len(self.prev_inControl_Faders) == 0:
+                self.prev_inControl_Faders.append(config.START_IN_INCONTROL_FADERS)
         
         # Set pads
         elif option == eventconsts.INCONTROL_PADS:
-           
-            if self.prev_inControl_Pads is True:
-                self.setVal(True, eventconsts.INCONTROL_PADS)
-            elif self.prev_inControl_Pads is False:
-                self.setVal(False, eventconsts.INCONTROL_PADS)
-            else: debugLog("New mode mode not boolean")
+            self.setVal(self.prev_inControl_Pads.pop(), eventconsts.INCONTROL_PADS)
+            if len(self.prev_inControl_Pads) == 0:
+                self.prev_inControl_Pads.append(config.START_IN_INCONTROL_PADS)
 
 
     # Sets extended mode on the device, use inControl constants to choose which
-    def setVal(self, newMode, option = eventconsts.SYSTEM_EXTENDED):
+    def setVal(self, newMode, option = eventconsts.SYSTEM_EXTENDED, force=False):
+        if self.ignore_all and not force:
+            return
+        
         # Set all
         if option == eventconsts.SYSTEM_EXTENDED:
-            if newMode is True and self.extendedMode is False:
+            if newMode is True:
                 sendMidiMessage(0x9F, 0x0C, 0x7F)
-            elif newMode is True and self.extendedMode is True: # Doesn't send event but still add it to history
-                self.prev_extendedMode = True
-            elif newMode is False and self.extendedMode is True:
+            elif newMode is False:
                 sendMidiMessage(0x9F, 0x0C, 0x00)
-            elif newMode is False and self.extendedMode is False: # Doesn't send event but still add it to history
-                self.prev_extendedMode = False
             
         
         # Set knobs
         elif option == eventconsts.INCONTROL_KNOBS:
-            if newMode is True and self.inControl_Knobs is False:
+            if newMode is True:
                 sendMidiMessage(0x9F, 0x0D, 0x7F)
-            elif newMode is True and self.inControl_Knobs is True: # Doesn't send event but still add it to history
-                self.prev_inControl_Knobs = True
-            elif newMode is False and self.inControl_Knobs is True:
+            elif newMode is False:
                 sendMidiMessage(0x9F, 0x0D, 0x00)
-            elif newMode is False and self.inControl_Knobs is False: # Doesn't send event but still add it to history
-                self.prev_inControl_Knobs = False
         
         # Set faders
         elif option == eventconsts.INCONTROL_FADERS:
-            if newMode is True and self.inControl_Faders is False:
+            if newMode is True:
                 sendMidiMessage(0x9F, 0x0E, 0x7F)
-            elif newMode is True and self.inControl_Faders is True: # Doesn't send event but still add it to history
-                self.prev_inControl_Faders = True
-            elif newMode is False and self.inControl_Faders is True:
+            elif newMode is False:
                 sendMidiMessage(0x9F, 0x0E, 0x00)
-            elif newMode is False and self.inControl_Faders is False: # Doesn't send event but still add it to history
-                self.prev_inControl_Faders = False
         
         # Set pads
         elif option == eventconsts.INCONTROL_PADS:
-            if newMode is True and self.inControl_Pads is False:
+            if newMode is True:
                 sendMidiMessage(0x9F, 0x0F, 0x7F)
-            elif newMode is True and self.inControl_Pads is True: # Doesn't send event but still add it to history
-                self.prev_inControl_Pads = True
-            elif newMode is False and self.inControl_Pads is True:
+            elif newMode is False:
                 sendMidiMessage(0x9F, 0x0F, 0x00)
-            elif newMode is False and self.inControl_Pads is False: # Doesn't send event but still add it to history
-                self.prev_inControl_Pads = False
+
+        if force:
+            self.recieve(newMode, option)
 
     # Processes extended mode messages from device
     def recieve(self, newMode, option = eventconsts.SYSTEM_EXTENDED):
+        if self.ignore_all:
+            return
+        
         # Set all
         if option == eventconsts.SYSTEM_EXTENDED:
             # Process variables for previous states
-            self.prev_extendedMode = self.extendedMode
-            self.prev_inControl_Knobs = config.START_IN_INCONTROL_KNOBS    # Set to default because otherwise 
-            self.prev_inControl_Faders = config.START_IN_INCONTROL_FADERS  # they'll revert badly sometimes
-            self.prev_inControl_Pads = config.START_IN_INCONTROL_PADS      #
+            self.prev_extendedMode.append(self.extendedMode)
+            self.prev_inControl_Knobs = [config.START_IN_INCONTROL_KNOBS]    # Set to default because otherwise 
+            self.prev_inControl_Faders = [config.START_IN_INCONTROL_FADERS]  # they'll revert badly sometimes
+            self.prev_inControl_Pads = [config.START_IN_INCONTROL_PADS]      #
             if newMode is True:
                 self.extendedMode = True
                 self.inControl_Knobs = True
@@ -413,7 +476,7 @@ class extended:
 
         # Set knobs
         elif option == eventconsts.INCONTROL_KNOBS:
-            self.prev_inControl_Knobs = self.inControl_Knobs
+            self.prev_inControl_Knobs.append(self.inControl_Knobs)
             if newMode is True:
                 self.inControl_Knobs = True
             elif newMode is False:
@@ -422,7 +485,7 @@ class extended:
         
         # Set faders
         elif option == eventconsts.INCONTROL_FADERS:
-            self.prev_inControl_Faders = self.inControl_Faders
+            self.prev_inControl_Faders.append(self.inControl_Faders)
             if newMode is True:
                 self.inControl_Faders = True
             elif newMode is False:
@@ -431,7 +494,7 @@ class extended:
         
         # Set pads
         elif option == eventconsts.INCONTROL_PADS:
-            self.prev_inControl_Pads = self.inControl_Pads
+            self.prev_inControl_Pads.append(self.inControl_Pads)
             window.reset_animation_tick()
             if newMode is True:
                 self.inControl_Pads = True
@@ -439,6 +502,14 @@ class extended:
                 self.inControl_Pads = False
             else: debugLog("New mode mode not boolean")
             lighting.state.reset()
+
+    # Forces out of extended mode and prevents further changes
+    def forceEnd(self):
+        self.setVal(False)
+        self.recieve(False)
+        self.ignore_all = True
+        
+
 
 extendedMode = extended()
 
@@ -451,36 +522,35 @@ def compareEvent(event):
 EventNameT = ['Note Off', 'Note On ', 'Key Aftertouch', 'Control Change','Program Change',  'Channel Aftertouch', 'Pitch Bend', 'System Message' ]
 """
 
-# Sends message to the default MIDI out device
+# Sends message to controller
 def sendMidiMessage(status, data1, data2):
     event_out  = toMidiMessage(status, data1, data2)
     str_event_out = str(status) + " " + str(data1) + " " + str(data2)
     if PORT == config.DEVICE_PORT_EXTENDED:
-        debugLog("Dispatched external MIDI message " + str_event_out, internalconstants.DEBUG_DISPATCH_EVENT)
-        device.midiOutMsg(event_out)
+        sendCompleteMidiMessage(event_out, str_event_out)
     else:
-        debugLog("Dispatched internal MIDI message" + str_event_out, internalconstants.DEBUG_DISPATCH_EVENT)
-        device.dispatch(0, event_out)
+        debugLog("Dispatched event through sendMidiMessage (depreciated)", internalconstants.DEBUG_WARNING_DEPRECIATED_FEATURE)
+        sendCompleteInternalMidiMessage(event_out, str_event_out)
+
+# Sends message to linked script
+def sendInternalMidiMessage(status, data1, data2):
+    event_out  = toMidiMessage(status, data1, data2)
+    str_event_out = str(status) + " " + str(data1) + " " + str(data2)
+    sendCompleteInternalMidiMessage(event_out, str_event_out)
+
+# Sends complete message to controller
+def sendCompleteMidiMessage(message, str_event_out = ""):
+    debugLog("Dispatched external MIDI message " + str_event_out + " (" + str(message) + ")", internalconstants.DEBUG_DISPATCH_EVENT)
+    device.midiOutMsg(message)
+
+# Sends complete message to linked script
+def sendCompleteInternalMidiMessage(message, str_event_out = ""):
+    debugLog("Dispatched internal MIDI message: " + str_event_out + " (" + str(message) + ")", internalconstants.DEBUG_DISPATCH_EVENT)
+    device.dispatch(0, message)
 
 # Generates a MIDI message given arguments
 def toMidiMessage(status, data1, data2):
     return status + (data1 << 8) + (data2 << 16)
-
-# Returns snap value
-def snap(value, snapTo):
-    if abs(value - snapTo) <= config.SNAP_RANGE:
-        return snapTo
-    else: return value
-
-# Returns snap value
-def didSnap(value, snapTo):
-    if abs(value - snapTo) <= config.SNAP_RANGE:
-        return True
-    else: return False
-
-# Converts MIDI event range to float for use in volume, pan, etc functions
-def toFloat(value, min = 0, max = 1):
-    return (value / 127) * (max - min) + min
 
 # Print out error message
 def debugLog(message, level = 0):
@@ -515,37 +585,47 @@ pads = padMgr()
 class shiftMgr:
     is_down = False
     used = False
-    sticky = False
+    sustained = False
+    
+    def setDown(self, value):
+        self.is_down = value
+        self.used = False
 
-    def press(self):
+    def press(self, double_click):
+        if PORT == config.DEVICE_PORT_EXTENDED:
+            sendCompleteInternalMidiMessage(internalconstants.MESSAGE_SHIFT_DOWN)
         self.is_down = True
         self.used = False
         window.reset_animation_tick()
     
-    def lift(self):
+    def lift(self, double_click):
+        
+        if self.sustained:
+            self.sustained = False
+            self.used = True
+
+        if double_click and config.ENABLE_SUSTAINED_SHIFT:
+            self.sustained = True
+        else:
+            if PORT == config.DEVICE_PORT_EXTENDED:
+                sendCompleteInternalMidiMessage(internalconstants.MESSAGE_SHIFT_UP)
         self.is_down = False
         window.reset_animation_tick()
         return self.used
 
-    def use(self):
-        if self.is_down:
+    def use(self, lift = False):
+        if self.is_down or self.sustained:
+            if PORT == config.DEVICE_PORT_BASIC:
+                sendCompleteInternalMidiMessage(internalconstants.MESSAGE_SHIFT_USE)
             self.used = True
+            if lift and config.AUTOCANCEL_SUSTAINED_SHIFT:
+                self.sustained = False
             return True
         else: return False
 
-    # Sets shift key to be down until pressed again
-    def set_sticky(self):
-        self.press()
-        self.sticky = True
-
-    def use_sticky(self):
-        self.lift()
-        self.sticky = False
-
-    def get_sticky(self):
-        return self.sticky
-
     def getDown(self):
+        if self.sustained:
+            return self.sustained
         return self.is_down
     
     def getUsed(self):
@@ -605,4 +685,136 @@ class beatMgr:
 beat = beatMgr()
 
 
+class ErrorState:
+    error = False
 
+    def triggerError(self, e):
+        self.error = True
+
+        # Set other script into error state too
+        sendCompleteInternalMidiMessage(internalconstants.MESSAGE_ERROR_CRASH)
+
+        noteMode.setState(internalconstants.NOTE_STATE_ERROR)
+
+        if PORT == config.DEVICE_PORT_EXTENDED:
+            # Force remove from in-control mode
+            extendedMode.forceEnd()
+
+            # Set pad lights
+            lightMap = lighting.LightMap()
+            lightMap.setFromMatrix(lighting.ERROR_COLOURS, 2)
+            lighting.state.setFromMap(lightMap)
+
+        # Print error message
+        print("")
+        print("")
+        print(getLineBreak())
+        print(getLineBreak())
+        print("Unfortunately, an error occurred, and the script has crashed.")
+        print("Please save a copy of this output to a text file, and create an issue on the project's GitHub page:")
+        print("          " + internalconstants.SCRIPT_URL)
+        print("Then, please restart both scripts by clicking `Reload script` in the Script output window.")
+        print(getLineBreak())
+        print(getLineBreak())
+        print("")
+        print("")
+
+        raise e
+
+    def triggerErrorFromOtherScript(self):
+        self.error = True
+
+        noteMode.setState(internalconstants.NOTE_STATE_ERROR)
+
+        if PORT == config.DEVICE_PORT_EXTENDED:
+            # Force remove from in-control mode
+            extendedMode.forceEnd()
+
+            # Set pad lights
+            lightMap = lighting.LightMap()
+            lightMap.setFromMatrix(lighting.ERROR_COLOURS, 2)
+            lighting.state.setFromMap(lightMap)
+
+        # Print error message
+        print("")
+        print("")
+        print(getLineBreak())
+        print(getLineBreak())
+        print("Unfortunately, an error occurred, and the script has crashed.")
+        print("Please refer to the other script output for the error info and instructions to report the error, ", end="")
+        print("then restart both scripts by clicking `Reload script` in the Script output window.")
+        print(getLineBreak())
+        print(getLineBreak())
+        print("")
+        print("")
+
+    def getError(self):
+        return self.error
+
+    def redrawError(self, lights):
+        lights.setFromMatrix(lighting.ERROR_COLOURS)
+        lights.solidifyAll()
+
+    def eventProcessError(self, command):
+        command.handle("Device in error state")
+
+errors = ErrorState()
+
+class NoteModeState:
+    current_state = internalconstants.NOTE_STATE_NORMAL
+
+    def getState(self):
+        return self.current_state
+
+    def setState(self, newState):
+        # Add some checks to ensure not setting into a bad state
+        self.current_state = newState
+
+noteMode = NoteModeState()
+
+class NotesDownMgr:
+    
+    def __init__(self):
+        # Append note objects to inner list when they are pressed
+        self.notes_list = [ [] for _ in range(128)]
+        
+    def __del__(self):
+        self.allNotesOff()
+        
+    def noteOn(self, ext_note):
+        ch_index = channels.channelNumber()
+        # Push note onto list
+        self.notes_list[ext_note.root.data1].append(ext_note)
+        
+        # Set root note to on - don't need to - FL does this for us
+        # channels.midiNoteOn(ch_index, ext_note.root.data1, ext_note.root.data2)
+        
+        for note in ext_note.extended_notes:
+            channels.midiNoteOn(ch_index, note.data1, note.data2)
+        
+    def noteOff(self, note):
+        ch_index = channels.channelNumber()
+        
+        note_num = note.data1
+        
+        # Don't need to turn root note off - FL does this for us
+        # channels.midiNoteOn(ch_index, note_num, 0)
+        
+        # Get ext_note from list - return early if list is empty
+        if len(self.notes_list[note_num]) == 0: return
+        ext_note = self.notes_list[note_num].pop()
+        
+        # Loop through and turn off any notes that were associated with that note
+        for enote in ext_note.extended_notes:
+            channels.midiNoteOn(ch_index, enote.data1, 0)
+        
+    def allNotesOff(self):
+        ch_index = channels.channelNumber()
+        
+        self.notes_list = [ [] for _ in range(128)]
+        
+        # Send note off to all notes
+        for x in range(128):
+            channels.midiNoteOn(ch_index, x, 0)
+    
+notesDown = NotesDownMgr()

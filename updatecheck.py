@@ -1,6 +1,8 @@
-"""
-update_check.py
-This module basically checks for script updates and returns true if they are available
+"""update_check.py
+
+This module basically checks for script updates and returns true if they are available.
+
+Author: Miguel Guthridge
 """
 
 import json
@@ -12,6 +14,12 @@ import internal
 
 
 def check():
+    """Checks for an update to the script using the GitHub API
+
+    Returns:
+        bool: need_update_flag
+            Indicates whether an update to the script is available
+    """
 
     need_update_flag = False
 
