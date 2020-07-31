@@ -33,7 +33,6 @@ import config
 import internal
 import eventprocessor
 
-import processdefault
 
 # device.dispatch(2, 0x9F + (0x0C << 8) + (0x00 << 16))
 

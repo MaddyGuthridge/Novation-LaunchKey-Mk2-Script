@@ -14,10 +14,11 @@ import eventconsts
 import internal
 import internalconstants
 import config
-import processdefault
-import processfirst
-import processfirst_basic
 import lighting
+
+import OtherProcessors.processdefault as processdefault
+import OtherProcessors.processfirst as processfirst
+import OtherProcessors.processfirst_basic as processfirst_basic
 
 import WindowProcessors.processwindows as processwindows
 import PluginProcessors.processplugins as processplugins
