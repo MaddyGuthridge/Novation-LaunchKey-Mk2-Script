@@ -29,6 +29,7 @@ TYPE_NOTE = 20
 TYPE_BASIC_EVENT = 21
 
 TYPE_SYSEX_EVENT = 30
+TYPE_INTERNAL_EVENT = 31
 
 
 NOTE_ON = 0x9 # Shortened as data1 also contains note channel

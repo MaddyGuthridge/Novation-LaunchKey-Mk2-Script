@@ -109,13 +109,27 @@ def processBasic(command):
 def processReceived(command):
     command.actions.addProcessor("Internal event processor")
 
-    if command.getDataMIDI() == internalconstants.MESSAGE_RESET_INTERNAL_CONTROLLER:
+    data = command.getDataMIDI()
+
+    if data == internalconstants.MESSAGE_RESET_INTERNAL_CONTROLLER:
         internal.window.reset_idle_tick()
         command.handle("Reset idle tick", True)
 
-    if command.getDataMIDI() == internalconstants.MESSAGE_ERROR_CRASH:
+    elif data == internalconstants.MESSAGE_ERROR_CRASH:
         internal.errors.triggerErrorFromOtherScript()
         command.handle("Trigger error state")
+        
+    elif data == internalconstants.MESSAGE_SHIFT_DOWN:
+        internal.shift.setDown(True)
+        command.handle("Press shift")
+        
+    elif data == internalconstants.MESSAGE_SHIFT_UP:
+        internal.shift.setDown(False)
+        command.handle("Release shift")
+        
+    elif data == internalconstants.MESSAGE_SHIFT_USE:
+        internal.shift.use()
+        command.handle("Use shift")
 
 # Called after a window is activated
 def activeStart():
@@ -306,15 +320,13 @@ class processedEvent:
                 self.handled = internal.shift.lift(self.is_double_click)
             else:
                 internal.shift.press(self.is_double_click)
-        elif internal.shift.getDown():
+        elif internal.shift.getDown() and self.type not in internalconstants.SHIFT_IGNORE_TYPES:
             self.shifted = internal.shift.use(self.is_lift)
 
         # Process sysex events
         if self.type is eventconsts.TYPE_SYSEX_EVENT:
             internal.processSysEx(self)
-
-                                                                                                                               
-
+                                                                                                          
     def parse(self):
         # Indicates whether to consider as a value or as an on/off
         self.isBinary = False
@@ -375,7 +387,7 @@ class processedEvent:
                 self.isBinary = True
 
         elif self.status_nibble == eventconsts.NOTE_ON or self.status_nibble == eventconsts.NOTE_OFF:
-        # Pads are actually note events
+            # Pads are actually note events
             if (self.status == 0x9F or self.status == 0x8F) or ((self.status == 0x99 or self.status == 0x89)):
                 x, y = self.getPadCoord()
                 if x != -1 and y != -1:
@@ -398,7 +410,8 @@ class processedEvent:
             self.coord_Y = eventconsts.BasicPads[8].index(self.note)
             self.isBinary = True
         
-        # Also check for basic mode buttons
+        if self.recieved_internal:
+            self.type = eventconsts.TYPE_INTERNAL_EVENT
         
         # Check if buttons were lifted
         if self.value is 0: 
@@ -526,6 +539,8 @@ class processedEvent:
         elif self.type is eventconsts.TYPE_BASIC_EVENT:
             a = "Basic Event"
             b = self.getID_Basic()
+        elif self.type is eventconsts.TYPE_INTERNAL_EVENT:
+            a = "Internal event"
         else: 
             internal.debugLog("Bad event type")
             a = "ERROR!!!"

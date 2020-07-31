@@ -596,26 +596,37 @@ class shiftMgr:
     is_down = False
     used = False
     sustained = False
+    
+    def setDown(self, value):
+        self.is_down = value
+        self.used = False
 
     def press(self, double_click):
+        if PORT == config.DEVICE_PORT_EXTENDED:
+            sendCompleteInternalMidiMessage(internalconstants.MESSAGE_SHIFT_DOWN)
         self.is_down = True
         self.used = False
         window.reset_animation_tick()
     
     def lift(self, double_click):
-
+        
         if self.sustained:
             self.sustained = False
             self.used = True
 
         if double_click and config.ENABLE_SUSTAINED_SHIFT:
             self.sustained = True
+        else:
+            if PORT == config.DEVICE_PORT_EXTENDED:
+                sendCompleteInternalMidiMessage(internalconstants.MESSAGE_SHIFT_UP)
         self.is_down = False
         window.reset_animation_tick()
         return self.used
 
     def use(self, lift = False):
         if self.is_down or self.sustained:
+            if PORT == config.DEVICE_PORT_BASIC:
+                sendCompleteInternalMidiMessage(internalconstants.MESSAGE_SHIFT_USE)
             self.used = True
             if lift and config.AUTOCANCEL_SUSTAINED_SHIFT:
                 self.sustained = False

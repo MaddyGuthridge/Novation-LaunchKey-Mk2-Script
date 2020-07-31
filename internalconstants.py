@@ -6,6 +6,7 @@ It is not recommended that the user modify these constants, as they may break th
 """
 
 import midi
+import eventconsts
 
 #---------------------------------
 # Script Info - Change this if you're forking the project
@@ -101,8 +102,11 @@ DEBUG_DEVICE_TYPE = "Device type"
 # Data for internal communication
 #---------------------------------
 
-MESSAGE_RESET_INTERNAL_CONTROLLER = 0x7F009E
-MESSAGE_ERROR_CRASH = 0x7F7F9E
+MESSAGE_RESET_INTERNAL_CONTROLLER = 0x7F00BE
+MESSAGE_ERROR_CRASH = 0x7F7FBE
+MESSAGE_SHIFT_DOWN = 0x7F01BE
+MESSAGE_SHIFT_UP = 0x0001BE
+MESSAGE_SHIFT_USE = 0x0101BE
 
 
 #---------------------------------
@@ -111,4 +115,11 @@ MESSAGE_ERROR_CRASH = 0x7F7F9E
 
 NOTE_STATE_NORMAL = 0
 NOTE_STATE_ERROR = -1
+
+# What events should be ignored when shifting
+SHIFT_IGNORE_TYPES = [eventconsts.TYPE_INCONTROL, eventconsts.TYPE_INTERNAL_EVENT, 
+                      eventconsts.TYPE_SYSEX_EVENT, eventconsts.TYPE_SYSTEM_MSG, eventconsts.TYPE_UNRECOGNISED]
+
+
+
 
