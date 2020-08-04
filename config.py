@@ -50,6 +50,9 @@ START_IN_INCONTROL_KNOBS = True
 START_IN_INCONTROL_FADERS = True
 START_IN_INCONTROL_PADS = True
 
+# Whether the script should automatically set the incontrol mode when changing windows
+AUTO_SET_INCONTROL_MODE = True
+
 TAB_LENGTH = 16 # How much spacing to add in console output
 
 # For fun when the script crashes

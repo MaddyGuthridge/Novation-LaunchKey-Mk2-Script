@@ -422,6 +422,10 @@ class extended:
     def revert(self, option = eventconsts.SYSTEM_EXTENDED):
         if self.ignore_all:
             return
+        
+        if not config.AUTO_SET_INCONTROL_MODE:
+            return
+        
         # Set all
         if option == eventconsts.SYSTEM_EXTENDED:
             self.setVal(self.prev_extendedMode.pop())
@@ -450,8 +454,11 @@ class extended:
 
 
     # Sets extended mode on the device, use inControl constants to choose which
-    def setVal(self, newMode, option = eventconsts.SYSTEM_EXTENDED, force=False):
+    def setVal(self, newMode, option = eventconsts.SYSTEM_EXTENDED, force=False, from_internal = True):
         if self.ignore_all and not force:
+            return
+        
+        if (not config.AUTO_SET_INCONTROL_MODE) and from_internal and not force:
             return
         
         # Set all

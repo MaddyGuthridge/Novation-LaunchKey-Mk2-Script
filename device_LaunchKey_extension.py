@@ -60,10 +60,10 @@ class TGeneric():
         # Run light show
         lighting.lightShow()
 
-        # Process inControl preferences
-        if config.START_IN_INCONTROL_KNOBS == False: internal.extendedMode.setVal(False, eventconsts.INCONTROL_KNOBS) 
-        if config.START_IN_INCONTROL_FADERS == False: internal.extendedMode.setVal(False, eventconsts.INCONTROL_FADERS) 
-        if config.START_IN_INCONTROL_PADS == False: internal.extendedMode.setVal(False, eventconsts.INCONTROL_PADS) 
+        # Process inControl preferences | Say it's external since we want the settings to be applied regardless
+        if config.START_IN_INCONTROL_KNOBS == False: internal.extendedMode.setVal(False, eventconsts.INCONTROL_KNOBS, from_internal=False) 
+        if config.START_IN_INCONTROL_FADERS == False: internal.extendedMode.setVal(False, eventconsts.INCONTROL_FADERS, from_internal=False) 
+        if config.START_IN_INCONTROL_PADS == False: internal.extendedMode.setVal(False, eventconsts.INCONTROL_PADS, from_internal=False) 
         
 
         print('Initialisation complete')
