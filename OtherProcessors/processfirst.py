@@ -17,22 +17,12 @@ import eventconsts
 import internal
 import lighting
 
-in_popup = False
 
 def redraw(lights):
-    global in_popup
     # In Popup Menu
-    if ui.isInPopupMenu():
-        if not in_popup:
-            internal.window.reset_animation_tick()
-            in_popup = True
+    if internal.window.getInPopup():
         redrawPopup(lights)
-
-    else:
-        if in_popup:
-            internal.window.reset_animation_tick()
-            in_popup = False
-
+        
     # Shift key triggers window switcher
     if internal.shift.getDown():
         redrawShift(lights)

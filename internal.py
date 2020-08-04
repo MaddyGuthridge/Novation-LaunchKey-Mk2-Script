@@ -133,6 +133,9 @@ def idleProcessor():
 
     # Update active window
     window.update()
+    
+    # If in a right-click menu, reset idle timer
+    
 
     # Stop performance timer
     idleClock.stop()
@@ -194,6 +197,7 @@ class windowMgr:
         self.animation_tick_number = 0
         self.idle_tick_number = 0
         self.absolute_tick_number = 0
+        self.in_popup = False
     
     # Reset tick number to zero
     def reset_animation_tick(self):
@@ -227,8 +231,31 @@ class windowMgr:
     def get_absolute_tick(self):
         return self.absolute_tick_number
 
+    # Return true if in a pop-up
+    def getInPopup(self):
+        return self.in_popup
+
     # Update active window
     def update(self):
+        
+        popup_active = ui.isInPopupMenu()
+        if popup_active:
+            # If state has changed, reset idle tick
+            if not self.in_popup:
+                self.reset_idle_tick()
+                self.reset_animation_tick()
+                
+            self.in_popup = True
+            
+        else:
+            # If state has changed, reset idle tick
+            if self.in_popup:
+                self.reset_idle_tick()
+                self.reset_animation_tick()
+                
+            self.in_popup = False
+            
+        
         old_window = self.active_fl_window
         # Update FL Window
         if   ui.getFocused(internalconstants.WINDOW_MIXER):        
