@@ -302,7 +302,7 @@ class processedEvent:
             self.recieved_internal = True
 
         # PME Flags to make sure errors don't happen or something
-        self.flags = event.pmeFlags
+        self.processPmeFlags(event.pmeFlags)
 
         # Add sysex information
         self.sysex = event.sysex
@@ -546,6 +546,21 @@ class processedEvent:
             a = "ERROR!!!"
         a = internal.getTab(a)
         return a + b
+
+    def processPmeFlags(self, flags):
+        bin_string = format(flags, '04b')
+        flags_list = [x == '1' for x in bin_string[::-1]]
+        
+        self.pme_system = flags_list[0]
+        
+        self.pme_system_safe = flags_list[1]
+        
+        self.pme_preview_note = flags_list[2]
+        
+        self.pme_from_host = flags_list[3]
+        
+        self.pme_from_midi = flags_list[4]
+        
 
     # Returns string event ID for system events
     def getID_System(self):
