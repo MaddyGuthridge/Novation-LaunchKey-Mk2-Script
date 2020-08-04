@@ -25,17 +25,17 @@ import PluginProcessors.processplugins as processplugins
 import NoteProcessors.processnotes as processnotes
 import ControllerProcessors.keys as keys
 
-""" For checking pme flags are working... delete soon
+
 num_sys_safe = 0
 num_sys = 0
 num_ct = 0
-"""
+
 
 
 # Recieve event and forward onto relative processors
 def processExtended(command):
 
-    """
+    
     global num_sys_safe
     global num_sys
     global num_ct
@@ -46,7 +46,7 @@ def processExtended(command):
     
     print("Sys rate:      ", num_sys/num_ct)
     print("Sys safe rate: ", num_sys_safe/num_ct)
-    """
+    
 
     try:
 
@@ -75,7 +75,7 @@ def processExtended(command):
         if command.handled: return
 
         # Only call plugin and window processors if it is safe to do so
-        if command.pme_system:
+        if command.pme_system_safe:
 
             # Shouldn't be called in extended mode
             """ # Attempt to process event using custom processors for plugins
@@ -120,7 +120,7 @@ def processBasic(command):
         if command.handled: return
 
         # Only call plugin and window processors if it is safe to do so
-        if command.pme_system:
+        if command.pme_system_safe:
 
             # Attempt to process event using custom processors for plugins
             processplugins.process(command)
@@ -573,9 +573,10 @@ class processedEvent:
         return a + b
 
     def processPmeFlags(self, flags):
-        bin_string = format(flags, '04b')
+        print(flags)
+        bin_string = format(flags, '8b')[:5]
+        print(bin_string)
         flags_list = [x == '1' for x in bin_string]
-        
         self.pme_system = flags_list[0]
         
         self.pme_system_safe = flags_list[1]
