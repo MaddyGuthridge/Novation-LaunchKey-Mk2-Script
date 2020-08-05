@@ -467,7 +467,13 @@ class extended:
                 sendMidiMessage(0x9F, 0x0C, 0x7F)
             elif newMode is False:
                 sendMidiMessage(0x9F, 0x0C, 0x00)
-            
+        
+        # On 25-key model, link the fader to the knobs
+        elif DEVICE_TYPE == internalconstants.DEVICE_KEYS_25 and (option == eventconsts.INCONTROL_FADERS or option == eventconsts.INCONTROL_KNOBS):
+            if newMode is True:
+                sendMidiMessage(0x9F, 0x0D, 0x7F)
+            elif newMode is False:
+                sendMidiMessage(0x9F, 0x0D, 0x00)
         
         # Set knobs
         elif option == eventconsts.INCONTROL_KNOBS:
@@ -517,6 +523,20 @@ class extended:
                 self.inControl_Pads = False
             else: debugLog("New mode mode not boolean")
             lighting.state.reset()
+
+        # On 25-key model, link the fader to the knobs
+        elif DEVICE_TYPE == internalconstants.DEVICE_KEYS_25 and (option == eventconsts.INCONTROL_FADERS or option == eventconsts.INCONTROL_KNOBS):
+            self.prev_inControl_Knobs.append(self.inControl_Knobs)
+            if newMode is True:
+                self.inControl_Knobs = True
+            elif newMode is False:
+                self.inControl_Knobs = False
+                
+            self.prev_inControl_Faders.append(self.inControl_Faders)
+            if newMode is True:
+                self.inControl_Faders = True
+            elif newMode is False:
+                self.inControl_Faders = False
 
         # Set knobs
         elif option == eventconsts.INCONTROL_KNOBS:

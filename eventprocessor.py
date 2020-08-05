@@ -74,8 +74,8 @@ def processExtended(command):
 
         if command.handled: return
 
-        # Only call plugin and window processors if it is safe to do so
-        if command.pme_system_safe:
+        # Only call plugin and window processors if it is safe to do so | Disabled because of errors
+        if command.pme_system_safe or True:
 
             # Shouldn't be called in extended mode
             """ # Attempt to process event using custom processors for plugins
@@ -119,8 +119,8 @@ def processBasic(command):
 
         if command.handled: return
 
-        # Only call plugin and window processors if it is safe to do so
-        if command.pme_system_safe:
+        # Only call plugin and window processors if it is safe to do so | Currently disabled due to errors
+        if command.pme_system_safe or True:
 
             # Attempt to process event using custom processors for plugins
             processplugins.process(command)

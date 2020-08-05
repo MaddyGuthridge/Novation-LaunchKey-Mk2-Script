@@ -10,10 +10,16 @@ import internalconstants
 import eventprocessor
 
 def process(command):
-    
+    command.actions.addProcessor("25-key Processor")
+    # Change fader automatically
     if command.type == eventconsts.TYPE_BASIC_FADER and command.coord_X == 8:
-        command.edit(eventprocessor.rawEvent(0xBF, 0x07, command.value))
-    pass
+        if internal.extendedMode.query(eventconsts.INCONTROL_FADERS):
+            command.edit(eventprocessor.rawEvent(0xBF, 0x07, command.value))
+        else:
+            internal.sendCompleteInternalMidiMessage(command.getDataMIDI())
+            command.handle("Send basic fader to basic processor")
+    
+
 
 def onInit():
     internal.debugLog("Running on 25-key model", internalconstants.DEBUG_DEVICE_TYPE)
