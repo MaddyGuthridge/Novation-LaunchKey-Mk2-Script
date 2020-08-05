@@ -16,8 +16,8 @@ import eventconsts
 SCRIPT_NAME = "Novation LaunchKey Mk2 Controller Script"
 SCRIPT_AUTHOR = "Miguel Guthridge"
 SCRIPT_VERSION_MAJOR = 1
-SCRIPT_VERSION_MINOR = 2
-SCRIPT_VERSION_REVISION = 2
+SCRIPT_VERSION_MINOR = 3
+SCRIPT_VERSION_REVISION = 0
 MIN_FL_SCRIPT_VERSION = 4
 SCRIPT_URL = "https://github.com/MiguelGuthridge/Novation-LaunchKey-Mk2-Script"
 UPDATE_JSON_URL = "https://api.github.com/repos/MiguelGuthridge/Novation-LaunchKey-Mk2-Script/tags"
