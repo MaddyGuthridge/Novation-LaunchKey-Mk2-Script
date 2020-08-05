@@ -1,8 +1,9 @@
-"""
-colourpicker.py
+"""PluginProcessors > colourpicker.py
+
 The file handles events when the colour picker window is active.
 Currently, this doesn't work in the playlist as there is no way to get selected track
 
+Author: Miguel Guthridge
 """
 
 plugins = ["Color selector"]
@@ -85,11 +86,11 @@ def process(command):
     # Add event processor to actions list (useful for debugging)
     command.actions.addProcessor("Colour Picker Processor")
 
-    if command.type == eventconsts.TYPE_PAD and command.padX != 8:
+    if command.type == eventconsts.TYPE_PAD and command.coord_X != 8:
         command.handled == True
         if command.is_lift:
 
-            colour = COLOUR_HEX_MAP[command.padX][command.padY]
+            colour = COLOUR_HEX_MAP[command.coord_X][command.coord_Y]
 
             if internal.window.active_fl_window == internalconstants.WINDOW_PLAYLIST:
                 patterns.setPatternColor(patterns.patternNumber(), colour)

@@ -1,7 +1,10 @@
-"""
-fpc.py
-This script is a custom processor module that can process events when the FPC plugin is active
+"""PluginProcessors > fpc.py
 
+This script is a custom processor module that can process events when the FPC plugin is active.
+It maps the pedal to the kick, and rearranges drums to match the FPC default layout, 
+as well as drawing pad colours to match the colours of the default note layout.
+
+Author: Miguel Guthridge
 """
 
 REMAP_DRUMS = True
@@ -33,8 +36,7 @@ COLOUR_MAP = [
     [lighting.COLOUR_YELLOW, lighting.COLOUR_ORANGE],
     [lighting.COLOUR_YELLOW, lighting.COLOUR_ORANGE],
     [lighting.COLOUR_LIGHT_BLUE, lighting.COLOUR_ORANGE],
-    [lighting.COLOUR_LIGHT_BLUE, lighting.COLOUR_ORANGE],
-    [-1, -1]
+    [lighting.COLOUR_LIGHT_BLUE, lighting.COLOUR_ORANGE]
 ]
 
 
@@ -73,7 +75,7 @@ def process(command):
                 command.edit(eventprocessor.rawEvent(0x99, eventconsts.BasicPads[1][1], command.value))
 
         # Dispatch event to extended mode
-        internal.sendMidiMessage(command.status, command.note, command.value)
+        internal.sendInternalMidiMessage(command.status, command.note, command.value)
 
         # Map drums to match FPC default layout
         change_pads(command)

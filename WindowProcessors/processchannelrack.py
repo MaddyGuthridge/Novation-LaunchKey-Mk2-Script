@@ -1,7 +1,9 @@
-"""
-processchannelrack.py
-This script handles events when the channel rack is active
+"""WindowProcessors > processchannelrack.py
 
+This script handles events when the channel rack is active.
+It provides functionality including modification of grid bits, setting channel volumes/pans, and copy-pasting between tracks.
+
+Author: Miguel Guthridge
 """
 
 import math # For logarithm
@@ -26,17 +28,19 @@ def process(command):
 
     command.actions.addProcessor("Channel rack Processor")
 
-    
+    current_channel = channels.channelNumber()
+
     #---------------------------------
     # Pads
     #---------------------------------
     if command.type == eventconsts.TYPE_PAD and command.is_lift:
         # UI Mode
-        if command.padY == 1 and command.padX == 0:
+        if command.coord_Y == 1 and command.coord_X == 0:
             ui_mode.nextMode()
             internal.window.reset_animation_tick()
-            command.actions.appendAction("Channel Rack: Next UI mode")
-            command.handled = True
+            command.handle("Channel Rack: Next UI mode")
+            if ui_mode.getMode():
+                gridBits.drawHighlight()
 
         elif ui_mode.getMode() == 1:
             process_bit_mode(command)
@@ -48,156 +52,41 @@ def process(command):
     # Faders
     #---------------------------------
     if command.type == eventconsts.TYPE_FADER:
-        # Fader 1
-        if command.id == eventconsts.FADER_1: 
-            setVolume(command, 0, command.value)
-            command.handled = True
-        
-        # Fader 2
-        if command.id == eventconsts.FADER_2: 
-            setVolume(command, 1, command.value)
-            command.handled = True
+        fader_num = command.coord_X
 
-        # Fader 3
-        if command.id == eventconsts.FADER_3: 
-            setVolume(command, 2, command.value)
-            command.handled = True
-        
-        # Fader 4
-        if command.id == eventconsts.FADER_4: 
-            setVolume(command, 3, command.value)
-            command.handled = True
+        if fader_num == 8 and not command.shifted:
+            channel_num = current_channel
+        else:
+            channel_num = fader_num
 
-        # Fader 5
-        if command.id == eventconsts.FADER_5: 
-            setVolume(command, 4, command.value)
-            command.handled = True
-        
-        # Fader 6
-        if command.id == eventconsts.FADER_6: 
-            setVolume(command, 5, command.value)
-            command.handled = True
-        
-        # Fader 7
-        if command.id == eventconsts.FADER_7: 
-            setVolume(command, 6, command.value)
-            command.handled = True
-
-        # Fader 8
-        if command.id == eventconsts.FADER_8: 
-            setVolume(command, 7, command.value)
-            command.handled = True
-
-        # Fader 9
-        if command.id == eventconsts.FADER_9: 
-            # If shift key held, change master track
-            if command.shifted:
-                setVolume(command, 8, command.value)
-                command.handled = True
-            # Otherwise change current track
-            else:
-                # Get current track number
-                track = channels.channelNumber()
-                setVolume(command, track, command.value)
-                command.handled = True
+        setVolume(command, channel_num, command.value)
 
     #---------------------------------
     # Knobs
     #---------------------------------
     if command.type == eventconsts.TYPE_KNOB:
-        # Knob 1
-        if command.id == eventconsts.KNOB_1: 
-            setPan(command, 0, command.value)
-            command.handled = True
-        
-        # Knob 2
-        if command.id == eventconsts.KNOB_2: 
-            setPan(command, 1, command.value)
-            command.handled = True
+        knob_num = command.coord_X
 
-        # Knob 3
-        if command.id == eventconsts.KNOB_3: 
-            setPan(command, 2, command.value)
-            command.handled = True
-        
-        # Knob 4
-        if command.id == eventconsts.KNOB_4: 
-            setPan(command, 3, command.value)
-            command.handled = True
+        if knob_num == 7 and not command.shifted:
+            channel_num = current_channel
+        else:
+            channel_num = knob_num
 
-        # Knob 5
-        if command.id == eventconsts.KNOB_5: 
-            setPan(command, 4, command.value)
-            command.handled = True
-        
-        # Knob 6
-        if command.id == eventconsts.KNOB_6: 
-            setPan(command, 5, command.value)
-            command.handled = True
-        
-        # Knob 7
-        if command.id == eventconsts.KNOB_7: 
-            setPan(command, 6, command.value)
-            command.handled = True
-
-        # Knob 8
-        if command.id == eventconsts.KNOB_8: 
-            # If shift key held, change track 7
-            if command.shifted:
-                setPan(command, 7, command.value)
-                command.handled = True
-            # Otherwise change current track
-            else:
-                # Get current track number
-                track = channels.channelNumber()
-                setPan(command, track, command.value)
-                command.handled = True
+        setPan(command, channel_num, command.value)
 
 
     #---------------------------------
     # Mixer Buttons - mute/solo tracks
     #---------------------------------
     if command.type == eventconsts.TYPE_FADER_BUTTON:
-        if command.id == eventconsts.FADER_BUTTON_1:
-            processMuteSolo(0, command)
-            command.handled = True
+        fader_num = command.coord_X
+        print(fader_num)
+        if fader_num == 8 and not command.shifted:
+            channel_num = current_channel
+        else:
+            channel_num = fader_num
 
-        if command.id == eventconsts.FADER_BUTTON_2:
-            processMuteSolo(1, command)
-            command.handled = True
-
-        if command.id == eventconsts.FADER_BUTTON_3:
-            processMuteSolo(2, command)
-            command.handled = True
-
-        if command.id == eventconsts.FADER_BUTTON_4:
-            processMuteSolo(3, command)
-            command.handled = True
-
-        if command.id == eventconsts.FADER_BUTTON_5:
-            processMuteSolo(4, command)
-            command.handled = True
-
-        if command.id == eventconsts.FADER_BUTTON_6:
-            processMuteSolo(5, command)
-            command.handled = True
-
-        if command.id == eventconsts.FADER_BUTTON_7:
-            processMuteSolo(6, command)
-            command.handled = True
-
-        if command.id == eventconsts.FADER_BUTTON_8:
-            processMuteSolo(7, command)
-            command.handled = True
-
-        if command.id == eventconsts.FADER_BUTTON_9:
-            # If shift key held, change 9th track
-            if command.shifted:
-                processMuteSolo(8, command)
-                command.handled = True
-            else:
-                processMuteSolo(channels.channelNumber(), command)
-                command.handled = True
+        processMuteSolo(channel_num, command)
 
     return
 
@@ -209,13 +98,16 @@ def process_bit_mode(command):
     #---------------------------------
     if command.type == eventconsts.TYPE_PAD and command.is_lift:
         # Grid bits
-        if command.padY == 0 and command.padX != 8:
-            command.handled = True
-
-            gridBits.toggleBit(current_track, command.padX)
-            command.actions.appendAction("Grid Bits: Toggle bit")
+        if command.coord_Y == 0 and command.coord_X != 8:
+            
+            if channels.channelCount() <= current_track:
+                command.handle("Channel out of range")
+                return
+            
+            gridBits.toggleBit(current_track, command.coord_X)
+            command.handle("Grid Bits: Toggle bit")
         
-        coord = [command.padX, command.padY]
+        coord = [command.coord_X, command.coord_Y]
 
 
         # Scroll grid bits
@@ -248,37 +140,42 @@ def process_bit_mode(command):
 
 # Process when in menu
 def process_menu_mode(command):
-    coord = [command.padX, command.padY]
+    coord = [command.coord_X, command.coord_Y]
 
     # Next/prev track
     if coord == [1, 0]:
         ui.previous()
         command.actions.appendAction("Channel Rack: Previous channel")
         command.handled = True
-    if coord == [1, 1]:
+    elif coord == [1, 1]:
         ui.next()
         command.actions.appendAction("Channel Rack: Next channel")
         command.handled = True
 
     # Cut, Copy, Paste
-    if coord == [3, 0]:
+    elif coord == [3, 0]:
         ui.cut()
         command.actions.appendAction("UI: Cut")
         command.handled = True
-    if coord == [4, 0]:
+    elif coord == [4, 0]:
         ui.copy()
         command.actions.appendAction("UI: Copy")
         command.handled = True
-    if coord == [5, 0]:
+    elif coord == [5, 0]:
         ui.paste()
         command.actions.appendAction("UI: Paste")
         command.handled = True
 
     # To piano roll
-    if coord == [7, 1]:
+    elif coord == [7, 1]:
         ui.showWindow(internalconstants.WINDOW_PIANO_ROLL)
         command.actions.appendAction("Sent to pianoroll")
         command.handled = True
+
+    # Plugin window
+    elif coord == [6, 1]:
+        channels.showEditor(channels.channelNumber())
+        command.handle("Opened plugin window")
 
 def redraw(lights):
     if internal.extendedMode.query(eventconsts.INCONTROL_PADS):
@@ -314,7 +211,8 @@ def redraw_menu_mode(lights):
     if internal.window.get_animation_tick() >= 4:
         lights.setPadColour(5, 0, lighting.UI_PASTE)            # Paste
 
-
+    if internal.window.get_animation_tick() >= 2:
+        lights.setPadColour(6, 1, lighting.UI_CHOOSE)
     if internal.window.get_animation_tick() >= 3:
         lights.setPadColour(7, 1, lighting.UI_ACCEPT, 2)           # To piano roll
 
@@ -334,39 +232,42 @@ def redraw_bit_mode(lights):
 
 
 def activeStart():
-
     internal.extendedMode.setVal(True, eventconsts.INCONTROL_PADS)
-
     return
 
 def activeEnd():
+    
+    
+    internal.extendedMode.revert(eventconsts.INCONTROL_PADS)
+    return
 
+def topWindowStart():
+    
+    return
+
+def topWindowEnd():
     # Reset Grid Bit controller
     gridBits.resetZoom()
     gridBits.resetScroll()
     ui_mode.resetMode()
-
-    internal.extendedMode.revert(eventconsts.INCONTROL_PADS)
-
-    return
-
-def topWindowStart():
-    if not internal.shift.getDown():   
-        internal.window.reset_animation_tick()
-
-    return
-
-def topWindowEnd():
-    
-
     return
 
 
-    # Internal functions
+# Internal functions
 
 class gridBitMgr:
     scroll = 0
     zoom = 1
+    
+    def drawHighlight(self):
+        current_ch = channels.channelNumber()
+        
+        left = 8*self.scroll
+        right = 8*self.zoom
+        top = current_ch
+        bottom = 1
+        
+        ui.crDisplayRect(left, top, right, bottom, 1000)
 
     def getBit(self, track, position):
         return channels.getGridBit(track, position*self.zoom + 8*self.scroll)
@@ -377,27 +278,36 @@ class gridBitMgr:
     
     def resetScroll(self):
         self.scroll = 0
+        self.drawHighlight()
 
     def scrollLeft(self):
         if self.scroll > 0:
             self.scroll -= 1
+        self.drawHighlight()
         
     def scrollRight(self):
         self.scroll += 1
+        self.drawHighlight()
 
     def zoomOut(self):
         self.zoom *= 2
+        self.drawHighlight()
     
     def zoomIn(self):
         if self.zoom > 1: self.zoom = int(self.zoom / 2)
+        self.drawHighlight()
 
     def resetZoom(self):
         self.zoom = 1
+        self.drawHighlight()
 
 gridBits = gridBitMgr()
 
 def setGridBits(lights):
     current_track = channels.channelNumber()
+
+    if channels.channelCount() <= current_track:
+        return
 
     # Set scroll indicator
     light_num_scroll = gridBits.scroll
@@ -434,51 +344,71 @@ def setGridBits(lights):
     return
 
 def processMuteSolo(channel, command):
-    if command.value == 0: return
-    if channels.isChannelSolo(channel):
-        channels.soloChannel(channel)
-        command.actions.appendAction("Unsolo channel " + str(channel))
-        return
-    channels.muteChannel(channel)
-    if command.is_double_click:
-        channels.soloChannel(channel)
-        command.actions.appendAction("Solo channel " + str(channel))
-    else: 
-        if channels.isChannelMuted(channel):
-            command.actions.appendAction("Mute channel " + str(channel))
-        else: 
-            command.actions.appendAction("Unmute channel " + str(channel))
 
-def setVolume(command, track, value):
+    if channels.channelCount() <= channel:
+        command.handle("Channel out of range. Couldn't process mute")
+        return
+
+    if command.value == 0: return
+    if channels.isChannelSolo(channel) and channels.channelCount() != 1:
+        channels.soloChannel(channel)
+        action = "Unsolo channel"
+        
+    elif command.is_double_click:
+        channels.soloChannel(channel)
+        action = "Solo channel"
+    else: 
+        channels.muteChannel(channel)
+        if channels.isChannelMuted(channel):
+            action = "Mute channel"
+        else: 
+            action = "Unmute channel"
+
+    command.handle(action)
+
+def setVolume(command, channel, value):
+
+    if channels.channelCount() <= channel:
+        command.handle("Channel out of range. Couldn't set volume")
+        return
+
     volume = getVolumeSend(value)
-    channels.setChannelVolume(track, volume)
-    command.actions.appendAction("Set " + channels.getChannelName(track) + " volume to " + getVolumeValue(value))
-    if internal.didSnap(internal.toFloat(value), internalconstants.CHANNEL_VOLUME_SNAP_TO):
-        command.actions.appendAction("[Snapped]")
+    channels.setChannelVolume(channel, volume)
+    action = "Set " + channels.getChannelName(channel) + " volume to " + getVolumeValue(value)
+    if processorhelpers.didSnap(processorhelpers.toFloat(value), internalconstants.CHANNEL_VOLUME_SNAP_TO):
+        action += " [Snapped]"
+    command.handle(action)
+
+def setPan(command, channel, value):
+    if channels.channelCount() <= channel:
+        command.handle("Channel out of range. Couldn't setpan")
+        return
+
+    volume = getPanSend(value)
+    channels.setChannelPan(channel, volume)
+    action = "Set " + channels.getChannelName(channel) + " pan to " + getPanValue(value)
+    if processorhelpers.didSnap(processorhelpers.toFloat(value, -1), internalconstants.CHANNEL_PAN_SNAP_TO):
+        action = "[Snapped]"
+    command.handle(action)
 
 # Returns volume value set to send to FL Studio
 def getVolumeSend(inVal):
     if config.ENABLE_SNAPPING:
-        return internal.snap(internal.toFloat(inVal), internalconstants.CHANNEL_VOLUME_SNAP_TO)
-    else: return internal.toFloat(inVal)
+        return processorhelpers.snap(processorhelpers.toFloat(inVal), internalconstants.CHANNEL_VOLUME_SNAP_TO)
+    else: return processorhelpers.toFloat(inVal)
 
 
 def getVolumeValue(inVal):
     
     return str(round(getVolumeSend(inVal) * 100)) + "%"
 
-def setPan(command, track, value):
-    volume = getPanSend(value)
-    channels.setChannelPan(track, volume)
-    command.actions.appendAction("Set " + channels.getChannelName(track) + " pan to " + getPanValue(value))
-    if internal.didSnap(internal.toFloat(value, -1), internalconstants.CHANNEL_PAN_SNAP_TO):
-        command.actions.appendAction("[Snapped]")
+
 
 # Returns volume value set to send to FL Studio
 def getPanSend(inVal):
     if config.ENABLE_SNAPPING:
-        return internal.snap(internal.toFloat(inVal, -1), internalconstants.CHANNEL_PAN_SNAP_TO)
-    else: return internal.toFloat(inVal, -1)
+        return processorhelpers.snap(processorhelpers.toFloat(inVal, -1), internalconstants.CHANNEL_PAN_SNAP_TO)
+    else: return processorhelpers.toFloat(inVal, -1)
 
 
 def getPanValue(inVal):

@@ -12,38 +12,149 @@ import utils
 
 import eventconsts
 import internal
+import internalconstants
 import config
-import processdefault
-import processfirst
 import lighting
+
+import OtherProcessors.processdefault as processdefault
+import OtherProcessors.processfirst as processfirst
+import OtherProcessors.processfirst_basic as processfirst_basic
+
 import WindowProcessors.processwindows as processwindows
 import PluginProcessors.processplugins as processplugins
+import NoteProcessors.processnotes as processnotes
+import ControllerProcessors.keys as keys
 
+"""
+num_sys_safe = 0
+num_sys = 0
+num_ct = 0
+"""
 
 
 # Recieve event and forward onto relative processors
-def process(command):
+def processExtended(command):
+
+    """
+    global num_sys_safe
+    global num_sys
+    global num_ct
     
-    # If basic processor, don't bother for note events
-    if internal.PORT == config.DEVICE_PORT_BASIC and command.type == eventconsts.TYPE_NOTE:
-        return
+    num_sys_safe += command.pme_system_safe
+    num_sys += command.pme_system
+    num_ct += 1
     
-    # Call primary processor
-    processfirst.process(command)
+    print("Sys rate:      ", num_sys/num_ct)
+    print("Sys safe rate: ", num_sys_safe/num_ct)
+    """
 
-    if command.handled: return
+    try:
 
-    # Attempt to process event using custom processors for plugins
-    processplugins.process(command)
+        # Process internal commands
+        if command.recieved_internal:
+            processReceived(command)
+            return
 
-    if command.handled: return
+        # Process error events
+        if internal.errors.getError():
+            internal.errors.eventProcessError(command)
+            return
 
-    # Process content from windows
-    processwindows.process(command)
+        # Reset idle timer
+        if not ((command.type is eventconsts.TYPE_BASIC_PAD or command.type is eventconsts.TYPE_PAD or command.type is eventconsts.TYPE_TRANSPORT) and not command.is_lift):
+            if lighting.idle_show_active():
+                command.handle("End Idle Light Show")
+            internal.window.reset_idle_tick()
 
-    # If command hasn't been handled by any above uses, use the default controls
-    if command.handled is False:
-        processdefault.process(command)
+        # Process key mappings
+        keys.process(command)
+        
+        # Call primary processor
+        processfirst.process(command)
+
+        if command.handled: return
+
+        # Only call plugin and window processors if it is safe to do so | Disabled because of errors
+        if command.pme_system_safe or True:
+
+            # Shouldn't be called in extended mode
+            """ # Attempt to process event using custom processors for plugins
+            processplugins.process(command)
+
+            if command.handled: return"""
+
+            # Process content from windows
+            processwindows.process(command)
+
+        # If command hasn't been handled by any above uses, use the default controls
+        if command.handled is False:
+            processdefault.process(command)
+
+    except Exception as e:
+        internal.errors.triggerError(e)
+
+def processBasic(command):
+
+    # Send event to reset other controller
+    internal.sendCompleteInternalMidiMessage(internalconstants.MESSAGE_RESET_INTERNAL_CONTROLLER)
+
+    try:
+
+        if command.recieved_internal:
+            processReceived(command)
+            return
+
+        # For note events, use note processors
+        if command.type == eventconsts.TYPE_NOTE:
+            processnotes.process(command)
+            return
+
+        # Now process other events for errors.
+        if internal.errors.getError():
+            internal.errors.eventProcessError(command)
+            return
+        
+        # Call primary processor
+        processfirst_basic.process(command)
+
+        if command.handled: return
+
+        # Only call plugin and window processors if it is safe to do so | Currently disabled due to errors
+        if command.pme_system_safe or True:
+
+            # Attempt to process event using custom processors for plugins
+            processplugins.process(command)
+
+        if command.handled: return
+
+    except Exception as e:
+        internal.errors.triggerError(e)
+
+# Processes events received internally
+def processReceived(command):
+    command.actions.addProcessor("Internal event processor")
+
+    data = command.getDataMIDI()
+
+    if data == internalconstants.MESSAGE_RESET_INTERNAL_CONTROLLER:
+        internal.window.reset_idle_tick()
+        command.handle("Reset idle tick", True)
+
+    elif data == internalconstants.MESSAGE_ERROR_CRASH:
+        internal.errors.triggerErrorFromOtherScript()
+        command.handle("Trigger error state")
+        
+    elif data == internalconstants.MESSAGE_SHIFT_DOWN:
+        internal.shift.setDown(True)
+        command.handle("Press shift")
+        
+    elif data == internalconstants.MESSAGE_SHIFT_UP:
+        internal.shift.setDown(False)
+        command.handle("Release shift")
+        
+    elif data == internalconstants.MESSAGE_SHIFT_USE:
+        internal.shift.use()
+        command.handle("Use shift")
 
 # Called after a window is activated
 def activeStart():
@@ -64,10 +175,19 @@ def activeEnd():
             processwindows.activeEnd()
 
 def redraw():
-    # Only in extended mode:
-    if internal.PORT == config.DEVICE_PORT_EXTENDED:
+        
+    lights = lighting.LightMap()
 
-        lights = lighting.LightMap()
+    if internal.errors.getError():
+        internal.errors.redrawError(lights)
+        lighting.state.setFromMap(lights)
+        return
+
+    # Error handling: set controller into an error state
+    try:
+
+        # Draws idle thing if idle
+        lighting.idle_lightshow(lights)
 
         # Get UI from primary processor
         processfirst.redraw(lights)
@@ -81,8 +201,59 @@ def redraw():
         # Get UI drawn from default processor
         processdefault.redraw(lights)
 
-        # Call pads refresh function
-        lighting.state.setFromMap(lights)
+    except Exception as e:
+        internal.errors.triggerError(e)
+
+
+    # Call pads refresh function
+    lighting.state.setFromMap(lights)
+
+# Stores a single action as a string
+class Action:
+    def __init__(self, act, silent):
+        self.act = act
+        self.silent = silent
+
+class ActionList:
+    def __init__(self, name):
+        self.name = name
+        self.list = []
+        self.didHandle = False
+
+    # Append action to the list
+    def appendAction(self, action, silent, handle):
+        self.list.append(Action(action, silent))
+
+        # Set flag indicating that this processor handled the event
+        if handle:
+            self.didHandle = True
+
+    def getString(self):
+        # Return that no action was taken if list is empty
+        if len(self.list) == 0:
+            return internal.getTab(self.name + ":", 2) + "[No actions]"
+
+        # No indentation required if there was only one action
+        elif len(self.list) == 1:
+            ret = internal.getTab(self.name + ":", 2) + self.list[0].act
+
+        # If there are multiple actions, indent them
+        else:
+            ret = self.name + ":"
+            for i in range(len(self.list)):
+                ret += '\n' + internal.getTab("") + self.list[i].act
+
+        if self.didHandle:
+            ret += '\n' + internal.getTab("") + "[Handled]"
+        return ret
+
+    # Returns the latest non-silent action to set as the hint message
+    def getHintMsg(self):
+        ret = ""
+        for i in range(len(self.list)):
+            if self.list[i].silent == False:
+                ret = self.list[i].act
+        return ret
 
 # Stores actions taken by various processor modules
 class actionPrinter:
@@ -90,34 +261,38 @@ class actionPrinter:
 
     def __init__(self):
         # String that is output after each event is processed
-        self.eventActions = [""]
-        self.eventProcessors = [""]
+        self.eventProcessors = []
 
-    # Set event processor
-    def addProcessor(self, string):
-        if self.eventProcessors[0] == "":
-            self.eventProcessors[0] = string
-        else:
-            if self.eventActions[len(self.eventActions) - 1] == "":
-                self.eventActions[len(self.eventActions) - 1] = "[Did not handle]"
-            self.eventProcessors.append(string)
-            self.eventActions.append("")
+    # Add an event processor object
+    def addProcessor(self, name):
+        self.eventProcessors.append(ActionList(name))
 
     # Add to event action
-    def appendAction(self, string):
-        self.eventActions[len(self.eventProcessors) - 1] += string
-        self.eventActions[len(self.eventProcessors) - 1] = internal.newGetTab(self.eventActions[len(self.eventProcessors) - 1])
+    def appendAction(self, act, silent=False, handled=False):
+
+        # Add some random processor if a processor doesn't exist for some reason
+        if len(self.eventProcessors) == 0:
+            self.addProcessor("NoProcessor")
+            internal.debugLog("Added NoProcessor Processor", internalconstants.DEBUG_WARNING_DEPRECIATED_FEATURE)
+        # Append the action
+        self.eventProcessors[len(self.eventProcessors) - 1].appendAction(act, silent, handled)
 
     def flush(self):
+        # Log all actions taken
         for x in range(len(self.eventProcessors)):
-            out = self.eventProcessors[x]
-            out = internal.newGetTab(out, 2)
-            out += self.eventActions[x]
-            print(out)
-            if self.eventActions[x] != "" and not "[Did not handle]" in self.eventActions[x]:
-                ui.setHintMsg(self.eventActions[x])
+            internal.debugLog(self.eventProcessors[x].getString(), internalconstants.DEBUG_EVENT_ACTIONS)
 
-        self.eventActions.clear()
+        # Get hint message to set (ignores silent messages)
+        hint_msg = ""
+        for x in range(len(self.eventProcessors)):
+            cur_msg = self.eventProcessors[x].getHintMsg()
+
+            # Might want to fix this some time, some handler modules append this manually
+            if cur_msg != "" and cur_msg != "[Did not handle]":
+                hint_msg = cur_msg
+
+        if hint_msg != "":
+            ui.setHintMsg(hint_msg)
         self.eventProcessors.clear()
 
 # Stores event in raw form. Used to edit events
@@ -131,17 +306,32 @@ class rawEvent:
 # Stores useful data about processed event
 class processedEvent:
     def __init__(self, event):
+        self.recieved_internal = False
         self.edited = False
         self.actions = actionPrinter()
 
         self.handled = False
 
         self.status = event.status
+        
         self.note = event.data1
+        self.data1 = event.data1
+        
         self.value = event.data2
+        self.data2 = event.data2
+        
         self.status_nibble = event.status >> 4              # Get first half of status byte
         self.channel = event.status & int('00001111', 2)    # Get 2nd half of status byte
         
+        if self.channel == 14:
+            self.recieved_internal = True
+
+        # PME Flags to make sure errors don't happen or something
+        self.processPmeFlags(event.pmeFlags)
+
+        # Add sysex information
+        self.sysex = event.sysex
+
         # Bit-shift status and data bytes to get event ID
         self.id = (self.status + (self.note << 8))
 
@@ -152,39 +342,31 @@ class processedEvent:
         # Process shift button
         if self.id == config.SHIFT_BUTTON:
             if self.is_lift:
-                if self.is_double_click and config.ENABLE_STICKY_SHIFT:
-                    internal.shift.set_sticky()
-                else:
-                    self.handled = internal.shift.lift()
+                self.handled = internal.shift.lift(self.is_double_click)
             else:
-                internal.shift.press()
+                internal.shift.press(self.is_double_click)
+        elif internal.shift.getDown() and self.type not in internalconstants.SHIFT_IGNORE_TYPES:
+            self.shifted = internal.shift.use(self.is_lift)
 
-            if internal.shift.get_sticky():
-                self.handle("Deactivate Held Shift")
-
-        elif internal.shift.get_sticky():
-            if self.isBinary:
-                if self.is_lift:
-                    internal.shift.use_sticky()
-                    self.shifted = True
-
-            
-
-        elif internal.shift.getDown():
-            self.shifted = internal.shift.use()
-
-                                                                                                                                     
-
+        # Process sysex events
+        if self.type is eventconsts.TYPE_SYSEX_EVENT:
+            internal.processSysEx(self)
+                                                                                                          
     def parse(self):
         # Indicates whether to consider as a value or as an on/off
         self.isBinary = False
+
+        
 
         # Determine type of event | unrecognised by default
         self.type = eventconsts.TYPE_UNRECOGNISED
 
         # If using basic port, check for notes
 
-        if self.id in eventconsts.InControlButtons: 
+        if self.status == eventconsts.SYSEX:
+            self.type = eventconsts.TYPE_SYSEX_EVENT
+
+        elif self.id in eventconsts.InControlButtons: 
             self.type = eventconsts.TYPE_INCONTROL
             self.isBinary = True
 
@@ -198,18 +380,30 @@ class processedEvent:
 
         elif self.id in eventconsts.Knobs: 
             self.type = eventconsts.TYPE_KNOB
+            self.coord_X = self.note - 0x15
 
         elif self.id in eventconsts.BasicKnobs: 
             self.type = eventconsts.TYPE_BASIC_KNOB
+            self.coord_X = self.note - 0x15
 
         elif self.id in eventconsts.Faders: 
             self.type = eventconsts.TYPE_FADER
+            self.coord_X = self.note - 0x29
+            if self.note == 0x07: self.coord_X = 8
 
         elif self.id in eventconsts.BasicFaders: 
             self.type = eventconsts.TYPE_BASIC_FADER
+            self.coord_X = self.note - 0x29
+            if self.note == 0x07: self.coord_X = 8
 
         elif self.id in eventconsts.FaderButtons: 
             self.type = eventconsts.TYPE_FADER_BUTTON
+            self.coord_X = self.note - 0x33
+            self.isBinary = True
+
+        elif self.id in eventconsts.BasicFaderButtons: 
+            self.type = eventconsts.TYPE_BASIC_FADER_BUTTON
+            self.coord_X = self.note - 0x33
             self.isBinary = True
         
         elif self.id in eventconsts.BasicEvents:
@@ -218,13 +412,13 @@ class processedEvent:
                 self.isBinary = True
 
         elif self.status_nibble == eventconsts.NOTE_ON or self.status_nibble == eventconsts.NOTE_OFF:
-        # Pads are actually note events
+            # Pads are actually note events
             if (self.status == 0x9F or self.status == 0x8F) or ((self.status == 0x99 or self.status == 0x89)):
                 x, y = self.getPadCoord()
                 if x != -1 and y != -1:
                     # Is a pad
-                    self.padX = x
-                    self.padY = y
+                    self.coord_X = x
+                    self.coord_Y = y
                     self.isBinary = True
                     if self.isPadExtendedMode():
                         self.type = eventconsts.TYPE_PAD
@@ -232,14 +426,17 @@ class processedEvent:
                         self.type = eventconsts.TYPE_BASIC_PAD
             else:
                 self.type = eventconsts.TYPE_NOTE
+                self.isBinary = True
 
-
-        # And also different signals for the mixer buttons in basic mode
-        # TODO: FIX THIS
-        elif self.status == 0xB0 and self.note in eventconsts.BasicPads:
+        # Detect basic circular pads
+        elif self.status == 0xB0 and self.note in eventconsts.BasicPads[8]:
             self.type = eventconsts.TYPE_BASIC_PAD
+            self.coord_X = 8
+            self.coord_Y = eventconsts.BasicPads[8].index(self.note)
             self.isBinary = True
         
+        if self.recieved_internal:
+            self.type = eventconsts.TYPE_INTERNAL_EVENT
         
         # Check if buttons were lifted
         if self.value is 0: 
@@ -276,61 +473,61 @@ class processedEvent:
 
         self.actions.appendAction(newEventStr)
     
-    def handle(self, action):
+    def handle(self, action, silent=False):
         self.handled = True
-        self.actions.appendAction(action)
+        self.actions.appendAction(action, silent, True)
 
     # Returns event info as string
     def getInfo(self):
         out = "Event:"
-        out = internal.newGetTab(out)
+        out = internal.getTab(out)
 
         # Event type and ID
         temp = self.getType()
         out += temp
-        out = internal.newGetTab(out)
+        out = internal.getTab(out)
 
         # Event value
         temp = self.getValue()
         out += temp
-        out = internal.newGetTab(out)
+        out = internal.getTab(out)
 
         # Event full data
         temp = self.getDataString()
         out += temp
-        out = internal.newGetTab(out)
+        out = internal.getTab(out)
 
         if self.is_double_click:
             out += "[Double Click]"
-            out = internal.newGetTab(out)
+            out = internal.getTab(out)
         
         if self.is_long_press:
             out += "[Long Press]"
-            out = internal.newGetTab(out)
+            out = internal.getTab(out)
         
         if self.shifted:
             out += "[Shifted]"
-            out = internal.newGetTab(out)
+            out = internal.getTab(out)
         
         if self.id == config.SHIFT_BUTTON:
             out += "[Shift Key]"
-            out = internal.newGetTab(out)
+            out = internal.getTab(out)
 
         return out
 
     # Prints event info
     def printInfo(self):
-        print(self.getInfo())
+        internal.debugLog(self.getInfo(), internalconstants.DEBUG_EVENT_DATA)
     
     # Prints event output
     def printOutput(self):
 
-        print("")
+        internal.debugLog("", internalconstants.DEBUG_EVENT_ACTIONS)
         self.actions.flush()
         if self.handled:
-            print("[Event was handled]")
+            internal.debugLog("[Event was handled]", internalconstants.DEBUG_EVENT_ACTIONS)
         else: 
-            print("[Event wasn't handled]")
+            internal.debugLog("[Event wasn't handled]", internalconstants.DEBUG_EVENT_ACTIONS)
 
     # Returns string with type and ID of event
     def getType(self):
@@ -338,6 +535,8 @@ class processedEvent:
         b = ""
         if self.type is eventconsts.TYPE_UNRECOGNISED: 
             a = "Unrecognised"
+        elif self.type is eventconsts.TYPE_SYSEX_EVENT:
+            a = "Sysex"
         elif self.type is eventconsts.TYPE_NOTE:
             a = "Note"
             b = utils.GetNoteName(self.note) + " (Ch. " + str(self.channel) + ')'
@@ -365,11 +564,29 @@ class processedEvent:
         elif self.type is eventconsts.TYPE_BASIC_EVENT:
             a = "Basic Event"
             b = self.getID_Basic()
+        elif self.type is eventconsts.TYPE_INTERNAL_EVENT:
+            a = "Internal event"
         else: 
             internal.debugLog("Bad event type")
             a = "ERROR!!!"
-        a = internal.newGetTab(a)
+        a = internal.getTab(a)
         return a + b
+
+    def processPmeFlags(self, flags):
+        #print(flags)
+        bin_string = format(flags, '8b')[:5]
+        #print(bin_string)
+        flags_list = [x == '1' for x in bin_string]
+        self.pme_system = flags_list[0]
+        
+        self.pme_system_safe = flags_list[1]
+        
+        self.pme_preview_note = flags_list[2]
+        
+        self.pme_from_host = flags_list[3]
+        
+        self.pme_from_midi = flags_list[4]
+        
 
     # Returns string event ID for system events
     def getID_System(self):
@@ -421,39 +638,14 @@ class processedEvent:
     
     # Returns string eventID for fader events
     def getID_Fader(self):
-        if   self.id == eventconsts.FADER_1 or self.id == eventconsts.BASIC_FADER_1: return "1"
-        elif self.id == eventconsts.FADER_2 or self.id == eventconsts.BASIC_FADER_2: return "2"
-        elif self.id == eventconsts.FADER_3 or self.id == eventconsts.BASIC_FADER_3: return "3"
-        elif self.id == eventconsts.FADER_4 or self.id == eventconsts.BASIC_FADER_4: return "4"
-        elif self.id == eventconsts.FADER_5 or self.id == eventconsts.BASIC_FADER_5: return "5"
-        elif self.id == eventconsts.FADER_6 or self.id == eventconsts.BASIC_FADER_6: return "6"
-        elif self.id == eventconsts.FADER_7 or self.id == eventconsts.BASIC_FADER_7: return "7"
-        elif self.id == eventconsts.FADER_8 or self.id == eventconsts.BASIC_FADER_8: return "8"
-        elif self.id == eventconsts.FADER_9 or self.id == eventconsts.BASIC_FADER_9: return "9 / Master"
-        else: return "ERROR"
+        return str(self.coord_X + 1)
 
     # Returns string eventID for fader events
     def getID_FaderButton(self):
-        if   self.id == eventconsts.FADER_BUTTON_1 or self.id == eventconsts.BASIC_FADER_BUTTON_1: return "1"
-        elif self.id == eventconsts.FADER_BUTTON_2 or self.id == eventconsts.BASIC_FADER_BUTTON_2: return "2"
-        elif self.id == eventconsts.FADER_BUTTON_3 or self.id == eventconsts.BASIC_FADER_BUTTON_3: return "3"
-        elif self.id == eventconsts.FADER_BUTTON_4 or self.id == eventconsts.BASIC_FADER_BUTTON_4: return "4"
-        elif self.id == eventconsts.FADER_BUTTON_5 or self.id == eventconsts.BASIC_FADER_BUTTON_5: return "5"
-        elif self.id == eventconsts.FADER_BUTTON_6 or self.id == eventconsts.BASIC_FADER_BUTTON_6: return "6"
-        elif self.id == eventconsts.FADER_BUTTON_7 or self.id == eventconsts.BASIC_FADER_BUTTON_7: return "7"
-        elif self.id == eventconsts.FADER_BUTTON_8 or self.id == eventconsts.BASIC_FADER_BUTTON_8: return "8"
-        elif self.id == eventconsts.FADER_BUTTON_9 or self.id == eventconsts.BASIC_FADER_BUTTON_9: return "9 / Master"
-        else: return "ERROR"
+        return str(self.coord_X + 1)
     
     def getID_Knobs(self):
-        if   self.id == eventconsts.KNOB_1 or self.id == eventconsts.BASIC_KNOB_1: return "1"
-        elif self.id == eventconsts.KNOB_2 or self.id == eventconsts.BASIC_KNOB_2: return "2"
-        elif self.id == eventconsts.KNOB_3 or self.id == eventconsts.BASIC_KNOB_3: return "3"
-        elif self.id == eventconsts.KNOB_4 or self.id == eventconsts.BASIC_KNOB_4: return "4"
-        elif self.id == eventconsts.KNOB_5 or self.id == eventconsts.BASIC_KNOB_5: return "5"
-        elif self.id == eventconsts.KNOB_6 or self.id == eventconsts.BASIC_KNOB_6: return "6"
-        elif self.id == eventconsts.KNOB_7 or self.id == eventconsts.BASIC_KNOB_7: return "7"
-        elif self.id == eventconsts.KNOB_8 or self.id == eventconsts.BASIC_KNOB_8: return "8"
+        return str(self.coord_X + 1)
     
     # Returns X and Y tuple for pads
     def getPadCoord(self):
@@ -472,8 +664,8 @@ class processedEvent:
 
     # Returns True if Pad is Extended
     def isPadExtendedMode(self):
-        if self.note == eventconsts.Pads[self.padX][self.padY]: return True
-        elif self.note == eventconsts.BasicPads[self.padX][self.padY]: return False
+        if self.note == eventconsts.Pads[self.coord_X][self.coord_Y]: return True
+        elif self.note == eventconsts.BasicPads[self.coord_X][self.coord_Y]: return False
         else: print("ERROR!!?")
 
     # Returns (formatted) value
@@ -484,11 +676,15 @@ class processedEvent:
             if self.value == 0:
                 b = "(Off)"
             else: b = "(On)"
-        a = internal.newGetTab(a, length=5)
+        a = internal.getTab(a, length=5)
         return a + b
 
     # Returns string with (formatted) hex of event
     def getDataString(self):
+
+        if self.type is eventconsts.TYPE_SYSEX_EVENT:
+            return str(self.sysex)
+
         # Append hex value of ID
         a = str(hex(self.id + (self.value << 16)))
         # If string requires leading zeros
@@ -506,7 +702,7 @@ class processedEvent:
 
     # Returns int with hex of event
     def getDataMIDI(self):
-        return hex(self.id + (self.value << 16))
+        return internal.toMidiMessage(self.status, self.note, self.value)
 
 
     

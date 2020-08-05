@@ -1,7 +1,8 @@
-"""
-processwindowed.py
-This script forwards events to event processors for FL Studio Windows
+"""WindowProcessors > processwindows.py
 
+This script forwards events to event processors for FL Studio Windows.
+
+Author: Miguel Guthridge
 """
 
 
@@ -17,6 +18,11 @@ import WindowProcessors.processplaylist
 import WindowProcessors.ProcessDefault
 
 def getWindowObject():
+    """Returns reference to module associated with a window
+
+    Returns:
+        module: active FL Window
+    """
     if internal.window.active_fl_window == internalconstants.WINDOW_MIXER:
         return WindowProcessors.processmixer
     

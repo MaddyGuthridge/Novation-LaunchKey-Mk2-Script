@@ -1,7 +1,9 @@
-"""
-processmixer.py
-This script processes events when the mixer window is active
+"""WindowProcessors > processmixer.py
 
+This script processes events when the mixer window is active. It provides functionality
+such as setting track volumes and visualising peak metres when transport is active.
+
+Author: Miguel Guthridge
 """
 
 import mixer
@@ -12,6 +14,7 @@ import internal
 import internalconstants
 import config
 import lighting
+import processorhelpers
 
 
 # Process is called to handle events
@@ -25,160 +28,78 @@ def process(command):
     # Faders
     #---------------------------------
     if command.type == eventconsts.TYPE_FADER:
-        # Fader 1
-        if command.id == eventconsts.FADER_1: 
-            setVolume(command, 1, command.value)
-            command.handled = True
-        
-        # Fader 2
-        if command.id == eventconsts.FADER_2: 
-            setVolume(command, 2, command.value)
-            command.handled = True
-
-        # Fader 3
-        if command.id == eventconsts.FADER_3: 
-            setVolume(command, 3, command.value)
-            command.handled = True
-        
-        # Fader 4
-        if command.id == eventconsts.FADER_4: 
-            setVolume(command, 4, command.value)
-            command.handled = True
-
-        # Fader 5
-        if command.id == eventconsts.FADER_5: 
-            setVolume(command, 5, command.value)
-            command.handled = True
-        
-        # Fader 6
-        if command.id == eventconsts.FADER_6: 
-            setVolume(command, 6, command.value)
-            command.handled = True
-        
-        # Fader 7
-        if command.id == eventconsts.FADER_7: 
-            setVolume(command, 7, command.value)
-            command.handled = True
-
-        # Fader 8
-        if command.id == eventconsts.FADER_8: 
-            setVolume(command, 8, command.value)
-            command.handled = True
-
-        # Fader 9
-        if command.id == eventconsts.FADER_9: 
-            # If shift key held, change master track
-            if command.shifted:
-                setVolume(command, 0, command.value)
-                command.handled = True
-            # Otherwise change current track
-            else:
-                setVolume(command, current_track, command.value)
-                command.handled = True
+        processFaders(command)
 
     #---------------------------------
     # Knobs
     #---------------------------------
     if command.type == eventconsts.TYPE_KNOB:
-        # Knob 1
-        if command.id == eventconsts.KNOB_1: 
-            setPan(command, 1, command.value)
-            command.handled = True
-        
-        # Knob 2
-        if command.id == eventconsts.KNOB_2: 
-            setPan(command, 2, command.value)
-            command.handled = True
-
-        # Knob 3
-        if command.id == eventconsts.KNOB_3: 
-            setPan(command, 3, command.value)
-            command.handled = True
-        
-        # Knob 4
-        if command.id == eventconsts.KNOB_4: 
-            setPan(command, 4, command.value)
-            command.handled = True
-
-        # Knob 5
-        if command.id == eventconsts.KNOB_5: 
-            setPan(command, 5, command.value)
-            command.handled = True
-        
-        # Knob 6
-        if command.id == eventconsts.KNOB_6: 
-            setPan(command, 6, command.value)
-            command.handled = True
-        
-        # Knob 7
-        if command.id == eventconsts.KNOB_7: 
-            setPan(command, 7, command.value)
-            command.handled = True
-
-        # Knob 8 # Like fader 9: applies to current track or master
-        if command.id == eventconsts.KNOB_8: 
-            # If shift key held, change master track
-            if command.shifted:
-                setPan(command, 0, command.value)
-                command.handled = True
-            # Otherwise change current track
-            else:
-                setPan(command, current_track, command.value)
-                command.handled = True
+        processKnobs(command)
 
 
     #---------------------------------
     # Mixer Buttons - mute/solo tracks
     #---------------------------------
     if command.type == eventconsts.TYPE_FADER_BUTTON:
-        if command.id == eventconsts.FADER_BUTTON_1:
-            processMuteSolo(1, command)
-            command.handled = True
-
-        if command.id == eventconsts.FADER_BUTTON_2:
-            processMuteSolo(2, command)
-            command.handled = True
-
-        if command.id == eventconsts.FADER_BUTTON_3:
-            processMuteSolo(3, command)
-            command.handled = True
-
-        if command.id == eventconsts.FADER_BUTTON_4:
-            processMuteSolo(4, command)
-            command.handled = True
-
-        if command.id == eventconsts.FADER_BUTTON_5:
-            processMuteSolo(5, command)
-            command.handled = True
-
-        if command.id == eventconsts.FADER_BUTTON_6:
-            processMuteSolo(6, command)
-            command.handled = True
-
-        if command.id == eventconsts.FADER_BUTTON_7:
-            processMuteSolo(7, command)
-            command.handled = True
-
-        if command.id == eventconsts.FADER_BUTTON_8:
-            processMuteSolo(8, command)
-            command.handled = True
-
-        if command.id == eventconsts.FADER_BUTTON_9:
-            # If shift key held, change master track
-            if command.shifted:
-                processMuteSolo(0, command)
-                command.handled = True
-            else:
-                processMuteSolo(current_track, command)
-                command.handled = True
+        processFaderButtons(command)
 
     #---------------------------------
     # Other
     #---------------------------------
 
-    if command.id == eventconsts.TRANSPORT_RECORD and command.is_lift:
+    # Arms current mixer track when shifted
+    if command.id == eventconsts.TRANSPORT_RECORD and command.is_lift and command.shifted:
         mixer.armTrack(current_track)
-        command.handled = True
+        command.handle("Arm current mixer track")
+
+# Process fader events
+def processFaders(command):
+    current_track = mixer.trackNumber()
+
+    fader_num = command.coord_X + 1
+
+    if fader_num == 9:
+        if command.shifted:
+            track_num = 0
+        else:
+            track_num = current_track
+    else:
+        track_num = fader_num
+
+    setVolume(command, track_num, command.value)
+
+# Process knob events
+def processKnobs(command):
+    current_track = mixer.trackNumber()
+
+    knob_num = command.coord_X + 1
+
+    if knob_num == 8:
+        if command.shifted:
+            track_num = 0
+        else:
+            track_num = current_track
+    else:
+        track_num = knob_num
+
+    setPan(command, track_num, command.value)
+
+# Process fader button events
+def processFaderButtons(command):
+    current_track = mixer.trackNumber()
+    
+    fader_num = command.coord_X + 1
+
+    if fader_num == 9:
+        if command.shifted:
+            track_num = 0
+        else:
+            track_num = current_track
+    else:
+        track_num = fader_num
+
+    processMuteSolo(track_num, command)
+
 
 def redraw(lights):
 
@@ -249,14 +170,14 @@ def setVolume(command, track, value):
     volume = getVolumeSend(value)
     mixer.setTrackVolume(track, volume)
     command.actions.appendAction("Set " + mixer.getTrackName(track) + " volume to " + getVolumeValue(value))
-    if internal.didSnap(internal.toFloat(value), internalconstants.MIXER_VOLUME_SNAP_TO):
+    if processorhelpers.didSnap(processorhelpers.toFloat(value), internalconstants.MIXER_VOLUME_SNAP_TO):
         command.actions.appendAction("[Snapped]")
 
 # Returns volume value set to send to FL Studio
 def getVolumeSend(inVal):
     if config.ENABLE_SNAPPING:
-        return internal.snap(internal.toFloat(inVal), internalconstants.MIXER_VOLUME_SNAP_TO)
-    else: return internal.toFloat(inVal)
+        return processorhelpers.snap(processorhelpers.toFloat(inVal), internalconstants.MIXER_VOLUME_SNAP_TO)
+    else: return processorhelpers.toFloat(inVal)
 
 
 def getVolumeValue(inVal):
@@ -267,14 +188,14 @@ def setPan(command, track, value):
     volume = getPanSend(value)
     mixer.setTrackPan(track, volume)
     command.actions.appendAction("Set " + mixer.getTrackName(track) + " pan to " + getPanValue(value))
-    if internal.didSnap(internal.toFloat(value, -1), internalconstants.MIXER_PAN_SNAP_TO):
+    if processorhelpers.didSnap(processorhelpers.toFloat(value, -1), internalconstants.MIXER_PAN_SNAP_TO):
         command.actions.appendAction("[Snapped]")
 
 # Returns volume value set to send to FL Studio
 def getPanSend(inVal):
     if config.ENABLE_SNAPPING:
-        return internal.snap(internal.toFloat(inVal, -1), internalconstants.MIXER_PAN_SNAP_TO)
-    else: return internal.toFloat(inVal, -1)
+        return processorhelpers.snap(processorhelpers.toFloat(inVal, -1), internalconstants.MIXER_PAN_SNAP_TO)
+    else: return processorhelpers.toFloat(inVal, -1)
 
 
 def getPanValue(inVal):

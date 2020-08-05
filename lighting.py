@@ -4,6 +4,14 @@ This file contains functions and constants related to controlling lights on the 
 
 """
 
+IDLE_ANIMATION_SPEED = 1
+IDLE_ANIMATION_STRETCH = 2
+IDLE_ANIMATION_DO_TRAILS = True
+IDLE_ANIMATION_TRAIL_SPEED_MODIFIER = 1
+IDLE_ANIMATION_TRAIL_SPEED = 2
+IDLE_ANIMATION_TRAIL_LENGTH = 6
+IDLE_ANIMATION_TRAIL_INFREQUENCY = 37
+IDLE_ANIMATION_TRAIL_Y_OFFSET = 13
 
 import time
 
@@ -11,6 +19,7 @@ import internal
 import eventconsts
 import eventprocessor
 import internalconstants
+import config
 
 # LightMap is sent around to collect colours on UI redraws
 class LightMap:
@@ -65,16 +74,17 @@ class LightMap:
         if self.FrozenMap[x][y] == 0 or override: # If pad available to map
             self.PadColours[x][y] = colour
             self.PadStates[x][y] = state
-            self.solidifyPad(x, y)
+            if colour != -1:
+                self.solidifyPad(x, y)
             return True
         else: return False
     
     # Sets colours based on state of LightMap object
     def setFromMatrix(self, map, state=3, override = False):
-        for x in range(len(self.FrozenMap)):
+        for x in range(len(self.FrozenMap) - 1): # Don't modify round pads
             for y in range(len(self.FrozenMap[x])):
                 if self.FrozenMap[x][y] == 0 or override:
-                    self.setPadColour(x, y, map[x][y], state)
+                    self.setPadColour(x, y, map[x][y], state, override)
         return
 
 
@@ -85,7 +95,7 @@ class LightMap:
     
     # Prevents row from being overwritten
     def solidifyRow(self, y):
-        for x in range(len(self.FrozenMap)):
+        for x in range(len(self.FrozenMap) - 1): # Don't solidify round pads
             if self.FrozenMap[x][y] == 0: self.FrozenMap[x][y] = 1
     
     # Prevents column from being overwritten
@@ -95,7 +105,7 @@ class LightMap:
 
     # Prevents all pads from being overwritten
     def solidifyAll(self):
-        for x in range(len(self.FrozenMap)):
+        for x in range(len(self.FrozenMap) - 1): # Don't solidify round pads
             for y in range(len(self.FrozenMap[x])):
                 self.solidifyPad(x, y)
 
@@ -138,7 +148,12 @@ class Lights:
 
     # Set the colour of a pad
     def setPadColour(self, x, y, colour, state = 3, override = False):
-
+        if internal.window.get_absolute_tick() % config.LIGHTS_FULL_REDRAW_FREQUENCY == 0:
+            full_redraw = True
+        else:
+            full_redraw = False
+            
+        
         # Handle light offs
         if colour == 0 and state == 3:
             state = 0
@@ -151,7 +166,7 @@ class Lights:
             colour = 0
 
         # Check if pad is already in that state - don't bother with event if so
-        if self.PadColours[x][y] == colour and self.PadStates[x][y] == state and not override:
+        if self.PadColours[x][y] == colour and self.PadStates[x][y] == state and not override and not full_redraw:
             return
 
         # Set state variables
@@ -220,13 +235,12 @@ def lightShow():
 
     sleepTime = 0.05
     x = 0
-    if internal.SHARED_INIT_OK:
-        if internal.SCRIPT_UPDATE_AVAILABLE:
-            rainbowColours = [COLOUR_BLUE, COLOUR_LIGHT_BLUE, COLOUR_LIGHT_BLUE, COLOUR_GREEN, COLOUR_GREEN, COLOUR_LIGHT_BLUE, COLOUR_LIGHT_BLUE, COLOUR_BLUE, COLOUR_OFF] 
-        else:
-            rainbowColours = [COLOUR_RED, COLOUR_PINK, COLOUR_PURPLE, COLOUR_BLUE, COLOUR_LIGHT_BLUE, COLOUR_GREEN, COLOUR_YELLOW, COLOUR_ORANGE, COLOUR_OFF]
-    else:
-        rainbowColours = [COLOUR_YELLOW, COLOUR_ORANGE, COLOUR_ORANGE, COLOUR_RED, COLOUR_RED, COLOUR_ORANGE, COLOUR_ORANGE, COLOUR_YELLOW, COLOUR_OFF] 
+    if internal.SHARED_INIT_STATE == internalconstants.INIT_OK:
+        rainbowColours = PALLETE_NORMAL
+    elif  internal.SHARED_INIT_STATE == internalconstants.INIT_API_OUTDATED or internal.SHARED_INIT_STATE == internalconstants.INIT_PORT_MISMATCH:
+        rainbowColours = PALLETE_INIT_FAIL
+    elif internal.SHARED_INIT_STATE == internalconstants.INIT_UPDATE_AVAILABLE:
+        rainbowColours = PALLETE_UPDATE
 
 
     while True:
@@ -284,7 +298,40 @@ def lightShow():
 
     state.reset()
 
+def idle_lightshow(lights):
+    if internal.window.get_idle_tick() > config.IDLE_WAIT_TIME and config.IDLE_LIGHTS_ENABLED:
+        tick_num = internal.window.get_idle_tick() - int(config.IDLE_WAIT_TIME) + IDLE_ANIMATION_TRAIL_LENGTH * IDLE_ANIMATION_TRAIL_SPEED
 
+        for x in range(9):
+            for y in range(2):
+                # Generate colours
+                if IDLE_ANIMATION_DO_TRAILS:
+                    animation_speed = IDLE_ANIMATION_SPEED * IDLE_ANIMATION_TRAIL_SPEED_MODIFIER
+                else:
+                    animation_speed = IDLE_ANIMATION_SPEED
+                colour = ((tick_num // animation_speed) + x - y) // IDLE_ANIMATION_STRETCH % 128
+
+                light_mode = 1
+
+                # Set off to on
+                if colour == 0:
+                    colour = 1
+
+                if IDLE_ANIMATION_DO_TRAILS:
+                    if not (((tick_num // IDLE_ANIMATION_TRAIL_SPEED) + x + IDLE_ANIMATION_TRAIL_Y_OFFSET*y) % IDLE_ANIMATION_TRAIL_INFREQUENCY < IDLE_ANIMATION_TRAIL_LENGTH):
+                        colour = COLOUR_OFF
+
+                lights.setPadColour(x, y, colour, light_mode)
+
+def idle_show_active():
+    if internal.window.get_idle_tick() > config.IDLE_WAIT_TIME and config.IDLE_LIGHTS_ENABLED:
+        return True
+
+    else:
+        return False
+
+def trigger_idle_show():
+    internal.window.idle_tick_number = config.IDLE_WAIT_TIME
 
 # Define colour codes
 COLOUR_TRANSPARENT = -1
@@ -309,7 +356,10 @@ COLOUR_DARK_PURPLE = 51
 COLOUR_DARK_BLUE = 47
 COLOUR_DARK_RED = 59
 
-
+# Define colour pallettes used by light show
+PALLETE_NORMAL = [COLOUR_RED, COLOUR_PINK, COLOUR_PURPLE, COLOUR_BLUE, COLOUR_LIGHT_BLUE, COLOUR_GREEN, COLOUR_YELLOW, COLOUR_ORANGE, COLOUR_OFF]
+PALLETE_INIT_FAIL = [COLOUR_YELLOW, COLOUR_ORANGE, COLOUR_ORANGE, COLOUR_RED, COLOUR_RED, COLOUR_ORANGE, COLOUR_ORANGE, COLOUR_YELLOW, COLOUR_OFF] 
+PALLETE_UPDATE = [COLOUR_BLUE, COLOUR_LIGHT_BLUE, COLOUR_LIGHT_BLUE, COLOUR_GREEN, COLOUR_GREEN, COLOUR_LIGHT_BLUE, COLOUR_LIGHT_BLUE, COLOUR_BLUE, COLOUR_OFF] 
 
 # Define UI colours
 UI_NAV_VERTICAL = COLOUR_LIGHT_BLUE
@@ -325,6 +375,8 @@ UI_REDO = COLOUR_LIGHT_BLUE
 UI_COPY = COLOUR_BLUE
 UI_CUT = COLOUR_LIGHT_BLUE
 UI_PASTE = COLOUR_GREEN
+
+UI_SAVE = COLOUR_GREEN
 
 # Define tool colours
 TOOL_PENCIL = COLOUR_ORANGE
@@ -343,6 +395,7 @@ WINDOW_CHANNEL_RACK = COLOUR_RED
 WINDOW_PIANO_ROLL = COLOUR_PINK
 WINDOW_MIXER = COLOUR_LIGHT_BLUE
 WINDOW_BROWSER = COLOUR_ORANGE
+WINDOW_PLUGIN_PICKER = COLOUR_BLUE
 
 # Define Beat Indicator Colours
 BEAT_PAT_BAR = COLOUR_RED
@@ -352,3 +405,16 @@ BEAT_SONG_BEAT = COLOUR_GREEN
 
 TEMPO_TAP = COLOUR_PINK
 METRONOME = COLOUR_DARK_GREY
+
+# Colour Matrix for errors
+ERROR_COLOURS = [
+    [COLOUR_RED, COLOUR_RED],
+    [COLOUR_RED, COLOUR_RED],
+    [COLOUR_RED, COLOUR_RED],
+    [COLOUR_RED, COLOUR_RED],
+    [COLOUR_RED, COLOUR_RED],
+    [COLOUR_RED, COLOUR_RED],
+    [COLOUR_RED, COLOUR_RED],
+    [COLOUR_RED, COLOUR_RED],
+    [COLOUR_RED, COLOUR_RED]
+]

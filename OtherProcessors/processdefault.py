@@ -1,7 +1,9 @@
-"""
-processdefault.py
-This file contains functions to process and act on events. It provides default functionality
+"""processdefault.py
 
+This script is the last to process events. It provides default functionality.
+Add things here when they are common throughout the entire script but can be overridden easily.
+
+Author: Miguel Guthridge
 """
 
 import time
@@ -34,7 +36,7 @@ def process(command):
     # Tempo button
     #---------------------------------
     if (command.type == eventconsts.TYPE_PAD or command.type == eventconsts.TYPE_BASIC_PAD) and command.is_lift:
-        if command.padX == 8 and command.padY == 0:
+        if command.coord_X == 8 and command.coord_Y == 0:
 
             # Double press: tap tempo
             if command.is_double_click:
