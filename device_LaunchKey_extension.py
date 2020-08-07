@@ -21,7 +21,7 @@ import device
 import transport
 import arrangement
 import general
-import launchMapPages
+import launchMapPages 
 import playlist
 import ui
 import screen
@@ -60,10 +60,10 @@ class TGeneric():
         # Run light show
         lighting.lightShow()
 
-        # Process inControl preferences
-        if config.START_IN_INCONTROL_KNOBS == False: internal.extendedMode.setVal(False, eventconsts.INCONTROL_KNOBS) 
-        if config.START_IN_INCONTROL_FADERS == False: internal.extendedMode.setVal(False, eventconsts.INCONTROL_FADERS) 
-        if config.START_IN_INCONTROL_PADS == False: internal.extendedMode.setVal(False, eventconsts.INCONTROL_PADS) 
+        # Process inControl preferences | Say it's external since we want the settings to be applied regardless
+        if config.START_IN_INCONTROL_KNOBS == False: internal.extendedMode.setVal(False, eventconsts.INCONTROL_KNOBS, from_internal=False) 
+        if config.START_IN_INCONTROL_FADERS == False: internal.extendedMode.setVal(False, eventconsts.INCONTROL_FADERS, from_internal=False) 
+        if config.START_IN_INCONTROL_PADS == False: internal.extendedMode.setVal(False, eventconsts.INCONTROL_PADS, from_internal=False) 
         
 
         print('Initialisation complete')
@@ -120,10 +120,19 @@ class TGeneric():
 
     def OnRefresh(self, flags):
         internal.refreshProcessor()
+        
+        # Prevent idle lightshow when other parts of FL are being used
+        internal.window.reset_idle_tick()
         return
     
     def OnUpdateBeatIndicator(self, beat):
         internal.beat.set_beat(beat)
+        
+        # Prevent idle lightshow from being triggered during playback
+        internal.window.reset_idle_tick()
+        
+    def OnSendTempMsg(self, msg, duration):
+        internal.window.reset_idle_tick()
 
 Generic = TGeneric()
 
@@ -145,4 +154,5 @@ def OnRefresh(flags):
 def OnUpdateBeatIndicator(beat):
     Generic.OnUpdateBeatIndicator(beat)
 
-
+def OnSendTempMsg(msg, duration):
+    Generic.OnSendTempMsg(msg, duration)

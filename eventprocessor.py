@@ -25,9 +25,28 @@ import PluginProcessors.processplugins as processplugins
 import NoteProcessors.processnotes as processnotes
 import ControllerProcessors.keys as keys
 
+"""
+num_sys_safe = 0
+num_sys = 0
+num_ct = 0
+"""
+
 
 # Recieve event and forward onto relative processors
 def processExtended(command):
+
+    """
+    global num_sys_safe
+    global num_sys
+    global num_ct
+    
+    num_sys_safe += command.pme_system_safe
+    num_sys += command.pme_system
+    num_ct += 1
+    
+    print("Sys rate:      ", num_sys/num_ct)
+    print("Sys safe rate: ", num_sys_safe/num_ct)
+    """
 
     try:
 
@@ -55,14 +74,17 @@ def processExtended(command):
 
         if command.handled: return
 
-        # Shouldn't be called in extended mode
-        """ # Attempt to process event using custom processors for plugins
-        processplugins.process(command)
+        # Only call plugin and window processors if it is safe to do so | Disabled because of errors
+        if command.pme_system_safe or True:
 
-        if command.handled: return"""
+            # Shouldn't be called in extended mode
+            """ # Attempt to process event using custom processors for plugins
+            processplugins.process(command)
 
-        # Process content from windows
-        processwindows.process(command)
+            if command.handled: return"""
+
+            # Process content from windows
+            processwindows.process(command)
 
         # If command hasn't been handled by any above uses, use the default controls
         if command.handled is False:
@@ -97,8 +119,11 @@ def processBasic(command):
 
         if command.handled: return
 
-        # Attempt to process event using custom processors for plugins
-        processplugins.process(command)
+        # Only call plugin and window processors if it is safe to do so | Currently disabled due to errors
+        if command.pme_system_safe or True:
+
+            # Attempt to process event using custom processors for plugins
+            processplugins.process(command)
 
         if command.handled: return
 
@@ -302,7 +327,7 @@ class processedEvent:
             self.recieved_internal = True
 
         # PME Flags to make sure errors don't happen or something
-        self.flags = event.pmeFlags
+        self.processPmeFlags(event.pmeFlags)
 
         # Add sysex information
         self.sysex = event.sysex
@@ -546,6 +571,22 @@ class processedEvent:
             a = "ERROR!!!"
         a = internal.getTab(a)
         return a + b
+
+    def processPmeFlags(self, flags):
+        #print(flags)
+        bin_string = format(flags, '8b')[:5]
+        #print(bin_string)
+        flags_list = [x == '1' for x in bin_string]
+        self.pme_system = flags_list[0]
+        
+        self.pme_system_safe = flags_list[1]
+        
+        self.pme_preview_note = flags_list[2]
+        
+        self.pme_from_host = flags_list[3]
+        
+        self.pme_from_midi = flags_list[4]
+        
 
     # Returns string event ID for system events
     def getID_System(self):

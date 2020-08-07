@@ -6,6 +6,8 @@ Author: [Miguel Guthridge](https://www.youtube.com/channel/UCPB_zkvsJKuIkCgEzoXt
 
 Project Page: [GitHub](https://github.com/MiguelGuthridge/Novation-LaunchKey49-Mk2-Script)
 
+Discord Server: [Here](https://discord.gg/BvXqq3w)
+
 # Key Features
 
 ## Advanced UI Control

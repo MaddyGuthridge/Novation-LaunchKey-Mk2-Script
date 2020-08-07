@@ -134,6 +134,9 @@ def idleProcessor():
 
     # Update active window
     window.update()
+    
+    # If in a right-click menu, reset idle timer
+    
 
     # Stop performance timer
     idleClock.stop()
@@ -195,6 +198,7 @@ class windowMgr:
         self.animation_tick_number = 0
         self.idle_tick_number = 0
         self.absolute_tick_number = 0
+        self.in_popup = False
     
     # Reset tick number to zero
     def reset_animation_tick(self):
@@ -228,8 +232,31 @@ class windowMgr:
     def get_absolute_tick(self):
         return self.absolute_tick_number
 
+    # Return true if in a pop-up
+    def getInPopup(self):
+        return self.in_popup
+
     # Update active window
     def update(self):
+        
+        popup_active = ui.isInPopupMenu()
+        if popup_active:
+            # If state has changed, reset idle tick
+            if not self.in_popup:
+                self.reset_idle_tick()
+                self.reset_animation_tick()
+                
+            self.in_popup = True
+            
+        else:
+            # If state has changed, reset idle tick
+            if self.in_popup:
+                self.reset_idle_tick()
+                self.reset_animation_tick()
+                
+            self.in_popup = False
+            
+        
         old_window = self.active_fl_window
         # Update FL Window
         if   ui.getFocused(internalconstants.WINDOW_MIXER):        
@@ -385,6 +412,10 @@ class extended:
     def revert(self, option = eventconsts.SYSTEM_EXTENDED):
         if self.ignore_all:
             return
+        
+        if not config.AUTO_SET_INCONTROL_MODE:
+            return
+        
         # Set all
         if option == eventconsts.SYSTEM_EXTENDED:
             self.setVal(self.prev_extendedMode.pop())
@@ -413,8 +444,11 @@ class extended:
 
 
     # Sets extended mode on the device, use inControl constants to choose which
-    def setVal(self, newMode, option = eventconsts.SYSTEM_EXTENDED, force=False):
+    def setVal(self, newMode, option = eventconsts.SYSTEM_EXTENDED, force=False, from_internal = True):
         if self.ignore_all and not force:
+            return
+        
+        if (not config.AUTO_SET_INCONTROL_MODE) and from_internal and not force:
             return
         
         # Set all
@@ -423,7 +457,13 @@ class extended:
                 sendMidiMessage(0x9F, 0x0C, 0x7F)
             elif newMode is False:
                 sendMidiMessage(0x9F, 0x0C, 0x00)
-            
+        
+        # On 25-key model, link the fader to the knobs
+        elif DEVICE_TYPE == internalconstants.DEVICE_KEYS_25 and (option == eventconsts.INCONTROL_FADERS or option == eventconsts.INCONTROL_KNOBS):
+            if newMode is True:
+                sendMidiMessage(0x9F, 0x0D, 0x7F)
+            elif newMode is False:
+                sendMidiMessage(0x9F, 0x0D, 0x00)
         
         # Set knobs
         elif option == eventconsts.INCONTROL_KNOBS:
@@ -473,6 +513,20 @@ class extended:
                 self.inControl_Pads = False
             else: debugLog("New mode mode not boolean")
             lighting.state.reset()
+
+        # On 25-key model, link the fader to the knobs
+        elif DEVICE_TYPE == internalconstants.DEVICE_KEYS_25 and (option == eventconsts.INCONTROL_FADERS or option == eventconsts.INCONTROL_KNOBS):
+            self.prev_inControl_Knobs.append(self.inControl_Knobs)
+            if newMode is True:
+                self.inControl_Knobs = True
+            elif newMode is False:
+                self.inControl_Knobs = False
+                
+            self.prev_inControl_Faders.append(self.inControl_Faders)
+            if newMode is True:
+                self.inControl_Faders = True
+            elif newMode is False:
+                self.inControl_Faders = False
 
         # Set knobs
         elif option == eventconsts.INCONTROL_KNOBS:
