@@ -64,7 +64,7 @@ def processExtended(command):
         if not ((command.type is eventconsts.TYPE_BASIC_PAD or command.type is eventconsts.TYPE_PAD or command.type is eventconsts.TYPE_TRANSPORT) and not command.is_lift):
             if lighting.idle_show_active():
                 command.handle("End Idle Light Show")
-            internal.window.reset_idle_tick()
+            internal.window.resetIdleTick()
 
         # Process key mappings
         keys.process(command)
@@ -137,7 +137,7 @@ def processReceived(command):
     data = command.getDataMIDI()
 
     if data == internalconstants.MESSAGE_RESET_INTERNAL_CONTROLLER:
-        internal.window.reset_idle_tick()
+        internal.window.resetIdleTick()
         command.handle("Reset idle tick", True)
 
     elif data == internalconstants.MESSAGE_ERROR_CRASH:
@@ -159,7 +159,7 @@ def processReceived(command):
 # Called after a window is activated
 def activeStart():
     # Only in extended mode:
-    if internal.PORT == config.DEVICE_PORT_EXTENDED:
+    if internal.state.PORT == config.DEVICE_PORT_EXTENDED:
         if internal.window.plugin_focused:
             processplugins.activeStart()
         else:
@@ -168,7 +168,7 @@ def activeStart():
 # Called just before active window is deactivated
 def activeEnd():
     # Only in extended mode:
-    if internal.PORT == config.DEVICE_PORT_EXTENDED:
+    if internal.state.PORT == config.DEVICE_PORT_EXTENDED:
         if internal.window.plugin_focused:
             processplugins.activeEnd()
         else:

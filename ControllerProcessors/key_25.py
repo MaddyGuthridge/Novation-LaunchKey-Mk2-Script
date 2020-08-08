@@ -20,7 +20,7 @@ def process(command):
         else:
             internal.sendCompleteInternalMidiMessage(command.getDataMIDI())
             command.handle("Send basic fader to basic processor")
-    
+
 
 
 def onInit():

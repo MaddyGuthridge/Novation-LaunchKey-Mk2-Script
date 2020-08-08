@@ -11,7 +11,7 @@ import time
 import transport
 import ui
 
-import lighting
+import lightingconsts
 import eventprocessor
 import eventconsts
 import internal
@@ -25,7 +25,7 @@ def redraw(lights):
     for x in range(len(internal.pads.padsDown)):
             for y in range(len(internal.pads.padsDown[x])):
                 if internal.pads.getVal(x, y):
-                    lights.setPadColour(x, y, lighting.COLOUR_WHITE, 2, True)
+                    lights.setPadColour(x, y, lightingconsts.COLOUR_WHITE, 2, True)
     return
 
 def process(command):

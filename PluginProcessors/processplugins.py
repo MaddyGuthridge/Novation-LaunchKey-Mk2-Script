@@ -32,7 +32,7 @@ print("Plugin Processor import complete")
 # Called when plugin is top plugin
 def topPluginStart():
     # Only in extended mode:
-    if internal.PORT == config.DEVICE_PORT_EXTENDED:
+    if internal.state.PORT == config.DEVICE_PORT_EXTENDED:
         for x in imports:
             object_to_call = getattr(PluginProcessors, x)
             if can_handle(object_to_call):
@@ -42,7 +42,7 @@ def topPluginStart():
 # Called when plugin is no longer top plugin
 def topPluginEnd():
     # Only in extended mode:
-    if internal.PORT == config.DEVICE_PORT_EXTENDED:
+    if internal.state.PORT == config.DEVICE_PORT_EXTENDED:
         for x in imports:
             object_to_call = getattr(PluginProcessors, x)
             if can_handle(object_to_call):

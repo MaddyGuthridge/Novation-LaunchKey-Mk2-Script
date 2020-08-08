@@ -26,17 +26,17 @@ import eventprocessor
 import internal
 import eventconsts
 import config
-import lighting
+import lightingconsts
 
 COLOUR_MAP = [
-    [lighting.COLOUR_BLUE, lighting.COLOUR_BLUE],
-    [lighting.COLOUR_BLUE, lighting.COLOUR_RED],
-    [lighting.COLOUR_GREEN, lighting.COLOUR_GREEN],
-    [lighting.COLOUR_GREEN, lighting.COLOUR_ORANGE],
-    [lighting.COLOUR_YELLOW, lighting.COLOUR_ORANGE],
-    [lighting.COLOUR_YELLOW, lighting.COLOUR_ORANGE],
-    [lighting.COLOUR_LIGHT_BLUE, lighting.COLOUR_ORANGE],
-    [lighting.COLOUR_LIGHT_BLUE, lighting.COLOUR_ORANGE]
+    [lightingconsts.COLOUR_BLUE, lightingconsts.COLOUR_BLUE],
+    [lightingconsts.COLOUR_BLUE, lightingconsts.COLOUR_RED],
+    [lightingconsts.COLOUR_GREEN, lightingconsts.COLOUR_GREEN],
+    [lightingconsts.COLOUR_GREEN, lightingconsts.COLOUR_ORANGE],
+    [lightingconsts.COLOUR_YELLOW, lightingconsts.COLOUR_ORANGE],
+    [lightingconsts.COLOUR_YELLOW, lightingconsts.COLOUR_ORANGE],
+    [lightingconsts.COLOUR_LIGHT_BLUE, lightingconsts.COLOUR_ORANGE],
+    [lightingconsts.COLOUR_LIGHT_BLUE, lightingconsts.COLOUR_ORANGE]
 ]
 
 

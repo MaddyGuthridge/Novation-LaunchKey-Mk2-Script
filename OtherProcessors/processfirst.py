@@ -16,6 +16,7 @@ import eventprocessor
 import eventconsts
 import internal
 import lighting
+import lightingconsts
 
 
 def redraw(lights):
@@ -34,19 +35,19 @@ def redraw(lights):
 def redrawPopup(lights):
     if not (internal.window.active_plugin == internalconstants.WINDOW_STR_SCRIPT_OUTPUT and internal.window.plugin_focused):
         
-        if internal.window.get_animation_tick() > 0:
-            lights.setPadColour(1, 1, lighting.UI_NAV_VERTICAL)         # Down
+        if internal.window.getAnimationTick() > 0:
+            lights.setPadColour(1, 1, lightingconsts.UI_NAV_VERTICAL)         # Down
 
-        if internal.window.get_animation_tick() > 1:
-            lights.setPadColour(1, 0, lighting.UI_NAV_VERTICAL)         # Up
-            lights.setPadColour(0, 1, lighting.UI_NAV_HORIZONTAL)       # Left
-            lights.setPadColour(2, 1, lighting.UI_NAV_HORIZONTAL)       # Right
+        if internal.window.getAnimationTick() > 1:
+            lights.setPadColour(1, 0, lightingconsts.UI_NAV_VERTICAL)         # Up
+            lights.setPadColour(0, 1, lightingconsts.UI_NAV_HORIZONTAL)       # Left
+            lights.setPadColour(2, 1, lightingconsts.UI_NAV_HORIZONTAL)       # Right
 
-        if internal.window.get_animation_tick() > 2:
-            lights.setPadColour(3, 1, lighting.UI_REJECT)               # No
+        if internal.window.getAnimationTick() > 2:
+            lights.setPadColour(3, 1, lightingconsts.UI_REJECT)               # No
 
-        if internal.window.get_animation_tick() > 3:
-            lights.setPadColour(4, 1, lighting.UI_ACCEPT)               # Yes
+        if internal.window.getAnimationTick() > 3:
+            lights.setPadColour(4, 1, lightingconsts.UI_ACCEPT)               # Yes
         
         lights.solidifyAll()
 
@@ -66,64 +67,64 @@ def redrawShift(lights):
     else:
         undo_type = UNDO_MIDDLE
 
-    if internal.window.get_animation_tick() > 0:
+    if internal.window.getAnimationTick() > 0:
         # Playlist
         if internal.window.getString() == internalconstants.WINDOW_STR_PLAYLIST:
-            lights.setPadColour(0, 1, lighting.COLOUR_DARK_GREY)
+            lights.setPadColour(0, 1, lightingconsts.COLOUR_DARK_GREY)
         else:
-            lights.setPadColour(0, 1, lighting.WINDOW_PLAYLIST)
+            lights.setPadColour(0, 1, lightingconsts.WINDOW_PLAYLIST)
 
-    if internal.window.get_animation_tick() > 1:
+    if internal.window.getAnimationTick() > 1:
         # Channel Rack
         if internal.window.getString() == internalconstants.WINDOW_STR_CHANNEL_RACK:
-            lights.setPadColour(1, 1, lighting.COLOUR_DARK_GREY)
+            lights.setPadColour(1, 1, lightingconsts.COLOUR_DARK_GREY)
         else:
-            lights.setPadColour(1, 1, lighting.WINDOW_CHANNEL_RACK)
+            lights.setPadColour(1, 1, lightingconsts.WINDOW_CHANNEL_RACK)
 
         # Undo
         if undo_type  == UNDO_FIRST:
-            lights.setPadColour(0, 0, lighting.COLOUR_DARK_GREY)
+            lights.setPadColour(0, 0, lightingconsts.COLOUR_DARK_GREY)
         else:
-            lights.setPadColour(0, 0, lighting.UI_UNDO)
+            lights.setPadColour(0, 0, lightingconsts.UI_UNDO)
 
-    if internal.window.get_animation_tick() > 2:
+    if internal.window.getAnimationTick() > 2:
         # Piano roll
         if internal.window.getString() == internalconstants.WINDOW_STR_PIANO_ROLL:
-            lights.setPadColour(2, 1, lighting.COLOUR_DARK_GREY)
+            lights.setPadColour(2, 1, lightingconsts.COLOUR_DARK_GREY)
         else:
-            lights.setPadColour(2, 1, lighting.WINDOW_PIANO_ROLL)
+            lights.setPadColour(2, 1, lightingconsts.WINDOW_PIANO_ROLL)
 
         # Redo
         if undo_type == UNDO_LAST:
-            lights.setPadColour(1, 0, lighting.COLOUR_DARK_GREY)
+            lights.setPadColour(1, 0, lightingconsts.COLOUR_DARK_GREY)
         else:
-            lights.setPadColour(1, 0, lighting.UI_REDO)
+            lights.setPadColour(1, 0, lightingconsts.UI_REDO)
 
-    if internal.window.get_animation_tick() > 3:
+    if internal.window.getAnimationTick() > 3:
         # Mixer
         if internal.window.getString() == internalconstants.WINDOW_STR_MIXER:
-            lights.setPadColour(3, 1, lighting.COLOUR_DARK_GREY)
+            lights.setPadColour(3, 1, lightingconsts.COLOUR_DARK_GREY)
         else:
-            lights.setPadColour(3, 1, lighting.WINDOW_MIXER)
+            lights.setPadColour(3, 1, lightingconsts.WINDOW_MIXER)
 
         # Next plugin
-        lights.setPadColour(7, 0, lighting.UI_NAV_HORIZONTAL)
+        lights.setPadColour(7, 0, lightingconsts.UI_NAV_HORIZONTAL)
 
         # Save
-        lights.setPadColour(3, 0, lighting.UI_SAVE)
+        lights.setPadColour(3, 0, lightingconsts.UI_SAVE)
         
-    if internal.window.get_animation_tick() > 4:
+    if internal.window.getAnimationTick() > 4:
         # Browser
         if internal.window.getString() == internalconstants.WINDOW_STR_BROWSER:
-            lights.setPadColour(4, 1, lighting.COLOUR_DARK_GREY)
+            lights.setPadColour(4, 1, lightingconsts.COLOUR_DARK_GREY)
         else:
-            lights.setPadColour(4, 1, lighting.WINDOW_BROWSER)
+            lights.setPadColour(4, 1, lightingconsts.WINDOW_BROWSER)
 
         # Prev plugin
-        lights.setPadColour(6, 0, lighting.UI_NAV_HORIZONTAL)
+        lights.setPadColour(6, 0, lightingconsts.UI_NAV_HORIZONTAL)
 
         # Plugin picker
-        lights.setPadColour(7, 1, lighting.WINDOW_PLUGIN_PICKER)
+        lights.setPadColour(7, 1, lightingconsts.WINDOW_PLUGIN_PICKER)
             
 
     lights.solidifyAll()
@@ -134,7 +135,7 @@ def process(command):
     command.actions.addProcessor("Primary Processor")
 
     # If in extended mode
-    if internal.PORT == config.DEVICE_PORT_EXTENDED:
+    if internal.state.PORT == config.DEVICE_PORT_EXTENDED:
 
         # Pads down (white light)
         if command.type == eventconsts.TYPE_BASIC_PAD or command.type == eventconsts.TYPE_PAD:

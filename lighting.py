@@ -20,6 +20,7 @@ import eventconsts
 import eventprocessor
 import internalconstants
 import config
+import lightingconsts
 
 # LightMap is sent around to collect colours on UI redraws
 class LightMap:
@@ -143,12 +144,12 @@ class Lights:
         
         internal.sendMidiMessage(0xBF, 0x00, 0x00)
         internal.debugLog("Sent lighting reset signal", internalconstants.DEBUG_LIGHTING_RESET)
-        internal.window.reset_animation_tick()
+        internal.window.resetAnimationTick()
         self.__init__()
 
     # Set the colour of a pad
     def setPadColour(self, x, y, colour, state = 3, override = False):
-        if internal.window.get_absolute_tick() % config.LIGHTS_FULL_REDRAW_FREQUENCY == 0:
+        if internal.window.getAbsoluteTick() % config.LIGHTS_FULL_REDRAW_FREQUENCY == 0:
             full_redraw = True
         else:
             full_redraw = False
@@ -235,12 +236,14 @@ def lightShow():
 
     sleepTime = 0.05
     x = 0
-    if internal.SHARED_INIT_STATE == internalconstants.INIT_OK:
-        rainbowColours = PALLETE_NORMAL
-    elif  internal.SHARED_INIT_STATE == internalconstants.INIT_API_OUTDATED or internal.SHARED_INIT_STATE == internalconstants.INIT_PORT_MISMATCH:
-        rainbowColours = PALLETE_INIT_FAIL
-    elif internal.SHARED_INIT_STATE == internalconstants.INIT_UPDATE_AVAILABLE:
-        rainbowColours = PALLETE_UPDATE
+    if internal.state.SHARED_INIT_STATE == internalconstants.INIT_OK:
+        rainbowColours = lightingconsts.PALLETE_NORMAL
+    elif  internal.state.SHARED_INIT_STATE == internalconstants.INIT_API_OUTDATED or internal.state.SHARED_INIT_STATE == internalconstants.INIT_PORT_MISMATCH:
+        rainbowColours = lightingconsts.PALLETE_INIT_FAIL
+    elif internal.state.SHARED_INIT_STATE == internalconstants.INIT_UPDATE_AVAILABLE:
+        rainbowColours = lightingconsts.PALLETE_UPDATE
+    else:
+        rainbowColours = lightingconsts.PALLETE_INIT_FAIL
 
 
     while True:
@@ -299,8 +302,8 @@ def lightShow():
     state.reset()
 
 def idle_lightshow(lights):
-    if internal.window.get_idle_tick() > config.IDLE_WAIT_TIME and config.IDLE_LIGHTS_ENABLED:
-        tick_num = internal.window.get_idle_tick() - int(config.IDLE_WAIT_TIME) + IDLE_ANIMATION_TRAIL_LENGTH * IDLE_ANIMATION_TRAIL_SPEED
+    if internal.window.getIdleTick() > config.IDLE_WAIT_TIME and config.IDLE_LIGHTS_ENABLED:
+        tick_num = internal.window.getIdleTick() - int(config.IDLE_WAIT_TIME) + IDLE_ANIMATION_TRAIL_LENGTH * IDLE_ANIMATION_TRAIL_SPEED
 
         for x in range(9):
             for y in range(2):
@@ -319,12 +322,12 @@ def idle_lightshow(lights):
 
                 if IDLE_ANIMATION_DO_TRAILS:
                     if not (((tick_num // IDLE_ANIMATION_TRAIL_SPEED) + x + IDLE_ANIMATION_TRAIL_Y_OFFSET*y) % IDLE_ANIMATION_TRAIL_INFREQUENCY < IDLE_ANIMATION_TRAIL_LENGTH):
-                        colour = COLOUR_OFF
+                        colour = lightingconsts.COLOUR_OFF
 
                 lights.setPadColour(x, y, colour, light_mode)
 
 def idle_show_active():
-    if internal.window.get_idle_tick() > config.IDLE_WAIT_TIME and config.IDLE_LIGHTS_ENABLED:
+    if internal.window.getIdleTick() > config.IDLE_WAIT_TIME and config.IDLE_LIGHTS_ENABLED:
         return True
 
     else:
@@ -333,88 +336,3 @@ def idle_show_active():
 def trigger_idle_show():
     internal.window.idle_tick_number = config.IDLE_WAIT_TIME
 
-# Define colour codes
-COLOUR_TRANSPARENT = -1
-COLOUR_OFF = 0
-COLOUR_WHITE = 3
-COLOUR_RED = 5
-COLOUR_GREEN = 25
-COLOUR_PINK = 53
-COLOUR_BLUE = 46
-COLOUR_YELLOW = 13
-COLOUR_PURPLE = 49
-COLOUR_LILAC = 116
-COLOUR_ORANGE = 84
-
-COLOUR_LIGHT_YELLOW = 109
-COLOUR_LIGHT_BLUE = 37
-COLOUR_LIGHT_LILAC = 116
-COLOUR_LIGHT_LIGHT_BLUE = 40
-
-COLOUR_DARK_GREY = 1
-COLOUR_DARK_PURPLE = 51
-COLOUR_DARK_BLUE = 47
-COLOUR_DARK_RED = 59
-
-# Define colour pallettes used by light show
-PALLETE_NORMAL = [COLOUR_RED, COLOUR_PINK, COLOUR_PURPLE, COLOUR_BLUE, COLOUR_LIGHT_BLUE, COLOUR_GREEN, COLOUR_YELLOW, COLOUR_ORANGE, COLOUR_OFF]
-PALLETE_INIT_FAIL = [COLOUR_YELLOW, COLOUR_ORANGE, COLOUR_ORANGE, COLOUR_RED, COLOUR_RED, COLOUR_ORANGE, COLOUR_ORANGE, COLOUR_YELLOW, COLOUR_OFF] 
-PALLETE_UPDATE = [COLOUR_BLUE, COLOUR_LIGHT_BLUE, COLOUR_LIGHT_BLUE, COLOUR_GREEN, COLOUR_GREEN, COLOUR_LIGHT_BLUE, COLOUR_LIGHT_BLUE, COLOUR_BLUE, COLOUR_OFF] 
-
-# Define UI colours
-UI_NAV_VERTICAL = COLOUR_LIGHT_BLUE
-UI_NAV_HORIZONTAL = COLOUR_PURPLE
-UI_ZOOM = COLOUR_BLUE
-UI_ACCEPT = COLOUR_GREEN
-UI_REJECT = COLOUR_RED
-UI_CHOOSE = COLOUR_PURPLE
-
-UI_UNDO = COLOUR_LIGHT_LIGHT_BLUE
-UI_REDO = COLOUR_LIGHT_BLUE
-
-UI_COPY = COLOUR_BLUE
-UI_CUT = COLOUR_LIGHT_BLUE
-UI_PASTE = COLOUR_GREEN
-
-UI_SAVE = COLOUR_GREEN
-
-# Define tool colours
-TOOL_PENCIL = COLOUR_ORANGE
-TOOL_BRUSH = COLOUR_LIGHT_BLUE
-TOOL_DELETE = COLOUR_RED
-TOOL_MUTE = COLOUR_PINK
-TOOL_SLIP = COLOUR_ORANGE
-TOOL_SLICE = COLOUR_LIGHT_BLUE
-TOOL_SELECT = COLOUR_YELLOW
-TOOL_ZOOM = COLOUR_BLUE
-TOOL_PLAYBACK = COLOUR_GREEN
-
-# Define Window Colours
-WINDOW_PLAYLIST = COLOUR_GREEN
-WINDOW_CHANNEL_RACK = COLOUR_RED
-WINDOW_PIANO_ROLL = COLOUR_PINK
-WINDOW_MIXER = COLOUR_LIGHT_BLUE
-WINDOW_BROWSER = COLOUR_ORANGE
-WINDOW_PLUGIN_PICKER = COLOUR_BLUE
-
-# Define Beat Indicator Colours
-BEAT_PAT_BAR = COLOUR_RED
-BEAT_PAT_BEAT = COLOUR_ORANGE
-BEAT_SONG_BAR = COLOUR_LIGHT_BLUE
-BEAT_SONG_BEAT = COLOUR_GREEN
-
-TEMPO_TAP = COLOUR_PINK
-METRONOME = COLOUR_DARK_GREY
-
-# Colour Matrix for errors
-ERROR_COLOURS = [
-    [COLOUR_RED, COLOUR_RED],
-    [COLOUR_RED, COLOUR_RED],
-    [COLOUR_RED, COLOUR_RED],
-    [COLOUR_RED, COLOUR_RED],
-    [COLOUR_RED, COLOUR_RED],
-    [COLOUR_RED, COLOUR_RED],
-    [COLOUR_RED, COLOUR_RED],
-    [COLOUR_RED, COLOUR_RED],
-    [COLOUR_RED, COLOUR_RED]
-]

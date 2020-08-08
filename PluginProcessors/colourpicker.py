@@ -13,7 +13,7 @@ import config
 import internal
 import eventconsts
 import eventprocessor
-import lighting
+import lightingconsts
 import internalconstants
 
 import ui
@@ -23,10 +23,10 @@ import mixer
 import channels
 
 COLOUR_MAP = [
-    [lighting.COLOUR_RED, lighting.COLOUR_LIGHT_BLUE],
-    [lighting.COLOUR_ORANGE, lighting.COLOUR_BLUE],
-    [lighting.COLOUR_YELLOW, lighting.COLOUR_PURPLE],
-    [lighting.COLOUR_GREEN, lighting.COLOUR_PINK],
+    [lightingconsts.COLOUR_RED, lightingconsts.COLOUR_LIGHT_BLUE],
+    [lightingconsts.COLOUR_ORANGE, lightingconsts.COLOUR_BLUE],
+    [lightingconsts.COLOUR_YELLOW, lightingconsts.COLOUR_PURPLE],
+    [lightingconsts.COLOUR_GREEN, lightingconsts.COLOUR_PINK],
     [-1, -1],
     [-1, -1],
     [-1, -1],

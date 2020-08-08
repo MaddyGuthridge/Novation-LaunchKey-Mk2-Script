@@ -122,17 +122,17 @@ class TGeneric():
         internal.refreshProcessor()
         
         # Prevent idle lightshow when other parts of FL are being used
-        internal.window.reset_idle_tick()
+        internal.window.resetIdleTick()
         return
     
     def OnUpdateBeatIndicator(self, beat):
         internal.beat.set_beat(beat)
         
         # Prevent idle lightshow from being triggered during playback
-        internal.window.reset_idle_tick()
+        internal.window.resetIdleTick()
         
     def OnSendTempMsg(self, msg, duration):
-        internal.window.reset_idle_tick()
+        internal.window.resetIdleTick()
 
 Generic = TGeneric()
 

@@ -13,7 +13,7 @@ import ui
 import eventconsts
 import internal
 import config
-import lighting
+import lightingconsts
 
 def activeStart():
     
@@ -32,15 +32,15 @@ def topWindowEnd():
     return
 
 def redraw(lights):
-    if internal.window.get_animation_tick() >= 0:
-        lights.setPadColour(3, 1, lighting.COLOUR_PURPLE)   # Next
-    if internal.window.get_animation_tick() >= 1:
-        lights.setPadColour(3, 0, lighting.COLOUR_PURPLE)   # Prev
-        lights.setPadColour(4, 1, lighting.COLOUR_RED)      # Stop
-    if internal.window.get_animation_tick() >= 2:
-        lights.setPadColour(5, 1, lighting.COLOUR_GREEN)    # Play
-    if internal.window.get_animation_tick() >= 4:
-        lights.setPadColour(7, 1, lighting.COLOUR_BLUE, 2)     # Select
+    if internal.window.getAnimationTick() >= 0:
+        lights.setPadColour(3, 1, lightingconsts.COLOUR_PURPLE)   # Next
+    if internal.window.getAnimationTick() >= 1:
+        lights.setPadColour(3, 0, lightingconsts.COLOUR_PURPLE)   # Prev
+        lights.setPadColour(4, 1, lightingconsts.COLOUR_RED)      # Stop
+    if internal.window.getAnimationTick() >= 2:
+        lights.setPadColour(5, 1, lightingconsts.COLOUR_GREEN)    # Play
+    if internal.window.getAnimationTick() >= 4:
+        lights.setPadColour(7, 1, lightingconsts.COLOUR_BLUE, 2)     # Select
     return
 
 def process(command):

@@ -11,7 +11,7 @@ import math # For logarithm
 import channels
 import ui
 
-import lighting
+import lightingconsts
 import config
 import internalconstants
 import internal
@@ -21,8 +21,8 @@ import processorhelpers
 ui_mode = processorhelpers.UI_mode_handler(2)
 
 
-MENU_MODE_COLOUR = lighting.UI_CHOOSE
-BIT_MODE_COLOUR = lighting.COLOUR_RED
+MENU_MODE_COLOUR = lightingconsts.UI_CHOOSE
+BIT_MODE_COLOUR = lightingconsts.COLOUR_RED
 
 def process(command):
 
@@ -37,7 +37,7 @@ def process(command):
         # UI Mode
         if command.coord_Y == 1 and command.coord_X == 0:
             ui_mode.nextMode()
-            internal.window.reset_animation_tick()
+            internal.window.resetAnimationTick()
             command.handle("Channel Rack: Next UI mode")
             if ui_mode.getMode():
                 gridBits.drawHighlight()
@@ -200,35 +200,35 @@ def redraw(lights):
 def redraw_menu_mode(lights):
     
     # Set colours for controls
-    if internal.window.get_animation_tick() >= 1:
-        lights.setPadColour(1, 1, lighting.UI_NAV_VERTICAL)     # Next track
+    if internal.window.getAnimationTick() >= 1:
+        lights.setPadColour(1, 1, lightingconsts.UI_NAV_VERTICAL)     # Next track
 
-    if internal.window.get_animation_tick() >= 2:
-        lights.setPadColour(1, 0, lighting.UI_NAV_VERTICAL)     # Prev track
-        lights.setPadColour(3, 0, lighting.UI_COPY)             # Copy
-    if internal.window.get_animation_tick() >= 3:
-        lights.setPadColour(4, 0, lighting.UI_CUT)              # Cut
-    if internal.window.get_animation_tick() >= 4:
-        lights.setPadColour(5, 0, lighting.UI_PASTE)            # Paste
+    if internal.window.getAnimationTick() >= 2:
+        lights.setPadColour(1, 0, lightingconsts.UI_NAV_VERTICAL)     # Prev track
+        lights.setPadColour(3, 0, lightingconsts.UI_COPY)             # Copy
+    if internal.window.getAnimationTick() >= 3:
+        lights.setPadColour(4, 0, lightingconsts.UI_CUT)              # Cut
+    if internal.window.getAnimationTick() >= 4:
+        lights.setPadColour(5, 0, lightingconsts.UI_PASTE)            # Paste
 
-    if internal.window.get_animation_tick() >= 2:
-        lights.setPadColour(6, 1, lighting.UI_CHOOSE)
-    if internal.window.get_animation_tick() >= 3:
-        lights.setPadColour(7, 1, lighting.UI_ACCEPT, 2)           # To piano roll
+    if internal.window.getAnimationTick() >= 2:
+        lights.setPadColour(6, 1, lightingconsts.UI_CHOOSE)
+    if internal.window.getAnimationTick() >= 3:
+        lights.setPadColour(7, 1, lightingconsts.UI_ACCEPT, 2)           # To piano roll
 
 # Redraw when in grid bits
 def redraw_bit_mode(lights):
     setGridBits(lights)
 
     # Set colours for controls
-    if internal.window.get_animation_tick() >= 6:
-        lights.setPadColour(4, 1, lighting.UI_NAV_HORIZONTAL)   # Move left
-    if internal.window.get_animation_tick() >= 5:
-        lights.setPadColour(5, 1, lighting.UI_NAV_HORIZONTAL)   # Move right
-    if internal.window.get_animation_tick() >= 4:
-        lights.setPadColour(6, 1, lighting.UI_ZOOM)             # Zoom out
-    if internal.window.get_animation_tick() >= 3:
-        lights.setPadColour(7, 1, lighting.UI_ZOOM)             # Zoom in
+    if internal.window.getAnimationTick() >= 6:
+        lights.setPadColour(4, 1, lightingconsts.UI_NAV_HORIZONTAL)   # Move left
+    if internal.window.getAnimationTick() >= 5:
+        lights.setPadColour(5, 1, lightingconsts.UI_NAV_HORIZONTAL)   # Move right
+    if internal.window.getAnimationTick() >= 4:
+        lights.setPadColour(6, 1, lightingconsts.UI_ZOOM)             # Zoom out
+    if internal.window.getAnimationTick() >= 3:
+        lights.setPadColour(7, 1, lightingconsts.UI_ZOOM)             # Zoom in
 
 
 def activeStart():
@@ -314,32 +314,32 @@ def setGridBits(lights):
     if light_num_scroll < 8:
 
         if not gridBits.getBit(channels.channelNumber(), light_num_scroll):
-            lights.setPadColour(light_num_scroll, 0, lighting.COLOUR_LIGHT_LILAC)
+            lights.setPadColour(light_num_scroll, 0, lightingconsts.COLOUR_LIGHT_LILAC)
         else:
-            lights.setPadColour(light_num_scroll, 0, lighting.COLOUR_PINK, 2)
+            lights.setPadColour(light_num_scroll, 0, lightingconsts.COLOUR_PINK, 2)
          
     # Set zoom indicator
     light_num_zoom = 7 - int(math.log(gridBits.zoom, 2))
-    if light_num_zoom >= 0 and internal.window.get_animation_tick() > 7:
+    if light_num_zoom >= 0 and internal.window.getAnimationTick() > 7:
         if not gridBits.getBit(channels.channelNumber(), light_num_zoom):
-            lights.setPadColour(light_num_zoom, 0, lighting.COLOUR_LIGHT_LIGHT_BLUE)
+            lights.setPadColour(light_num_zoom, 0, lightingconsts.COLOUR_LIGHT_LIGHT_BLUE)
         else:
-            lights.setPadColour(light_num_zoom, 0, lighting.COLOUR_BLUE, 2)
+            lights.setPadColour(light_num_zoom, 0, lightingconsts.COLOUR_BLUE, 2)
 
     # If zoom and scroll lie on same pad
     if light_num_scroll == light_num_zoom:
         if not gridBits.getBit(channels.channelNumber(), light_num_zoom):
-            lights.setPadColour(light_num_zoom, 0, lighting.COLOUR_LIGHT_YELLOW)
+            lights.setPadColour(light_num_zoom, 0, lightingconsts.COLOUR_LIGHT_YELLOW)
         else:
-            lights.setPadColour(light_num_zoom, 0, lighting.COLOUR_PINK, 2)
+            lights.setPadColour(light_num_zoom, 0, lightingconsts.COLOUR_PINK, 2)
 
     # Set remaining grid bits
     for i in range(8):
-        if i <= internal.window.get_animation_tick():
+        if i <= internal.window.getAnimationTick():
             if gridBits.getBit(current_track, i):
-                lights.setPadColour(i, 0, lighting.COLOUR_RED, 2)
+                lights.setPadColour(i, 0, lightingconsts.COLOUR_RED, 2)
             else:
-                lights.setPadColour(i, 0, lighting.COLOUR_DARK_GREY)
+                lights.setPadColour(i, 0, lightingconsts.COLOUR_DARK_GREY)
 
     return
 

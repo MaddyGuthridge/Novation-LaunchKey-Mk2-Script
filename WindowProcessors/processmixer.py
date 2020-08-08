@@ -13,7 +13,7 @@ import eventconsts
 import internal
 import internalconstants
 import config
-import lighting
+import lightingconsts
 import processorhelpers
 
 
@@ -126,16 +126,16 @@ def topWindowEnd():
 
 def processPeak(lights, y, level):
     level = level ** 3
-    colour = lighting.COLOUR_RED
+    colour = lightingconsts.COLOUR_RED
     for i in range(8):
         
         if level > 1 - (i + 1)/8:
             if i >= 4:
-                colour = lighting.COLOUR_GREEN
+                colour = lightingconsts.COLOUR_GREEN
             elif i >= 2:
-                colour = lighting.COLOUR_YELLOW
+                colour = lightingconsts.COLOUR_YELLOW
             elif i >= 1:
-                colour = lighting.COLOUR_ORANGE
+                colour = lightingconsts.COLOUR_ORANGE
             lights.setPadColour(7 - i, y, colour)
     
 

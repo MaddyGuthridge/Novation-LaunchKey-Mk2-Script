@@ -67,7 +67,7 @@ def activeEnd():
 
 def topWindowStart():
     # Only in extended mode:
-    if internal.PORT == config.DEVICE_PORT_EXTENDED:
+    if internal.state.PORT == config.DEVICE_PORT_EXTENDED:
         current_window = getWindowObject()
         current_window.topWindowStart()
 
@@ -75,7 +75,7 @@ def topWindowStart():
 
 def topWindowEnd():
     # Only in extended mode:
-    if internal.PORT == config.DEVICE_PORT_EXTENDED:
+    if internal.state.PORT == config.DEVICE_PORT_EXTENDED:
         current_window = getWindowObject()
         current_window.topWindowEnd()
 

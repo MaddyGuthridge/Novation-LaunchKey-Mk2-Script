@@ -16,22 +16,22 @@ import ControllerProcessors.key_61 as k61
 
 def process(command):
     
-    if internal.DEVICE_TYPE == internalconstants.DEVICE_KEYS_25:
+    if internal.state.DEVICE_TYPE == internalconstants.DEVICE_KEYS_25:
         k25.process(command)
     
-    if internal.DEVICE_TYPE == internalconstants.DEVICE_KEYS_49:
+    if internal.state.DEVICE_TYPE == internalconstants.DEVICE_KEYS_49:
         k49.process(command)
         
-    if internal.DEVICE_TYPE == internalconstants.DEVICE_KEYS_61:
+    if internal.state.DEVICE_TYPE == internalconstants.DEVICE_KEYS_61:
         k61.process(command)
 
 def onInit():
     
-    if internal.DEVICE_TYPE == internalconstants.DEVICE_KEYS_25:
+    if internal.state.DEVICE_TYPE == internalconstants.DEVICE_KEYS_25:
         k25.onInit()
     
-    if internal.DEVICE_TYPE == internalconstants.DEVICE_KEYS_49:
+    if internal.state.DEVICE_TYPE == internalconstants.DEVICE_KEYS_49:
         k49.onInit()
         
-    if internal.DEVICE_TYPE == internalconstants.DEVICE_KEYS_61:
+    if internal.state.DEVICE_TYPE == internalconstants.DEVICE_KEYS_61:
         k61.onInit()
