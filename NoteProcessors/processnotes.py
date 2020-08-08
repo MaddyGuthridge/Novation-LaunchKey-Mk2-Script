@@ -1,8 +1,8 @@
 """
-processwindowed.py
-This script forwards events to event processors for Plugins
+processnotes.py
+This script forwards events to note processors depending on the current mode.
 
-THIS PART CURRENTLY DOESN'T WORK :(
+Author: Miguel Guthridge
 
 """
 

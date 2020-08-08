@@ -2,6 +2,8 @@
 key.py
 
 This script handles initialisation and some event handling specific to certain devices
+
+Author: Miguel Guthridge
 """
 
 import eventconsts

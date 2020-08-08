@@ -1,6 +1,8 @@
 """
-error.py
-This script processes notes when the error state is active
+default.py
+This script processes notes nomally.
+
+Author: Miguel Guthridge
 """
 
 import internalconstants
@@ -11,6 +13,7 @@ import processorhelpers
 NOTE_MODE = internalconstants.NOTE_STATE_NORMAL
 
 def process(command):
+    """
     command.actions.addProcessor("Default Note Handler")
     
     if not command.is_lift:
@@ -24,4 +27,6 @@ def process(command):
     else:
         internal.notesDown.noteOff(command)
         command.handle("Note off")
+    """
+    pass
 

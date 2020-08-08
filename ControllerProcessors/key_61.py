@@ -2,6 +2,8 @@
 key_61.py
 
 This script handles initialisation and some event handling specific to the 61-key model
+
+Author: Miguel Guthridge
 """
 
 import eventconsts

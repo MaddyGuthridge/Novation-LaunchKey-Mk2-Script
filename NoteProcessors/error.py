@@ -1,6 +1,9 @@
 """
 error.py
-This script processes notes when the error state is active
+This script processes notes when the error state is active.
+It includes the "Chaotic Evil Error Note Handler" which changes single note on events to all 128 note-on events.
+
+Author: Miguel Guthridge
 """
 
 import internalconstants
