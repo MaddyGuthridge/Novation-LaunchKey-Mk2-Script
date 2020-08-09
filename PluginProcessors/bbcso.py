@@ -68,7 +68,7 @@ def process(command):
             # Use coord_X number for keyswitch number
             keyswitchNum = command.coord_X
 
-            command.edit(processorhelpers.rawEvent(0x90, keyswitchNum, command.value))
+            command.edit(processorhelpers.RawEvent(0x90, keyswitchNum, command.value))
 
     """ Link to parameters - Fix this once API updates
     if command.id == eventconsts.BASIC_FADER_1:

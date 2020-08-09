@@ -19,7 +19,7 @@ import internal
 import eventconsts
 import processorhelpers
 
-ui_mode = processorhelpers.UI_mode_handler(2)
+ui_mode = processorhelpers.UiModeHandler(2)
 
 
 MENU_MODE_COLOUR = lightingconsts.UI_CHOOSE

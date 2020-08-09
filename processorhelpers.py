@@ -19,7 +19,7 @@ import internal
 import internalconstants
 
 
-class UI_mode_handler: 
+class UiModeHandler: 
     """This object is used to manage menu layers, which can be toggled and switched through.
         It is best used in handler scripts to allow for a plugin or window to have multiple menus.
     """
@@ -257,7 +257,7 @@ class ActionList:
         return ret
 
 
-class actionPrinter:
+class ActionPrinter:
     """Object containing actions taken by all processor modules
     """
 
@@ -312,7 +312,7 @@ class actionPrinter:
         self.eventProcessors.clear()
 
 
-class rawEvent:
+class RawEvent:
     """Stores event in raw form. A quick way to generate events for editing.
     """
     def __init__(self, status, data1, data2, shift = False):
@@ -330,7 +330,7 @@ class rawEvent:
         self.shift = shift
 
 
-class processedEvent:
+class ProcessedEvent:
     """Stores data about an event, including useful parsed data
     """
     def __init__(self, event):
@@ -341,7 +341,7 @@ class processedEvent:
         """
         self.recieved_internal = False
         self.edited = False
-        self.actions = actionPrinter()
+        self.actions = ActionPrinter()
 
         self.handled = False
 

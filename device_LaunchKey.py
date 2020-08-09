@@ -66,7 +66,7 @@ class TGeneric():
         
         
         # Process the event into processedEvent format
-        command = processorhelpers.processedEvent(event)
+        command = processorhelpers.ProcessedEvent(event)
         
         # Print event before processing
         internal.printCommand(command)

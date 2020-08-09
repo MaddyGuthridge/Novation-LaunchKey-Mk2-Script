@@ -19,7 +19,7 @@ def process(command):
         # Do chaotic evil things
         if not command.is_lift:
             
-            notes_list = [processorhelpers.rawEvent(0, x, 127) for x in range(127, -1, -1)]
+            notes_list = [processorhelpers.RawEvent(0, x, 127) for x in range(127, -1, -1)]
             
             note = processorhelpers.ExtensibleNote(command, notes_list)
             
