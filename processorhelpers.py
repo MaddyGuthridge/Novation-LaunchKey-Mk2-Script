@@ -133,10 +133,17 @@ def convertPadMapping(padNumber):
                 return eventconsts.BasicPads[y][x]
 
 
-# Returns true if is a double click for a press
 lastPressID = -1
 lastPressTime = -1
 def isDoubleClickPress(id):
+    """Returns whether a press event was a double click
+
+    Args:
+        id (int): Event ID
+
+    Returns:
+        bool: whether the event was a double click
+    """
     global lastPressID
     global lastPressTime
     ret = False
@@ -147,10 +154,18 @@ def isDoubleClickPress(id):
     lastPressTime = currentTime
     return ret
 
-# Returns true if is a double click for a lift
+
 lastLiftID = -1
 lastLiftTime = -1
 def isDoubleClickLift(id):
+    """Returns whether a lift event was a double click
+
+    Args:
+        id (int): Event ID
+
+    Returns:
+        bool: whether the event was a double click
+    """
     global lastLiftID
     global lastLiftTime
     ret = False
@@ -163,20 +178,41 @@ def isDoubleClickLift(id):
 
 
 
-# Stores a single action as a string
 class Action:
+    """Stores an action as a string
+    """
     def __init__(self, act, silent):
+        """Create an event action
+
+        Args:
+            act (str): The action taken
+            silent (bool): Whether the action should be set as a hint message
+        """
         self.act = act
         self.silent = silent
 
 class ActionList:
+    """Stores a list of actions taken by a single processor
+    """
     def __init__(self, name):
+        """Create an action list
+
+        Args:
+            name (str): Name of the processor
+        """
         self.name = name
         self.list = []
         self.didHandle = False
 
-    # Append action to the list
+    
     def appendAction(self, action, silent, handle):
+        """Append action to list of actions
+
+        Args:
+            action (str): The action taken
+            silent (bool): Whether the action should be set as a hint message
+            handle (bool): Whether this action handled the event
+        """
         self.list.append(Action(action, silent))
 
         # Set flag indicating that this processor handled the event
@@ -184,6 +220,11 @@ class ActionList:
             self.didHandle = True
 
     def getString(self):
+        """Returns a string of the actions taken
+
+        Returns:
+            str: actions taken
+        """
         # Return that no action was taken if list is empty
         if len(self.list) == 0:
             return internal.getTab(self.name + ":", 2) + "[No actions]"
@@ -204,26 +245,44 @@ class ActionList:
 
     # Returns the latest non-silent action to set as the hint message
     def getHintMsg(self):
+        """Returns string of hint message to set, empty string if none
+
+        Returns:
+            str: Hint message
+        """
         ret = ""
         for i in range(len(self.list)):
             if self.list[i].silent == False:
                 ret = self.list[i].act
         return ret
 
-# Stores actions taken by various processor modules
+
 class actionPrinter:
-    
+    """Object containing actions taken by all processor modules
+    """
 
     def __init__(self):
         # String that is output after each event is processed
         self.eventProcessors = []
 
-    # Add an event processor object
+    
     def addProcessor(self, name):
+        """Add an event processor
+
+        Args:
+            name (str): Name of the processor
+        """
         self.eventProcessors.append(ActionList(name))
 
-    # Add to event action
+    
     def appendAction(self, act, silent=False, handled=False):
+        """Appends an action to the current event processor
+
+        Args:
+            act (str): The action taken
+            silent (bool, optional): Whether the action should be set as a hint message. Defaults to False.
+            handled (bool, optional): Whether the action handled the event. Defaults to False.
+        """
 
         # Add some random processor if a processor doesn't exist for some reason
         if len(self.eventProcessors) == 0:
@@ -233,6 +292,8 @@ class actionPrinter:
         self.eventProcessors[len(self.eventProcessors) - 1].appendAction(act, silent, handled)
 
     def flush(self):
+        """Log all actions taken, and set a hint message if applicable
+        """
         # Log all actions taken
         for x in range(len(self.eventProcessors)):
             internal.debugLog(self.eventProcessors[x].getString(), internalconstants.DEBUG_EVENT_ACTIONS)
@@ -250,17 +311,34 @@ class actionPrinter:
             ui.setHintMsg(hint_msg)
         self.eventProcessors.clear()
 
-# Stores event in raw form. Used to edit events
+
 class rawEvent:
+    """Stores event in raw form. A quick way to generate events for editing.
+    """
     def __init__(self, status, data1, data2, shift = False):
+        """Create a RawEvent object
+
+        Args:
+            status (int): Status byte
+            data1 (int): First data byte
+            data2 (int): 2nd data byte
+            shift (bool, optional): Whether the event is shifted. Defaults to False.
+        """
         self.status = status
         self.data1 = data1
         self.data2 = data2
         self.shift = shift
 
-# Stores useful data about processed event
+
 class processedEvent:
+    """Stores data about an event, including useful parsed data
+    """
     def __init__(self, event):
+        """Create ProcessedEvent from event object
+
+        Args:
+            event (MIDI Event): FL Studio MIDI Event
+        """
         self.recieved_internal = False
         self.edited = False
         self.actions = actionPrinter()
@@ -308,6 +386,9 @@ class processedEvent:
             internal.processSysEx(self)
                                                                                                           
     def parse(self):
+        """Parses information about the event
+        """
+        
         # Indicates whether to consider as a value or as an on/off
         self.isBinary = False
 
@@ -413,6 +494,11 @@ class processedEvent:
                 self.is_double_click = isDoubleClickPress(self.id)
         
     def edit(self, event):
+        """Edit the event to change data
+
+        Args:
+            event (RawEvent): A MIDI Event to change this event to
+        """
         self.edited = True
         self.status = event.status
         self.note = event.data1
@@ -429,11 +515,30 @@ class processedEvent:
         self.actions.appendAction(newEventStr)
     
     def handle(self, action, silent=False):
+        """Handles the event
+
+        Args:
+            action (str): The action that handled the event
+            silent (bool, optional): Whether the action should be set as a hint message. Defaults to False.
+        """
         self.handled = True
         self.actions.appendAction(action, silent, True)
 
-    # Returns event info as string
+    def act(self, action):
+        """Adds an action to the event without handling it
+
+        Args:
+            action (str): The action taken
+        """
+        self.actions.appendAction(action, False, False)
+
+    
     def getInfo(self):
+        """Returns info about event
+
+        Returns:
+            str: Details about the event
+        """
         out = "Event:"
         out = internal.getTab(out)
 
@@ -470,13 +575,16 @@ class processedEvent:
 
         return out
 
-    # Prints event info
+    
     def printInfo(self):
+        """Prints string info about event
+        """
         internal.debugLog(self.getInfo(), internalconstants.DEBUG_EVENT_DATA)
     
-    # Prints event output
+    
     def printOutput(self):
-
+        """Prints actions taken whilst handling event
+        """
         internal.debugLog("", internalconstants.DEBUG_EVENT_ACTIONS)
         self.actions.flush()
         if self.handled:
@@ -484,8 +592,13 @@ class processedEvent:
         else: 
             internal.debugLog("[Event wasn't handled]", internalconstants.DEBUG_EVENT_ACTIONS)
 
-    # Returns string with type and ID of event
+    
     def getType(self):
+        """Returns string detailing type and ID of event
+
+        Returns:
+            str: Type and ID of event info
+        """
         a = ""
         b = ""
         if self.type is eventconsts.TYPE_UNRECOGNISED: 
@@ -528,6 +641,11 @@ class processedEvent:
         return a + b
 
     def processPmeFlags(self, flags):
+        """Processes PME flags on event (Currently very broken)
+
+        Args:
+            flags (int): PME flags
+        """
         #print(flags)
         bin_string = format(flags, '8b')[:5]
         #print(bin_string)
@@ -543,28 +661,47 @@ class processedEvent:
         self.pme_from_midi = flags_list[4]
         
 
-    # Returns string event ID for system events
     def getID_System(self):
+        """Returns string event ID for system events
+
+        Returns:
+            str: Event ID details
+        """
         if   self.id == eventconsts.SYSTEM_EXTENDED: return "InControl"
         elif self.id == eventconsts.SYSTEM_MISC: return "Misc"
         else: return "ERROR"
 
-    # Returns string event ID for InControl events
+    
     def getID_InControl(self):
+        """Returns string event ID for InControl events
+
+        Returns:
+            str: Event ID details
+        """
         if   self.id == eventconsts.INCONTROL_KNOBS: return "Knobs"
         elif self.id == eventconsts.INCONTROL_FADERS: return "Faders"
         elif self.id == eventconsts.INCONTROL_PADS: return "Pads"
         else: return "ERROR"
     
-    # Returns string event ID for basic events
+    
     def getID_Basic(self):
+        """Returns string event ID for basic events
+
+        Returns:
+            str: Event ID Details
+        """
         if self.id == eventconsts.PEDAL: return "Pedal"
         elif self.id == eventconsts.MOD_WHEEL: return "Modulation"
         elif self.id == eventconsts.PITCH_BEND: return "Pitch Bend"
         else: return "ERROR"
 
-    # Returns string event ID for transport events
+    
     def getID_Transport(self):
+        """Returns string event ID for transport events
+
+        Returns:
+            str: Event ID details
+        """
         if   self.id == eventconsts.TRANSPORT_BACK: return "Back"
         elif self.id == eventconsts.TRANSPORT_FORWARD: return "Forward"
         elif self.id == eventconsts.TRANSPORT_STOP: return "Stop"
@@ -575,8 +712,13 @@ class processedEvent:
         elif self.id == eventconsts.TRANSPORT_TRACK_PREVIOUS: return "Previous Track"
         else: return "ERROR"
     
-    # Returns string eventID for knob events
+    
     def getID_Pads(self):
+        """Returns string eventID for pad events
+
+        Returns:
+            str: Event ID details
+        """
         x_map, y_map = self.getPadCoord()
         
         ret_str = ""
@@ -591,19 +733,40 @@ class processedEvent:
 
         return ret_str
     
-    # Returns string eventID for fader events
+    
     def getID_Fader(self):
+        """Returns string eventID for fader events
+
+        Returns:
+            str: Event ID details
+        """
         return str(self.coord_X + 1)
 
-    # Returns string eventID for fader events
+
     def getID_FaderButton(self):
+        """Returns string eventID for fader button events
+
+        Returns:
+            str: Event ID details
+        """
         return str(self.coord_X + 1)
     
     def getID_Knobs(self):
+        """Returns string eventID for knob events
+
+        Returns:
+            str: Event ID details
+        """
         return str(self.coord_X + 1)
     
-    # Returns X and Y tuple for pads
+    
     def getPadCoord(self):
+        """Returns X, Y coordinates for pad events
+
+        Returns:
+            int: X
+            int: Y
+        """
         y_map = -1
         x_map = -1
         done_flag = False
@@ -617,14 +780,24 @@ class processedEvent:
             if done_flag: break
         return x_map, y_map
 
-    # Returns True if Pad is Extended
+    
     def isPadExtendedMode(self):
+        """Returns True if Pad is Extended
+
+        Returns:
+            bool: whether pad is extended
+        """
         if self.note == eventconsts.Pads[self.coord_X][self.coord_Y]: return True
         elif self.note == eventconsts.BasicPads[self.coord_X][self.coord_Y]: return False
         else: print("ERROR!!?")
 
-    # Returns (formatted) value
+    
     def getValue(self):
+        """Returns (formatted) value of event  
+
+        Returns:
+            str: Formatted value (data2) of event
+        """
         a = str(self.value)
         b = ""
         if self.isBinary:
@@ -634,9 +807,13 @@ class processedEvent:
         a = internal.getTab(a, length=5)
         return a + b
 
-    # Returns string with (formatted) hex of event
+    
     def getDataString(self):
+        """Returns string with (formatted) hex of event
 
+        Returns:
+            str: hex of event
+        """
         if self.type is eventconsts.TYPE_SYSEX_EVENT:
             return str(self.sysex)
 
@@ -655,8 +832,13 @@ class processedEvent:
         
         return a
 
-    # Returns int with hex of event
+    
     def getDataMIDI(self):
+        """Returns int with hex of event
+
+        Returns:
+            int: MIDI event
+        """
         return internal.toMidiMessage(self.status, self.note, self.value)
 
 
