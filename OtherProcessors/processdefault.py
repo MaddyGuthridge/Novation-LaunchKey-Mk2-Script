@@ -22,9 +22,9 @@ def redraw(lights):
     internal.beat.redraw(lights)
 
     # Pads white if pressed
-    for x in range(len(internal.pads.padsDown)):
-            for y in range(len(internal.pads.padsDown[x])):
-                if internal.pads.getVal(x, y):
+    for x in range(len(internal.notemanager.pads.padsDown)):
+            for y in range(len(internal.notemanager.pads.padsDown[x])):
+                if internal.notemanager.pads.getVal(x, y):
                     lights.setPadColour(x, y, lightingconsts.COLOUR_WHITE, 2, True)
     return
 
