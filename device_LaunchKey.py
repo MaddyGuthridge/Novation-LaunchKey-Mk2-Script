@@ -32,6 +32,7 @@ import utils
 import config
 import internal
 import eventprocessor
+import internalconstants
 
 
 # device.dispatch(2, 0x9F + (0x0C << 8) + (0x00 << 16))
@@ -58,7 +59,7 @@ class TGeneric():
 
     def OnMidiIn(self, event):
         event.handled = False
-
+        internal.performance.eventClock.start()
         
         
         # Process the event into processedEvent format
@@ -75,6 +76,8 @@ class TGeneric():
             event.status = command.status
             event.data1 = command.note
             event.data2 = command.value
+        
+        internal.performance.eventClock.stop()
 
         # Print output
         internal.printCommandOutput(command)

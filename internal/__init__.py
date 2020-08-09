@@ -17,4 +17,3 @@ from .windowstate import window
 from .shiftstate import shift
 from .misc import idleProcessor, beat, refreshProcessor, processSysEx
 from .notemanager import pads, noteMode, notesDown
-from .performance import eventClock, idleClock

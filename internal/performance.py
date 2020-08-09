@@ -38,11 +38,11 @@ class PerformanceMontor:
         self.total_time += process_time
         self.num_events += 1
         if self.debug_level in config.CONSOLE_DEBUG_MODE:
-            getLineBreak()
+            print(getLineBreak())
             print(self.name)
             print("Processed in:", round(process_time, 4), "seconds")
             print("Average processing time:", round(self.total() / self.num_events, 4), "seconds")
-            getLineBreak()
+            print(getLineBreak())
         return process_time
     
     def total(self):

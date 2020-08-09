@@ -85,7 +85,7 @@ class TGeneric():
 
     def OnMidiIn(self, event):
         event.handled = False
-        internal.eventClock.start()
+        internal.performance.eventClock.start()
         # Update active window (ui.onRefresh() isnt working properly)
         internal.ActiveWindow = ui.getFocusedFormCaption()
 
@@ -108,6 +108,8 @@ class TGeneric():
             event.status = command.status
             event.data1 = command.note
             event.data2 = command.value
+            
+        internal.performance.eventClock.stop()
 
         # Print output of command
         internal.printCommandOutput(command)
