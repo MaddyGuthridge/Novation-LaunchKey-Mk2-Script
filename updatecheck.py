@@ -41,8 +41,7 @@ def check():
         need_update_flag = True
     elif latest_rev > internalconstants.SCRIPT_VERSION_REVISION:
         need_update_flag = True
-    
-    internal.SCRIPT_UPDATE_AVAILABLE = need_update_flag
+        
     return need_update_flag
 
 
