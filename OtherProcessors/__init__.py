@@ -1,5 +1,6 @@
 """
-__INIT__.py
+otherprocessors > __init__.py
 (probably empty)
 
+Author: Miguel Guthridge
 """

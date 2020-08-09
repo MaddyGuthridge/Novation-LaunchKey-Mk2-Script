@@ -1,4 +1,5 @@
-"""ProcessDefault.py
+"""
+windowprocessors > processdefault.py
 
 This script can be used as a template for window scripts.
 

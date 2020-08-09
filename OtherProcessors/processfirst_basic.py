@@ -1,7 +1,8 @@
 """
-processfirst.py
-This file processes events before anything else.
+otherprocessors > processfirst_basic.py
+This file processes events before anything else when basic mode is active.
 
+Author: Miguel Guthridge
 """
 
 import transport

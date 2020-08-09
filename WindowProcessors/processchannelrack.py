@@ -1,4 +1,5 @@
-"""WindowProcessors > processchannelrack.py
+"""
+windowprocessors > processchannelrack.py
 
 This script handles events when the channel rack is active.
 It provides functionality including modification of grid bits, setting channel volumes/pans, and copy-pasting between tracks.

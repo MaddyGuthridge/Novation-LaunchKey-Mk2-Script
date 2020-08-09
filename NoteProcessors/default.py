@@ -1,5 +1,5 @@
 """
-default.py
+noteprocessors > default.py
 This script processes notes nomally.
 
 Author: Miguel Guthridge

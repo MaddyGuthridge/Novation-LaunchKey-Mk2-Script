@@ -26,7 +26,8 @@ PORT = -1 # Set in initialisation function then left constant
 
 SHARED_INIT_STATE = internalconstants.INIT_INCOMPLETE
 
-
+def getPortExtended():
+    return PORT == config.DEVICE_PORT_EXTENDED
 
 def getVersionStr():
     """Returns Script version as a string

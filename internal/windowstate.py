@@ -1,5 +1,5 @@
 """
-internal > window.py
+internal > windowstate.py
 
 Contains objects and functions to do with managing active FL windows.
 
@@ -12,8 +12,8 @@ import internalconstants
 import config
 import eventprocessor
 
-import WindowProcessors.processwindows as processwindows
-import PluginProcessors.processplugins as processplugins
+import windowprocessors
+import pluginprocessors
 
 from .logging import debugLog, getLineBreak
 
@@ -151,7 +151,7 @@ class WindowMgr:
 
             # End old window
             if new_fl_window != self.active_fl_window:
-                processwindows.topWindowEnd()
+                windowprocessors.topWindowEnd()
 
             # Set active window
             self.active_fl_window = new_fl_window
@@ -163,7 +163,7 @@ class WindowMgr:
 
             # Start new window
             if new_fl_window != old_window:
-                processwindows.topWindowStart()
+                windowprocessors.topWindowStart()
 
             # Start new window active
             eventprocessor.activeStart()
@@ -205,7 +205,7 @@ class WindowMgr:
                 # End replaced plugin
                 if new_plugin != self.active_plugin:
                     self.previous_plugin = self.active_plugin
-                    processplugins.topPluginEnd()
+                    pluginprocessors.topPluginEnd()
 
                 # Set new plugin
                 self.plugin_focused = True
@@ -217,7 +217,7 @@ class WindowMgr:
 
                 # Start new plugin
                 if new_plugin != old_plugin:
-                    processplugins.topPluginStart()
+                    pluginprocessors.topPluginStart()
 
                 # Start new plugin active
                 eventprocessor.activeStart()

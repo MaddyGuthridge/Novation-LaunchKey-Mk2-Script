@@ -1,5 +1,5 @@
 """
-key.py
+controllerprocessors > keys.py
 
 This script handles initialisation and some event handling specific to certain devices
 
@@ -10,9 +10,9 @@ import eventconsts
 import internal
 import internalconstants
 
-import ControllerProcessors.key_25 as k25
-import ControllerProcessors.key_49 as k49
-import ControllerProcessors.key_61 as k61
+import controllerprocessors.key_25 as k25
+import controllerprocessors.key_49 as k49
+import controllerprocessors.key_61 as k61
 
 def process(command):
     

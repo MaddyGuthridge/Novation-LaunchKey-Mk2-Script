@@ -4,9 +4,11 @@
 
 """
 device_LaunchKey49 port 2.py
+
 This file is the controller file for port 2 of the LaunchKey49 Mk2.
 It handles communication with the device, including colours.
 
+Author: Miguel Guthridge
 """
 
 
@@ -37,6 +39,7 @@ import internal
 import lighting
 import eventconsts
 import eventprocessor
+import processorhelpers
 
 
 
@@ -90,7 +93,7 @@ class TGeneric():
         internal.ActiveWindow = ui.getFocusedFormCaption()
 
         # Process the event into processedEvent format
-        command = eventprocessor.processedEvent(event)
+        command = processorhelpers.processedEvent(event)
 
         # Print event before processing
         internal.printCommand(command)

@@ -18,7 +18,7 @@ from .performance import idleClock
 from .logging import getLineBreak, debugLog, getTab
 from . import state
 
-from ControllerProcessors import keys
+import controllerprocessors
 
 def refreshProcessor():
     """Called on refresh
@@ -149,7 +149,7 @@ def processSysEx(event):
             print("Make sure to tell me your device info, and include a copy of the Syxex Event below.")
             print("Link to GitHub Page: " + internalconstants.SCRIPT_URL)
 
-        keys.onInit()
+        controllerprocessors.onInit()
         
     else:
         state.DEVICE_TYPE = internalconstants.DEVICE_UNRECOGNISED

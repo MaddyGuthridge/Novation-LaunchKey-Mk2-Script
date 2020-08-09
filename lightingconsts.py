@@ -2,6 +2,8 @@
 lightingconsts.py
 
 This file contains constants regarding lights
+
+Author: Miguel Guthridge
 """
 
 # Define colour codes

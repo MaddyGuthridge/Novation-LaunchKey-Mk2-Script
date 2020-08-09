@@ -1,4 +1,5 @@
-"""PluginProcessors > processplugins.py
+"""
+pluginprocessors > processplugins.py
 
 This script forwards events to any plugin processors that can handle the currently active plugin.
 More plugin processors can be added by adding them to the import list.
@@ -16,14 +17,14 @@ imports = ["fpc", "bbcso"]
 
 import config
 import internal
-import PluginProcessors
+import pluginprocessors
 
 # Import custom processors specified in list above
 print("Importing Plguin Processors")
 customProcessors = []
 for x in range(len(imports)):
     try:
-        customProcessors.append( __import__("PluginProcessors." + imports[x]) )
+        customProcessors.append( __import__("pluginprocessors." + imports[x]) )
         print (" - Successfully imported: " + imports[x])
     except ImportError:
         print (" - Error importing: " + imports[x])
@@ -34,7 +35,7 @@ def topPluginStart():
     # Only in extended mode:
     if internal.state.PORT == config.DEVICE_PORT_EXTENDED:
         for x in imports:
-            object_to_call = getattr(PluginProcessors, x)
+            object_to_call = getattr(pluginprocessors, x)
             if can_handle(object_to_call):
                 object_to_call.topPluginStart()
     return
@@ -44,7 +45,7 @@ def topPluginEnd():
     # Only in extended mode:
     if internal.state.PORT == config.DEVICE_PORT_EXTENDED:
         for x in imports:
-            object_to_call = getattr(PluginProcessors, x)
+            object_to_call = getattr(pluginprocessors, x)
             if can_handle(object_to_call):
                 object_to_call.topPluginEnd()
     return
@@ -52,7 +53,7 @@ def topPluginEnd():
 # Called when plugin brought to foreground
 def activeStart():
     for x in imports:
-        object_to_call = getattr(PluginProcessors, x)
+        object_to_call = getattr(pluginprocessors, x)
         if can_handle(object_to_call):
             object_to_call.activeStart()
     return
@@ -60,20 +61,20 @@ def activeStart():
 # Called when plugin no longer in foreground
 def activeEnd():
     for x in imports:
-        object_to_call = getattr(PluginProcessors, x)
+        object_to_call = getattr(pluginprocessors, x)
         if can_handle(object_to_call):
             object_to_call.activeEnd()
     return
 
 def redraw(lights):
     for x in imports:
-        object_to_call = getattr(PluginProcessors, x)
+        object_to_call = getattr(pluginprocessors, x)
         if can_handle(object_to_call):
             object_to_call.redraw(lights)
 
 def process(command):
     for x in imports:
-        object_to_call = getattr(PluginProcessors, x)
+        object_to_call = getattr(pluginprocessors, x)
         if can_handle(object_to_call):
             object_to_call.process(command)
         

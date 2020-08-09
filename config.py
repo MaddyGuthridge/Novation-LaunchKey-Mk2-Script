@@ -1,4 +1,5 @@
-"""config.py
+"""
+config.py
 
 This file contains variables intended for the user to edit to suit their needs.
 All these variables should be safe to edit, but if things break, you might want to revert your changes.

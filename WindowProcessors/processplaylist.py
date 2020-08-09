@@ -1,4 +1,5 @@
-"""WindowProcessors > processplaylist.py
+"""
+windowprocessors > processplaylist.py
 
 This script processes events when the playlist is active.
 It allows you to jump between markers if the exist using the skip button.
@@ -8,7 +9,7 @@ Author: Miguel Guthridge
 """
 
 import eventconsts
-import eventprocessor
+import processorhelpers
 
 import transport
 import internal

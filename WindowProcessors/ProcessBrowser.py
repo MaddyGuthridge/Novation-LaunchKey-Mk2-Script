@@ -1,4 +1,5 @@
-"""WindowProcessors > processbrowser.py
+"""
+windowprocessors > processbrowser.py
 
 This script processes events when the browser window is active.
 It provides functionality to navigate the browser and load files and plugins.

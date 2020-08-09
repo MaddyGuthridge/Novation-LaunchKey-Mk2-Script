@@ -1,4 +1,5 @@
-"""WindowProcessors > processwindows.py
+"""
+windowprocessors > processwindows.py
 
 This script forwards events to event processors for FL Studio Windows.
 
@@ -10,12 +11,12 @@ import config
 import internal
 import internalconstants
 
-import WindowProcessors.processmixer
-import WindowProcessors.ProcessBrowser
-import WindowProcessors.processchannelrack
-import WindowProcessors.processplaylist
+import windowprocessors.processmixer
+import windowprocessors.processbrowser
+import windowprocessors.processchannelrack
+import windowprocessors.processplaylist
 
-import WindowProcessors.ProcessDefault
+import windowprocessors.processdefault
 
 def getWindowObject():
     """Returns reference to module associated with a window
@@ -24,18 +25,18 @@ def getWindowObject():
         module: active FL Window
     """
     if internal.window.active_fl_window == internalconstants.WINDOW_MIXER:
-        return WindowProcessors.processmixer
+        return windowprocessors.processmixer
     
     elif internal.window.active_fl_window == internalconstants.WINDOW_BROWSER:
-        return WindowProcessors.ProcessBrowser
+        return windowprocessors.processbrowser
     
     elif internal.window.active_fl_window == internalconstants.WINDOW_CHANNEL_RACK:
-        return WindowProcessors.processchannelrack
+        return windowprocessors.processchannelrack
 
     elif internal.window.active_fl_window == internalconstants.WINDOW_PLAYLIST:
-        return WindowProcessors.processplaylist
+        return windowprocessors.processplaylist
 
-    else: return WindowProcessors.ProcessDefault
+    else: return windowprocessors.processdefault
 
 def process(command):
 

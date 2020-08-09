@@ -1,7 +1,9 @@
 """
 lighting.py
+
 This file contains functions and constants related to controlling lights on the controller.
 
+Author: Miguel Guthridge
 """
 
 IDLE_ANIMATION_SPEED = 1
@@ -18,6 +20,7 @@ import time
 import internal
 import eventconsts
 import eventprocessor
+import processorhelpers
 import internalconstants
 import config
 import lightingconsts
@@ -198,7 +201,7 @@ class Lights:
             internal.debugLog("Sent lighting command [" + str(x) + ", " + str(y) + "] (InControl Enabled)", internalconstants.DEBUG_LIGHTING_MESSAGE)
             
         else: 
-            internal.sendMidiMessage(status, eventprocessor.convertPadMapping(eventconsts.Pads[x][y]), colour)
+            internal.sendMidiMessage(status, processorhelpers.convertPadMapping(eventconsts.Pads[x][y]), colour)
             internal.debugLog("Sent lighting command [" + str(x) + ", " + str(y) + "] (InControl Disabled)", internalconstants.DEBUG_LIGHTING_MESSAGE)
         
         if state < 0: # Send extra event to trigger flashing
@@ -211,7 +214,7 @@ class Lights:
                 internal.debugLog("Sent light flash command [" + str(x) + ", " + str(y) + "] (InControl Enabled)", internalconstants.DEBUG_LIGHTING_MESSAGE)
                 
             else: 
-                internal.sendMidiMessage(status, eventprocessor.convertPadMapping(eventconsts.Pads[x][y]), -state)
+                internal.sendMidiMessage(status, processorhelpers.convertPadMapping(eventconsts.Pads[x][y]), -state)
                 internal.debugLog("Sent light flash command [" + str(x) + ", " + str(y) + "] (InControl Disabled)", internalconstants.DEBUG_LIGHTING_MESSAGE)
     
     # Sets colours based on state of LightMap object

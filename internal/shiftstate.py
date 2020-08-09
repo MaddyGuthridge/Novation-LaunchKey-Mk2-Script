@@ -1,5 +1,5 @@
 """
-internal > shift.py
+internal > shiftstate.py
 
 This module contains classes and objects regarding using buttons as shift controls.
 

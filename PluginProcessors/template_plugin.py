@@ -1,4 +1,5 @@
-"""PluginProcessors > template_plugin.py
+"""
+pluginprocessors > template_plugin.py
 
 The file acts as a template for plugin handlers. Copy it and edit to add your own plugin handlers.
 To get it to be imported by the event processor, add its filename (without the .py) to processplugins.py
@@ -15,7 +16,7 @@ import config
 import internal
 import eventconsts
 import eventprocessor
-import lighting
+import lightingconsts
 
 
 def topPluginStart():
@@ -23,7 +24,7 @@ def topPluginStart():
     """
     
     # Only in extended mode: uncomment lines to set inControl mode
-    if internal.extendedMode.query():
+    if internal.getPortExtended():
         # internal.extendedMode.setVal(False, eventconsts.INCONTROL_FADERS) # Faders
         # internal.extendedMode.setVal(False, eventconsts.INCONTROL_KNOBS) # Knobs
         # internal.extendedMode.setVal(False, eventconsts.INCONTROL_PADS) # Pads
@@ -35,7 +36,7 @@ def topPluginEnd():
     """
     
     # Only in extended mode: uncomment lines to revert to previous inControl modes
-    if internal.extendedMode.query():
+    if internal.getPortExtended():
         # internal.extendedMode.revert(eventconsts.INCONTROL_FADERS) # Faders
         # internal.extendedMode.revert(eventconsts.INCONTROL_KNOBS) # Knobs
         # internal.extendedMode.revert(eventconsts.INCONTROL_PADS) # Pads

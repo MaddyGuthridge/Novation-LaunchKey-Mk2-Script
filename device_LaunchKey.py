@@ -4,9 +4,11 @@
 
 """
 device_LaunchKey49.py
+
 This file is the controller file for port 1 of the LaunchKey49 Mk2.
 It handles most note and controller events.
 
+Author: Miguel Guthridge
 """
 
 
@@ -33,6 +35,7 @@ import config
 import internal
 import eventprocessor
 import internalconstants
+import processorhelpers
 
 
 # device.dispatch(2, 0x9F + (0x0C << 8) + (0x00 << 16))
@@ -63,7 +66,7 @@ class TGeneric():
         
         
         # Process the event into processedEvent format
-        command = eventprocessor.processedEvent(event)
+        command = processorhelpers.processedEvent(event)
         
         # Print event before processing
         internal.printCommand(command)

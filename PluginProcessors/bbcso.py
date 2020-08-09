@@ -1,4 +1,5 @@
-"""PluginProcessors > bbcso.py
+"""
+pluginprocessors > bbcso.py
 
 This script processes events when the BBC Symphony Orchesra plugin is active.
 It allows the use of keyswitches, and maps faders to expression, dynamics and reverb.
@@ -13,7 +14,7 @@ import config
 import internal
 import lightingconsts
 import eventconsts
-import eventprocessor
+import processorhelpers
 
 # Constants for event remapping
 EXPRESSION = 11
@@ -24,7 +25,7 @@ REVERB = 19
 # Called when plugin is top plugin
 def topPluginStart():
     # Only in extended mode:
-    if internal.PORT == config.DEVICE_PORT_EXTENDED:
+    if internal.getPortExtended():
         internal.extendedMode.setVal(False, eventconsts.INCONTROL_FADERS)
         internal.extendedMode.setVal(False, eventconsts.INCONTROL_KNOBS)
         internal.extendedMode.setVal(False, eventconsts.INCONTROL_PADS)
@@ -33,7 +34,7 @@ def topPluginStart():
 # Called when plugin is no longer top plugin
 def topPluginEnd():
     # Only in extended mode:
-    if internal.PORT == config.DEVICE_PORT_EXTENDED:
+    if internal.getPortExtended():
        internal.extendedMode.revert(eventconsts.INCONTROL_FADERS)
        internal.extendedMode.revert(eventconsts.INCONTROL_KNOBS)
        internal.extendedMode.revert(eventconsts.INCONTROL_PADS)
@@ -67,7 +68,7 @@ def process(command):
             # Use coord_X number for keyswitch number
             keyswitchNum = command.coord_X
 
-            command.edit(eventprocessor.rawEvent(0x90, keyswitchNum, command.value))
+            command.edit(processorhelpers.rawEvent(0x90, keyswitchNum, command.value))
 
     """ Link to parameters - Fix this once API updates
     if command.id == eventconsts.BASIC_FADER_1:

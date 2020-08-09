@@ -1,5 +1,5 @@
 """
-error.py
+noteprocessors > error.py
 This script processes notes when the error state is active.
 It includes the "Chaotic Evil Error Note Handler" which changes single note on events to all 128 note-on events.
 
@@ -10,7 +10,6 @@ import internalconstants
 import config
 import internal
 import processorhelpers
-import eventprocessor
 
 NOTE_MODE = internalconstants.NOTE_STATE_ERROR
 
@@ -20,7 +19,7 @@ def process(command):
         # Do chaotic evil things
         if not command.is_lift:
             
-            notes_list = [eventprocessor.rawEvent(0, x, 127) for x in range(127, -1, -1)]
+            notes_list = [processorhelpers.rawEvent(0, x, 127) for x in range(127, -1, -1)]
             
             note = processorhelpers.ExtensibleNote(command, notes_list)
             

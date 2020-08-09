@@ -10,7 +10,7 @@ Author: Miguel Guthridge
 """
 
 
-from .state import sharedInit, extendedMode, errors
+from .state import sharedInit, extendedMode, errors, getPortExtended
 from .messages import sendInternalMidiMessage, sendCompleteInternalMidiMessage, sendMidiMessage, sendCompleteMidiMessage, toMidiMessage
 from .logging import debugLog, getLineBreak, printCommand, printCommandOutput, getTab
 from .windowstate import window

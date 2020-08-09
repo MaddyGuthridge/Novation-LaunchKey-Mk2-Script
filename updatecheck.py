@@ -1,4 +1,5 @@
-"""update_check.py
+"""
+update_check.py
 
 This module basically checks for script updates and returns true if they are available.
 
@@ -22,9 +23,11 @@ def check():
     """
 
     need_update_flag = False
-
-    with urllib.request.urlopen(internalconstants.UPDATE_JSON_URL) as url:
-        data = json.loads(url.read().decode())
+    try:
+        with urllib.request.urlopen(internalconstants.UPDATE_JSON_URL) as url:
+            data = json.loads(url.read().decode())
+    except:
+        return False
         
     latest_ver = data[0]["name"].split(".")
 
@@ -39,7 +42,7 @@ def check():
     elif latest_rev > internalconstants.SCRIPT_VERSION_REVISION:
         need_update_flag = True
     
-    internal.SCRIPT_UPDATE_AVAILABLE = True
+    internal.SCRIPT_UPDATE_AVAILABLE = need_update_flag
     return need_update_flag
 
 

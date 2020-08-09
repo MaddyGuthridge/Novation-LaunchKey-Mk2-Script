@@ -1,4 +1,5 @@
-"""processdefault.py
+"""
+otherprocessors > processdefault.py
 
 This script is the last to process events. It provides default functionality.
 Add things here when they are common throughout the entire script but can be overridden easily.

@@ -1,4 +1,5 @@
-"""processfirst.py
+"""
+otherprocessors > processfirst.py
 
 This file processes events before anything else. 
 Add things here when they need to override all other functionality (eg shift menu).
