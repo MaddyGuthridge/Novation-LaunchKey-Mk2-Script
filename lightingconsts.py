@@ -19,13 +19,38 @@ class ColourContainer:
     rgb_colours = dict()
     
     def addColour(self, name, int_val, rgb):
+        """Adds a colour to the list
+
+        Args:
+            name (str): Name of colour, used as key in dictionaries
+            int_val (int): colour on keyboard
+            rgb (int): RGB value
+        """
         self.int_colours[name] = int_val
         self.rgb_colours[name] = rgb
         
     def getColourByName(self, name):
+        """Returns details of colour
+
+        Args:
+            name (str): Name of colour
+
+        Returns:
+            tuple:
+                int: int_colour
+                int: rgb_clour
+        """
         return (self.int_colours[name], self.rgb_colours[name])
     
     def __getitem__(self, key):
+        """Get internal colour
+
+        Args:
+            key (str): Key (name of colour)
+
+        Returns:
+            int: internal colour
+        """
         return self.int_colours[key]
     
 colours = ColourContainer()
