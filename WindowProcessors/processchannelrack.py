@@ -23,7 +23,7 @@ ui_mode = processorhelpers.UiModeHandler(2)
 
 
 MENU_MODE_COLOUR = lightingconsts.UI_CHOOSE
-BIT_MODE_COLOUR = lightingconsts.COLOUR_RED
+BIT_MODE_COLOUR = lightingconsts.colours["RED"]
 
 def process(command):
 
@@ -315,32 +315,32 @@ def setGridBits(lights):
     if light_num_scroll < 8:
 
         if not gridBits.getBit(channels.channelNumber(), light_num_scroll):
-            lights.setPadColour(light_num_scroll, 0, lightingconsts.COLOUR_LIGHT_LILAC)
+            lights.setPadColour(light_num_scroll, 0, lightingconsts.colours["LIGHT LILAC"])
         else:
-            lights.setPadColour(light_num_scroll, 0, lightingconsts.COLOUR_PINK, 2)
+            lights.setPadColour(light_num_scroll, 0, lightingconsts.colours["PINK"], 2)
          
     # Set zoom indicator
     light_num_zoom = 7 - int(math.log(gridBits.zoom, 2))
     if light_num_zoom >= 0 and internal.window.getAnimationTick() > 7:
         if not gridBits.getBit(channels.channelNumber(), light_num_zoom):
-            lights.setPadColour(light_num_zoom, 0, lightingconsts.COLOUR_LIGHT_LIGHT_BLUE)
+            lights.setPadColour(light_num_zoom, 0, lightingconsts.colours["LIGHT LIGHT BLUE"])
         else:
-            lights.setPadColour(light_num_zoom, 0, lightingconsts.COLOUR_BLUE, 2)
+            lights.setPadColour(light_num_zoom, 0, lightingconsts.colours["BLUE"], 2)
 
     # If zoom and scroll lie on same pad
     if light_num_scroll == light_num_zoom:
         if not gridBits.getBit(channels.channelNumber(), light_num_zoom):
-            lights.setPadColour(light_num_zoom, 0, lightingconsts.COLOUR_LIGHT_YELLOW)
+            lights.setPadColour(light_num_zoom, 0, lightingconsts.colours["LIGHT YELLOW"])
         else:
-            lights.setPadColour(light_num_zoom, 0, lightingconsts.COLOUR_PINK, 2)
+            lights.setPadColour(light_num_zoom, 0, lightingconsts.colours["PINK"], 2)
 
     # Set remaining grid bits
     for i in range(8):
         if i <= internal.window.getAnimationTick():
             if gridBits.getBit(current_track, i):
-                lights.setPadColour(i, 0, lightingconsts.COLOUR_RED, 2)
+                lights.setPadColour(i, 0, lightingconsts.colours["RED"], 2)
             else:
-                lights.setPadColour(i, 0, lightingconsts.COLOUR_DARK_GREY)
+                lights.setPadColour(i, 0, lightingconsts.colours["DARK GREY"])
 
     return
 

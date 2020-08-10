@@ -127,16 +127,16 @@ def topWindowEnd():
 
 def processPeak(lights, y, level):
     level = level ** 3
-    colour = lightingconsts.COLOUR_RED
+    colour = lightingconsts.colours["RED"]
     for i in range(8):
         
         if level > 1 - (i + 1)/8:
             if i >= 4:
-                colour = lightingconsts.COLOUR_GREEN
+                colour = lightingconsts.colours["GREEN"]
             elif i >= 2:
-                colour = lightingconsts.COLOUR_YELLOW
+                colour = lightingconsts.colours["YELLOW"]
             elif i >= 1:
-                colour = lightingconsts.COLOUR_ORANGE
+                colour = lightingconsts.colours["ORANGE"]
             lights.setPadColour(7 - i, y, colour)
     
 

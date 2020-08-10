@@ -30,14 +30,14 @@ import lightingconsts
 import processorhelpers
 
 COLOUR_MAP = [
-    [lightingconsts.COLOUR_BLUE, lightingconsts.COLOUR_BLUE],
-    [lightingconsts.COLOUR_BLUE, lightingconsts.COLOUR_RED],
-    [lightingconsts.COLOUR_GREEN, lightingconsts.COLOUR_GREEN],
-    [lightingconsts.COLOUR_GREEN, lightingconsts.COLOUR_ORANGE],
-    [lightingconsts.COLOUR_YELLOW, lightingconsts.COLOUR_ORANGE],
-    [lightingconsts.COLOUR_YELLOW, lightingconsts.COLOUR_ORANGE],
-    [lightingconsts.COLOUR_LIGHT_BLUE, lightingconsts.COLOUR_ORANGE],
-    [lightingconsts.COLOUR_LIGHT_BLUE, lightingconsts.COLOUR_ORANGE]
+    [lightingconsts.colours["BLUE"], lightingconsts.colours["BLUE"]],
+    [lightingconsts.colours["BLUE"], lightingconsts.colours["RED"]],
+    [lightingconsts.colours["GREEN"], lightingconsts.colours["GREEN"]],
+    [lightingconsts.colours["GREEN"], lightingconsts.colours["ORANGE"]],
+    [lightingconsts.colours["YELLOW"], lightingconsts.colours["ORANGE"]],
+    [lightingconsts.colours["YELLOW"], lightingconsts.colours["ORANGE"]],
+    [lightingconsts.colours["LIGHT BLUE"], lightingconsts.colours["ORANGE"]],
+    [lightingconsts.colours["LIGHT BLUE"], lightingconsts.colours["ORANGE"]]
 ]
 
 

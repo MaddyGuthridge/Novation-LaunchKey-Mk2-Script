@@ -34,14 +34,14 @@ def topWindowEnd():
 
 def redraw(lights):
     if internal.window.getAnimationTick() >= 0:
-        lights.setPadColour(3, 1, lightingconsts.COLOUR_PURPLE)   # Next
+        lights.setPadColour(3, 1, lightingconsts.colours["PURPLE"])   # Next
     if internal.window.getAnimationTick() >= 1:
-        lights.setPadColour(3, 0, lightingconsts.COLOUR_PURPLE)   # Prev
-        lights.setPadColour(4, 1, lightingconsts.COLOUR_RED)      # Stop
+        lights.setPadColour(3, 0, lightingconsts.colours["PURPLE"])   # Prev
+        lights.setPadColour(4, 1, lightingconsts.colours["RED"])      # Stop
     if internal.window.getAnimationTick() >= 2:
-        lights.setPadColour(5, 1, lightingconsts.COLOUR_GREEN)    # Play
+        lights.setPadColour(5, 1, lightingconsts.colours["GREEN"])    # Play
     if internal.window.getAnimationTick() >= 4:
-        lights.setPadColour(7, 1, lightingconsts.COLOUR_BLUE, 2)     # Select
+        lights.setPadColour(7, 1, lightingconsts.colours["BLUE"], 2)     # Select
     return
 
 def process(command):

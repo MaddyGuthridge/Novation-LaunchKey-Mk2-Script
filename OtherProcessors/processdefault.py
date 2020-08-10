@@ -26,7 +26,7 @@ def redraw(lights):
     for x in range(len(internal.notemanager.pads.padsDown)):
             for y in range(len(internal.notemanager.pads.padsDown[x])):
                 if internal.notemanager.pads.getVal(x, y):
-                    lights.setPadColour(x, y, lightingconsts.COLOUR_WHITE, 2, True)
+                    lights.setPadColour(x, y, lightingconsts.colours["WHITE"], 2, True)
     return
 
 def process(command):

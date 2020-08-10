@@ -24,10 +24,10 @@ import mixer
 import channels
 
 COLOUR_MAP = [
-    [lightingconsts.COLOUR_RED, lightingconsts.COLOUR_LIGHT_BLUE],
-    [lightingconsts.COLOUR_ORANGE, lightingconsts.COLOUR_BLUE],
-    [lightingconsts.COLOUR_YELLOW, lightingconsts.COLOUR_PURPLE],
-    [lightingconsts.COLOUR_GREEN, lightingconsts.COLOUR_PINK],
+    [lightingconsts.colours["RED"], lightingconsts.colours["LIGHT BLUE"]],
+    [lightingconsts.colours["ORANGE"], lightingconsts.colours["BLUE"]],
+    [lightingconsts.colours["YELLOW"], lightingconsts.colours["PURPLE"]],
+    [lightingconsts.colours["GREEN"], lightingconsts.colours["PINK"]],
     [-1, -1],
     [-1, -1],
     [-1, -1],

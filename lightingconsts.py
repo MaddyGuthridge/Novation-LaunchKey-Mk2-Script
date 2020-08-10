@@ -1,93 +1,126 @@
 """
 lightingconsts.py
 
-This file contains constants regarding lights
+This file contains constants regarding lights. It is reorganised into objects so as to allow for colour mapping to match FL Colours.
 
 Author: Miguel Guthridge
 """
 
-# Define colour codes
-COLOUR_TRANSPARENT = -1
-COLOUR_OFF = 0
-COLOUR_WHITE = 3
-COLOUR_RED = 5
-COLOUR_GREEN = 25
-COLOUR_PINK = 53
-COLOUR_BLUE = 46
-COLOUR_YELLOW = 13
-COLOUR_PURPLE = 49
-COLOUR_LILAC = 116
-COLOUR_ORANGE = 84
+MODE_OFF = 0
+MODE_ON = 1
+MODE_PULSE = 2
 
-COLOUR_LIGHT_YELLOW = 109
-COLOUR_LIGHT_BLUE = 37
-COLOUR_LIGHT_LILAC = 116
-COLOUR_LIGHT_LIGHT_BLUE = 40
+class ColourContainer:
+    """Object that basic colours are stored in. Will have functionality to search by name or RGB value.
+    """
+    
+    int_colours = dict()
+    
+    rgb_colours = dict()
+    
+    def addColour(self, name, int_val, rgb):
+        self.int_colours[name] = int_val
+        self.rgb_colours[name] = rgb
+        
+    def getColourByName(self, name):
+        return (self.int_colours[name], self.rgb_colours[name])
+    
+    def __getitem__(self, key):
+        return self.int_colours[key]
+    
+colours = ColourContainer()
 
-COLOUR_DARK_GREY = 1
-COLOUR_DARK_PURPLE = 51
-COLOUR_DARK_BLUE = 47
-COLOUR_DARK_RED = 59
+colours.addColour("OFF", 0, 0x000000)
+colours.addColour("TRANSPARENT", -1, 0x000000)
+colours.addColour("WHITE", 3, 0xFFFFFF)
+
+colours.addColour("RED", 5, 0xFF2900)
+colours.addColour("GREEN", 25, 0xFF2900)
+colours.addColour("PINK", 53, 0xFF40FF)
+colours.addColour("BLUE", 45, 0x0433FF)
+colours.addColour("YELLOW", 13, 0x0433FF)
+colours.addColour("PURPLE", 49, 0x6435FF)
+colours.addColour("LILAC", 116, 0x9E7DFF)
+colours.addColour("ORANGE", 84, 0x9E7DFF)
+
+colours.addColour("LIGHT YELLOW", 109, 0xFFE400)
+colours.addColour("LIGHT BLUE", 37, 0x00B7FF)
+colours.addColour("LIGHT_LILAC", 115, 0xA7ABFF)
+colours.addColour("LIGHT LIGHT BLUE", 40, 0x509CFF)
+
+colours.addColour("DARK GREY", 1, 0x509CFF)
+colours.addColour("DARK PURPLE", 51, 0x0C0641)
+colours.addColour("DARK BLUE", 47, 0x0C0641)
+colours.addColour("DARK RED", 59, 0x0C0641)
 
 # Define colour pallettes used by light show
-PALLETE_NORMAL = [COLOUR_RED, COLOUR_PINK, COLOUR_PURPLE, COLOUR_BLUE, COLOUR_LIGHT_BLUE, COLOUR_GREEN, COLOUR_YELLOW, COLOUR_ORANGE, COLOUR_OFF]
-PALLETE_INIT_FAIL = [COLOUR_YELLOW, COLOUR_ORANGE, COLOUR_ORANGE, COLOUR_RED, COLOUR_RED, COLOUR_ORANGE, COLOUR_ORANGE, COLOUR_YELLOW, COLOUR_OFF] 
-PALLETE_UPDATE = [COLOUR_BLUE, COLOUR_LIGHT_BLUE, COLOUR_LIGHT_BLUE, COLOUR_GREEN, COLOUR_GREEN, COLOUR_LIGHT_BLUE, COLOUR_LIGHT_BLUE, COLOUR_BLUE, COLOUR_OFF] 
+PALLETE_NORMAL = [
+    colours["RED"], colours["PINK"], colours["PURPLE"], colours["BLUE"], 
+    colours["LIGHT BLUE"], colours["GREEN"], colours["YELLOW"], colours["ORANGE"], colours["OFF"]
+    ]
+PALLETE_INIT_FAIL = [
+    colours["YELLOW"], colours["ORANGE"], colours["ORANGE"], colours["RED"], 
+    colours["RED"], colours["ORANGE"], colours["ORANGE"], colours["YELLOW"], colours["OFF"]
+    ] 
+PALLETE_UPDATE = [
+    colours["BLUE"], colours["LIGHT BLUE"], colours["LIGHT BLUE"], colours["GREEN"], 
+    colours["GREEN"], colours["LIGHT BLUE"], colours["LIGHT BLUE"], colours["BLUE"], colours["OFF"]
+    ] 
 
 # Define UI colours
-UI_NAV_VERTICAL = COLOUR_LIGHT_BLUE
-UI_NAV_HORIZONTAL = COLOUR_PURPLE
-UI_ZOOM = COLOUR_BLUE
-UI_ACCEPT = COLOUR_GREEN
-UI_REJECT = COLOUR_RED
-UI_CHOOSE = COLOUR_PURPLE
+UI_NAV_VERTICAL = colours["LIGHT BLUE"]
+UI_NAV_HORIZONTAL = colours["PURPLE"]
+UI_ZOOM = colours["BLUE"]
+UI_ACCEPT = colours["GREEN"]
+UI_REJECT = colours["RED"]
+UI_CHOOSE = colours["PURPLE"]
 
-UI_UNDO = COLOUR_LIGHT_LIGHT_BLUE
-UI_REDO = COLOUR_LIGHT_BLUE
+UI_UNDO = colours["LIGHT LIGHT BLUE"]
+UI_REDO = colours["LIGHT BLUE"]
 
-UI_COPY = COLOUR_BLUE
-UI_CUT = COLOUR_LIGHT_BLUE
-UI_PASTE = COLOUR_GREEN
+UI_COPY = colours["BLUE"]
+UI_CUT = colours["LIGHT BLUE"]
+UI_PASTE = colours["GREEN"]
 
-UI_SAVE = COLOUR_GREEN
+UI_SAVE = colours["GREEN"]
 
 # Define tool colours
-TOOL_PENCIL = COLOUR_ORANGE
-TOOL_BRUSH = COLOUR_LIGHT_BLUE
-TOOL_DELETE = COLOUR_RED
-TOOL_MUTE = COLOUR_PINK
-TOOL_SLIP = COLOUR_ORANGE
-TOOL_SLICE = COLOUR_LIGHT_BLUE
-TOOL_SELECT = COLOUR_YELLOW
-TOOL_ZOOM = COLOUR_BLUE
-TOOL_PLAYBACK = COLOUR_GREEN
+TOOL_PENCIL = colours["ORANGE"]
+TOOL_BRUSH = colours["LIGHT BLUE"]
+TOOL_DELETE = colours["RED"]
+TOOL_MUTE = colours["PINK"]
+TOOL_SLIP = colours["ORANGE"]
+TOOL_SLICE = colours["LIGHT BLUE"]
+TOOL_SELECT = colours["YELLOW"]
+TOOL_ZOOM = colours["BLUE"]
+TOOL_PLAYBACK = colours["GREEN"]
 
 # Define Window Colours
-WINDOW_PLAYLIST = COLOUR_GREEN
-WINDOW_CHANNEL_RACK = COLOUR_RED
-WINDOW_PIANO_ROLL = COLOUR_PINK
-WINDOW_MIXER = COLOUR_LIGHT_BLUE
-WINDOW_BROWSER = COLOUR_ORANGE
-WINDOW_PLUGIN_PICKER = COLOUR_BLUE
+WINDOW_PLAYLIST = colours["GREEN"]
+WINDOW_CHANNEL_RACK = colours["RED"]
+WINDOW_PIANO_ROLL = colours["PINK"]
+WINDOW_MIXER = colours["LIGHT BLUE"]
+WINDOW_BROWSER = colours["ORANGE"]
+WINDOW_PLUGIN_PICKER = colours["BLUE"]
 
 # Define Beat Indicator Colours
-BEAT_PAT_BAR = COLOUR_RED
-BEAT_PAT_BEAT = COLOUR_ORANGE
-BEAT_SONG_BAR = COLOUR_LIGHT_BLUE
-BEAT_SONG_BEAT = COLOUR_GREEN
+BEAT_PAT_BAR = colours["RED"]
+BEAT_PAT_BEAT = colours["ORANGE"]
+BEAT_SONG_BAR = colours["LIGHT BLUE"]
+BEAT_SONG_BEAT = colours["GREEN"]
 
-TEMPO_TAP = COLOUR_PINK
-METRONOME = COLOUR_DARK_GREY
+TEMPO_TAP = colours["PINK"]
+METRONOME = colours["DARK GREY"]
 
 # Colour Matrix for errors
 ERROR_COLOURS = [
-    [COLOUR_RED, COLOUR_RED],
-    [COLOUR_RED, COLOUR_RED],
-    [COLOUR_RED, COLOUR_RED],
-    [COLOUR_RED, COLOUR_RED],
-    [COLOUR_RED, COLOUR_RED],
-    [COLOUR_RED, COLOUR_RED],
-    [COLOUR_RED, COLOUR_RED],
-    [COLOUR_RED, COLOUR_RED],
-    [COLOUR_RED, COLOUR_RED]
+    [colours["RED"], colours["RED"]],
+    [colours["RED"], colours["RED"]],
+    [colours["RED"], colours["RED"]],
+    [colours["RED"], colours["RED"]],
+    [colours["RED"], colours["RED"]],
+    [colours["RED"], colours["RED"]],
+    [colours["RED"], colours["RED"]],
+    [colours["RED"], colours["RED"]],
+    [colours["RED"], colours["RED"]]
 ]
