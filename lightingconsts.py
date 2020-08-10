@@ -6,6 +6,8 @@ This file contains constants regarding lights. It is reorganised into objects so
 Author: Miguel Guthridge
 """
 
+import math
+
 MODE_OFF = 0
 MODE_ON = 1
 MODE_PULSE = 2
@@ -53,6 +55,64 @@ class ColourContainer:
         """
         return self.int_colours[key]
     
+    def getClosestName(self, rgb):
+        """Returns name of closest colour in colour set
+
+        Args:
+            rgb (int): RGB colour
+
+        Returns:
+            str: colour name (key)
+        """
+        
+        # Extract r, g, b values
+        r = rgb >> 16
+        g = (rgb >> 8) - (r << 8)
+        b = rgb - (g << 8) - (r << 16)
+        
+        # Loop over each colour to get the closest one
+        min_distance = math.inf
+        min_distance_name= None
+        for name_check, rgb_check in self.rgb_colours.items():
+            
+            # Extract r, g, b values
+            r_check = rgb_check >> 16
+            g_check = (rgb_check >> 8) - (r_check << 8)
+            b_check = rgb_check - (g_check << 8) - (r_check << 16)
+            
+            # Use distance formula to get closest colour in RGB space
+            distance = math.sqrt( (r - r_check)**2 + (g - g_check)**2 + (b - b_check)**2 )
+            
+            if distance < min_distance:
+                min_distance = distance
+                min_distance_name = name_check
+        
+        return min_distance_name
+    
+    def getClosestInt(self, rgb):
+        """Returns internal value of closest colour in colour set
+
+        Args:
+            rgb (int): RGB colour
+
+        Returns:
+            int: colour internal number
+        """
+        return self.int_colours[self.getClosestName(rgb)]
+    
+    def getClosestRgb(self, rgb):
+        """Returns rgb of closest colour in colour set
+
+        Args:
+            rgb (int): RGB colour
+
+        Returns:
+            int: colour rgb
+        """
+        return self.rgb_colours[self.getClosestName(rgb)]
+
+
+
 colours = ColourContainer()
 
 colours.addColour("OFF", 0, 0x000000)

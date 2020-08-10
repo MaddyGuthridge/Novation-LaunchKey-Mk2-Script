@@ -406,7 +406,7 @@ def idleLightshow(lights):
 
                 if IDLE_ANIMATION_DO_TRAILS:
                     if not (((tick_num // IDLE_ANIMATION_TRAIL_SPEED) + x + IDLE_ANIMATION_TRAIL_Y_OFFSET*y) % IDLE_ANIMATION_TRAIL_INFREQUENCY < IDLE_ANIMATION_TRAIL_LENGTH):
-                        colour = lightingconsts.COLOUR_OFF
+                        colour = lightingconsts.colours["OFF"]
 
                 lights.setPadColour(x, y, colour, light_mode)
 
