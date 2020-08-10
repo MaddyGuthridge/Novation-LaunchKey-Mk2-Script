@@ -25,15 +25,19 @@ import internalconstants
 import config
 import lightingconsts
 
-# LightMap is sent around to collect colours on UI redraws
+
 class LightMap:
+    """This object is sent through event processors to gather colours for UI redraws.
+    """
     def __init__(self):
-        # 0 = off, 1-127 = colour
+        """Create instance
+        """
         self.reset()
     
-    # Set all pads to off      
+      
     def reset(self):
-
+        """Resets all lights to transparent
+        """
         # 0 = unfrozen, 1 = frozen
         self.FrozenMap = [
             [0, 0],
@@ -73,8 +77,25 @@ class LightMap:
             [0, 0]
             ]
 
-    # Set the colour of a pad
+
     def setPadColour(self, x, y, colour, state = 3, override = False):
+        """Sets the colour of a pad
+
+        Args:
+            x (int): X coordinate
+            y (int): Y coordinate
+            colour (int): Colour (specified in lightingconsts)
+            state (int, optional): Lighting mode. Defaults to 3.
+                - 0 = off
+                - 1 = on
+                - 2 = pulse
+                - negative = flashing with abs(state)
+                - 3 = automatic
+            override (bool, optional): Whether to override the current pad option. Defaults to False.
+
+        Returns:
+            bool: Whether the assignment was successful.
+        """
         if self.FrozenMap[x][y] == 0 or override: # If pad available to map
             self.PadColours[x][y] = colour
             self.PadStates[x][y] = state
@@ -83,8 +104,20 @@ class LightMap:
             return True
         else: return False
     
-    # Sets colours based on state of LightMap object
+    
     def setFromMatrix(self, map, state=3, override = False):
+        """Set pad lights from a 2x8 matrix
+
+        Args:
+            map (matrix): 2D list structure containing light settings
+            state (int, optional): Lighting mode. Defaults to 3.
+                - 0 = off
+                - 1 = on
+                - 2 = pulse
+                - negative = flashing with abs(state)
+                - 3 = automatic
+            override (bool, optional): Whether to override the current pad option. Defaults to False.
+        """
         for x in range(len(self.FrozenMap) - 1): # Don't modify round pads
             for y in range(len(self.FrozenMap[x])):
                 if self.FrozenMap[x][y] == 0 or override:
@@ -92,30 +125,52 @@ class LightMap:
         return
 
 
-    # Prevents pad from being overwritten
     def solidifyPad(self, x, y):
+        """Prevent a pad from being overwritten
+
+        Args:
+            x (int): X coordinate
+            y (int): Y coordinate
+        """
         if self.FrozenMap[x][y] == 0: # If pad available to map
             self.FrozenMap[x][y] = 1
     
-    # Prevents row from being overwritten
+    
     def solidifyRow(self, y):
+        """Prevent a row of lights from being overwritten (not including round pads)
+
+        Args:
+            y (int): Y coordinate
+        """
         for x in range(len(self.FrozenMap) - 1): # Don't solidify round pads
             if self.FrozenMap[x][y] == 0: self.FrozenMap[x][y] = 1
     
-    # Prevents column from being overwritten
+    
     def solidifyColumn(self, x):
+        """Prevents a column from being overwritten
+
+        Args:
+            x (int): X coordinate
+        """
         for y in range(len(self.FrozenMap)):
             if self.FrozenMap[x][y] == 0: self.FrozenMap[x][y] = 1
 
     # Prevents all pads from being overwritten
     def solidifyAll(self):
+        """Prevents all pads from being overwritten (not including round pads). Call this at the end of your redraw functions 
+        if you don't want other processors to possibly draw behind your UI.
+        """
         for x in range(len(self.FrozenMap) - 1): # Don't solidify round pads
             for y in range(len(self.FrozenMap[x])):
                 self.solidifyPad(x, y)
 
-# Lights manages state of pad lights
+
 class Lights:
+    """Manages the current state of lights.
+    """
     def __init__(self):
+        """Create instance.
+        """
         # 0 = off, 1-127 = colour
         self.PadColours = [
             [0, 0],
@@ -142,16 +197,27 @@ class Lights:
             [0, 0]
             ]
 
-    # Set all pads to off      
+
     def reset(self):
-        
+        """Reset all lights to off
+        """
         internal.sendMidiMessage(0xBF, 0x00, 0x00)
         internal.debugLog("Sent lighting reset signal", internalconstants.DEBUG_LIGHTING_RESET)
         internal.window.resetAnimationTick()
         self.__init__()
 
-    # Set the colour of a pad
+
     def setPadColour(self, x, y, colour, state = 3, override = False):
+        """Set the colour of a pad
+
+        Args:
+            x (int): X coordinate
+            y (int): Y coordinate
+            colour (int): Colour option
+            state (int, optional): Light mode. Defaults to 3.
+            override (bool, optional): Whether the event should be sent regardless of the 
+                current state of that pad. Defaults to False.
+        """
         if internal.window.getAbsoluteTick() % config.LIGHTS_FULL_REDRAW_FREQUENCY == 0:
             full_redraw = True
         else:
@@ -217,8 +283,13 @@ class Lights:
                 internal.sendMidiMessage(status, processorhelpers.convertPadMapping(eventconsts.Pads[x][y]), -state)
                 internal.debugLog("Sent light flash command [" + str(x) + ", " + str(y) + "] (InControl Disabled)", internalconstants.DEBUG_LIGHTING_MESSAGE)
     
-    # Sets colours based on state of LightMap object
+    
     def setFromMap(self, map):
+        """Set light colours from LightMap object
+
+        Args:
+            map (LightMap): What to set the lights to
+        """
         map.solidifyAll()
         for x in range(len(self.PadColours)):
             for y in range(len(self.PadColours[x])):
@@ -226,15 +297,20 @@ class Lights:
         return
     
     def redraw(self):
+        """Resends all lighting options from current state.
+        """
         for x in range(len(self.PadColours)):
             for y in range(len(self.PadColours[x])):
                 self.setPadColour(x, y, self.PadColours[x][y], override=True)
 
 state = Lights()
 
-# OoooOooOOOooO PREETTTTTYYYY!!!!!!
-def lightShow():
 
+def lightShow():
+    """OooOOoOOoOOoOOoOoO PREEEETTTTTTTTTTTTTYYYYYYYYYYYYYYYYYY!!!!!!!!!!!
+    
+    This draws the initialisation sequence.
+    """
     state.reset()
 
     sleepTime = 0.05
@@ -304,7 +380,12 @@ def lightShow():
 
     state.reset()
 
-def idle_lightshow(lights):
+def idleLightshow(lights):
+    """EVEN PRETTIER!!!!!!!!!!
+
+    Args:
+        lights (LightMap): LightMap object to draw to
+    """
     if internal.window.getIdleTick() > config.IDLE_WAIT_TIME and config.IDLE_LIGHTS_ENABLED:
         tick_num = internal.window.getIdleTick() - int(config.IDLE_WAIT_TIME) + IDLE_ANIMATION_TRAIL_LENGTH * IDLE_ANIMATION_TRAIL_SPEED
 
@@ -329,13 +410,21 @@ def idle_lightshow(lights):
 
                 lights.setPadColour(x, y, colour, light_mode)
 
-def idle_show_active():
+def idleLightshowActive():
+    """Whether the idle lightshow is currently active
+
+    Returns:
+        bool: Whether it's active
+    """
     if internal.window.getIdleTick() > config.IDLE_WAIT_TIME and config.IDLE_LIGHTS_ENABLED:
         return True
 
     else:
         return False
 
-def trigger_idle_show():
+def triggerIdleLightshow():
+    """Set idle tick number to tick required for lightshow to begin.
+    Call this to get that sweet sweet RGB going.
+    """
     internal.window.idle_tick_number = config.IDLE_WAIT_TIME
 

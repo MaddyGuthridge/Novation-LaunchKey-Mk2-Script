@@ -64,7 +64,7 @@ def processExtended(command):
 
         # Reset idle timer
         if not ((command.type is eventconsts.TYPE_BASIC_PAD or command.type is eventconsts.TYPE_PAD or command.type is eventconsts.TYPE_TRANSPORT) and not command.is_lift):
-            if lighting.idle_show_active():
+            if lighting.idleLightshowActive():
                 command.handle("End Idle Light Show")
             internal.window.resetIdleTick()
 
@@ -189,7 +189,7 @@ def redraw():
     try:
 
         # Draws idle thing if idle
-        lighting.idle_lightshow(lights)
+        lighting.idleLightshow(lights)
 
         # Get UI from primary processor
         processfirst.redraw(lights)
