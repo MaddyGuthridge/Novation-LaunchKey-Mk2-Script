@@ -65,6 +65,10 @@ class ColourContainer:
             str: colour name (key)
         """
         
+        # Trim unnessesary data
+        rgb = int.from_bytes(rgb.to_bytes(8, byteorder="big")[-3:], byteorder="big")
+        print(rgb)
+        
         # Extract r, g, b values
         r = rgb >> 16
         g = (rgb >> 8) - (r << 8)
@@ -137,6 +141,7 @@ colours.addColour("DARK GREY", 1, 0x509CFF)
 colours.addColour("DARK PURPLE", 51, 0x0C0641)
 colours.addColour("DARK BLUE", 47, 0x0C0641)
 colours.addColour("DARK RED", 59, 0x0C0641)
+
 
 # Define colour pallettes used by light show
 PALLETE_NORMAL = [
