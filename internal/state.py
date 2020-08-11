@@ -345,7 +345,8 @@ class ErrorState:
         print("")
         print("")
 
-        raise e
+        if config.DEBUG_HARD_CRASHING:
+            raise e
 
     def triggerErrorFromOtherScript(self):
         """Sets the device into an error state when an error was encoutered on the other script.
@@ -391,16 +392,35 @@ class ErrorState:
             lights (LightMap): Object containining lighting state during redraw
         """
         lights.setFromMatrix(lightingconsts.ERROR_COLOURS)
+        lights.setPadColour(8, 1, lightingconsts.colours["ORANGE"])
         lights.solidifyAll()
 
+    def recoverError(self, received=False):
+        self.error = False
+        if not received:
+            sendCompleteInternalMidiMessage(internalconstants.MESSAGE_ERROR_RECOVER)
+        
+        if getPortExtended():
+            print("Here")
+            extendedMode.ignore_all = False
+            extendedMode.setVal(True)
+            
+        noteMode.setState(internalconstants.NOTE_STATE_NORMAL)
+        
+        #config.DEBUG_HARD_CRASHING = True
+            
+        print(getLineBreak())
+        print("Error ignored")
+        print(getLineBreak())
+    
     def eventProcessError(self, command):
-        """Process an error while the device is in an error state. Depreciated.
+        """Handles extended mode events when in an error state
 
         Args:
-            command (ProcessedEvent): The event to be handled
+            command (ProcessedEvent): An event
         """
         command.handle("Device in error state")
-
+    
 errors = ErrorState()
 
 

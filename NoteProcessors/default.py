@@ -11,9 +11,11 @@ import internal
 import processorhelpers
 import lightingconsts
 
-NOTE_MODE = internalconstants.NOTE_STATE_NORMAL
+NAME = internalconstants.NOTE_STATE_NORMAL
 
 COLOUR = lightingconsts.colours["DARK GREY"]
+
+SILENT = False
 
 def process(command):
     """

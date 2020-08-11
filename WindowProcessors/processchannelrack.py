@@ -28,7 +28,7 @@ BIT_MODE_COLOUR = lightingconsts.colours["RED"]
 def process(command):
 
     command.actions.addProcessor("Channel rack Processor")
-
+    
     current_channel = channels.channelNumber()
 
     #---------------------------------

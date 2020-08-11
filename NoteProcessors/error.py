@@ -11,14 +11,23 @@ import config
 import internal
 import processorhelpers
 import lightingconsts
+import eventconsts
 
-NOTE_MODE = internalconstants.NOTE_STATE_ERROR
+NAME = internalconstants.NOTE_STATE_ERROR
 
-COLOUR = lightingconsts.colours["RED"]
+COLOUR = lightingconsts.colours["ORANGE"]
+
+SILENT = False
 
 def process(command):
     command.actions.addProcessor("Error note handler")
-    if config.CHAOTIC_EVIL_ERROR_NOTE_HANDLER:
+    
+    if command.type is eventconsts.TYPE_BASIC_PAD and command.is_lift and command.getPadCoord() == (8, 1):
+        internal.errors.recoverError(False)
+        command.handle("Recover error")
+            
+    elif config.CHAOTIC_EVIL_ERROR_NOTE_HANDLER and command.type is eventconsts.TYPE_NOTE:
+        
         # Do chaotic evil things
         if not command.is_lift:
             

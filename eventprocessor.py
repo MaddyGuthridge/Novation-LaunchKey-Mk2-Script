@@ -106,14 +106,14 @@ def processBasic(command):
             processReceived(command)
             return
 
-        # For note events, use note processors
-        if command.type == eventconsts.TYPE_NOTE:
-            noteprocessors.process(command)
+        # Send to note processors
+        noteprocessors.process(command)
+        
+        if command.handled:
             return
 
-        # Now process other events for errors.
-        if internal.errors.getError():
-            internal.errors.eventProcessError(command)
+        # For note events quit now
+        if command.type == eventconsts.TYPE_NOTE:
             return
         
         # Call primary processor
@@ -145,6 +145,10 @@ def processReceived(command):
     elif data == internalconstants.MESSAGE_ERROR_CRASH:
         internal.errors.triggerErrorFromOtherScript()
         command.handle("Trigger error state")
+    
+    elif data == internalconstants.MESSAGE_ERROR_RECOVER:
+        internal.errors.recoverError(True)
+        command.handle("Recover from error state")
         
     elif data == internalconstants.MESSAGE_SHIFT_DOWN:
         internal.shift.setDown(True)
@@ -157,6 +161,11 @@ def processReceived(command):
     elif data == internalconstants.MESSAGE_SHIFT_USE:
         internal.shift.use()
         command.handle("Use shift")
+        
+    elif command.id == internalconstants.MESSAGE_INPUT_MODE_SELECT:
+        noteprocessors.setModeByIndex(command.value)
+        command.handle("Set note state")
+        
 
 # Called after a window is activated
 def activeStart():

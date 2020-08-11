@@ -159,8 +159,6 @@ def process(command):
         
         processShift(command)
 
-        
-
     # Right click menu
     if ui.isInPopupMenu() and command.type == eventconsts.TYPE_PAD and command.is_lift and (internal.window.getString() != internalconstants.WINDOW_STR_SCRIPT_OUTPUT):
         
@@ -176,26 +174,24 @@ def process(command):
     # All
     if command.id == eventconsts.SYSTEM_EXTENDED:
         internal.extendedMode.recieve(not command.is_lift)
-        command.actions.appendAction("Set Extended Mode to " + str(not command.is_lift))
-        command.handled = True
+        command.handle("Set Extended Mode to " + str(not command.is_lift))
 
     # Knobs
     if command.id == eventconsts.INCONTROL_KNOBS:
         internal.extendedMode.recieve(not command.is_lift, eventconsts.INCONTROL_KNOBS)
-        command.actions.appendAction("Set Extended Mode (Knobs) to " + str(not command.is_lift))
-        command.handled = True
+        command.handle("Set Extended Mode (Knobs) to " + str(not command.is_lift))
     
     # Faders
     if command.id == eventconsts.INCONTROL_FADERS:
         internal.extendedMode.recieve(not command.is_lift, eventconsts.INCONTROL_FADERS)
-        command.actions.appendAction("Set Extended Mode (Faders) to " + str(not command.is_lift))
-        command.handled = True
+        command.handle("Set Extended Mode (Faders) to " + str(not command.is_lift))
     
     # Pads
     if command.id == eventconsts.INCONTROL_PADS:
         internal.extendedMode.recieve(not command.is_lift, eventconsts.INCONTROL_PADS)
-        command.actions.appendAction("Set Extended Mode (Pads) to " + str(not command.is_lift))
-        command.handled = True
+        if command.is_lift:
+            noteprocessors.processnotes.switchNoteModeMenu(False)
+        command.handle("Set Extended Mode (Pads) to " + str(not command.is_lift))
     
     # That random event on the knobs button
     if command.id == eventconsts.SYSTEM_MISC:

@@ -500,9 +500,18 @@ class ProcessedEvent:
             event (RawEvent): A MIDI Event to change this event to
         """
         self.edited = True
+        
         self.status = event.status
+        
         self.note = event.data1
+        self.data1 = event.data1
+        
         self.value = event.data2
+        self.data2 = event.data2
+        
+        self.status_nibble = event.status >> 4              # Get first half of status byte
+        self.channel = event.status & int('00001111', 2)    # Get 2nd half of status byte
+        
         self.shifted = event.shift
 
         # Bit-shift status and data bytes to get event ID

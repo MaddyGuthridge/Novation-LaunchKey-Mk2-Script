@@ -98,6 +98,7 @@ DEBUG_EVENT_ACTIONS = "Event actions"
 DEBUG_WINDOW_CHANGES = "Window changed"
 DEBUG_WARNING_DEPRECIATED_FEATURE = "Depreciated feature"
 DEBUG_DEVICE_TYPE = "Device type"
+DEBUG_NOTE_MODE = "Note mode"
 
 
 #---------------------------------
@@ -105,10 +106,14 @@ DEBUG_DEVICE_TYPE = "Device type"
 #---------------------------------
 
 MESSAGE_RESET_INTERNAL_CONTROLLER = 0x7F00BE
+
 MESSAGE_ERROR_CRASH = 0x7F7FBE
+MESSAGE_ERROR_RECOVER = 0x007FBE
+
 MESSAGE_SHIFT_DOWN = 0x7F01BE
 MESSAGE_SHIFT_UP = 0x0001BE
 MESSAGE_SHIFT_USE = 0x0101BE
+
 MESSAGE_INPUT_MODE_SELECT = 0x02BE # Mode number as velocity
 
 
@@ -116,8 +121,8 @@ MESSAGE_INPUT_MODE_SELECT = 0x02BE # Mode number as velocity
 # Note States
 #---------------------------------
 
-NOTE_STATE_NORMAL = 0
-NOTE_STATE_ERROR = -1
+NOTE_STATE_NORMAL = "Default"
+NOTE_STATE_ERROR = "Error"
 
 # What events should be ignored when shifting
 SHIFT_IGNORE_TYPES = [eventconsts.TYPE_INCONTROL, eventconsts.TYPE_INTERNAL_EVENT, 

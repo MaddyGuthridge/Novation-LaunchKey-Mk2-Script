@@ -9,6 +9,8 @@ Author: Miguel Guthridge
 import internalconstants
 import channels
 
+from internal.logging import debugLog
+
 class NoteModeState:
     current_state = internalconstants.NOTE_STATE_NORMAL
 
@@ -16,6 +18,7 @@ class NoteModeState:
         return self.current_state
 
     def setState(self, newState):
+        debugLog("Set note mode state to " + newState, internalconstants.DEBUG_NOTE_MODE)
         # Add some checks to ensure not setting into a bad state
         self.current_state = newState
 
