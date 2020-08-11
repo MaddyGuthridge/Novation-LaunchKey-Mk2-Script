@@ -66,15 +66,15 @@ def activeEnd():
 def process(command):
     command.actions.addProcessor("FPC Processor")
 
-    # Basic Mode Processing:
-    if not internal.getPortExtended():
-        # Change pedals to kick:
-        if command.id == eventconsts.PEDAL:
-            if command.value == 0: # Pedal up
-                command.edit(processorhelpers.RawEvent(0x89, eventconsts.BasicPads[1][1], command.value))
-            else: # Pedal up
-                command.edit(processorhelpers.RawEvent(0x99, eventconsts.BasicPads[1][1], command.value))
+   
+    # Change pedals to kick:
+    if command.id == eventconsts.PEDAL:
+        if command.value == 0: # Pedal up
+            command.edit(processorhelpers.RawEvent(0x89, eventconsts.BasicPads[1][1], command.value))
+        else: # Pedal up
+            command.edit(processorhelpers.RawEvent(0x99, eventconsts.BasicPads[1][1], command.value))
 
+    if command.type is eventconsts.TYPE_BASIC_PAD:
         # Dispatch event to extended mode
         internal.sendInternalMidiMessage(command.status, command.note, command.value)
 
@@ -82,9 +82,7 @@ def process(command):
         change_pads(command)
 
 
-    # Add did not handle flag if not handled
-    if command.handled is False: 
-        command.actions.appendAction("[Did not handle]")
+    
     return
 
 

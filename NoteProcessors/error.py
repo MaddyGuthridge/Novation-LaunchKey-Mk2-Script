@@ -10,8 +10,11 @@ import internalconstants
 import config
 import internal
 import processorhelpers
+import lightingconsts
 
 NOTE_MODE = internalconstants.NOTE_STATE_ERROR
+
+COLOUR = lightingconsts.colours["RED"]
 
 def process(command):
     command.actions.addProcessor("Error note handler")

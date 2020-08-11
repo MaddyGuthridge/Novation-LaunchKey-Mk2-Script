@@ -9,8 +9,11 @@ import internalconstants
 import eventconsts
 import internal
 import processorhelpers
+import lightingconsts
 
 NOTE_MODE = internalconstants.NOTE_STATE_NORMAL
+
+COLOUR = lightingconsts.colours["DARK GREY"]
 
 def process(command):
     """

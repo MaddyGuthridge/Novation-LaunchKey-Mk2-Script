@@ -7,18 +7,18 @@ Add things here when they need to override all other functionality (eg shift men
 Author: Miguel Guthridge
 """
 
-import transport
 import ui
 import general
+import transport
 
 import config
 import internalconstants
-import eventprocessor
+import processorhelpers
 import eventconsts
 import internal
 import lighting
 import lightingconsts
-
+import noteprocessors
 
 def redraw(lights):
     # In Popup Menu
@@ -29,7 +29,7 @@ def redraw(lights):
     if internal.shift.getDown():
         redrawShift(lights)
 
-
+    noteprocessors.redrawNoteModeMenu(lights)
 
     return
 
@@ -71,40 +71,40 @@ def redrawShift(lights):
     if internal.window.getAnimationTick() > 0:
         # Playlist
         if internal.window.getString() == internalconstants.WINDOW_STR_PLAYLIST:
-            lights.setPadColour(0, 1, lightingconsts.COLOUR_DARK_GREY)
+            lights.setPadColour(0, 1, lightingconsts.colours["DARK GREY"])
         else:
             lights.setPadColour(0, 1, lightingconsts.WINDOW_PLAYLIST)
 
     if internal.window.getAnimationTick() > 1:
         # Channel Rack
         if internal.window.getString() == internalconstants.WINDOW_STR_CHANNEL_RACK:
-            lights.setPadColour(1, 1, lightingconsts.COLOUR_DARK_GREY)
+            lights.setPadColour(1, 1, lightingconsts.colours["DARK GREY"])
         else:
             lights.setPadColour(1, 1, lightingconsts.WINDOW_CHANNEL_RACK)
 
         # Undo
         if undo_type  == UNDO_FIRST:
-            lights.setPadColour(0, 0, lightingconsts.COLOUR_DARK_GREY)
+            lights.setPadColour(0, 0, lightingconsts.colours["DARK GREY"])
         else:
             lights.setPadColour(0, 0, lightingconsts.UI_UNDO)
 
     if internal.window.getAnimationTick() > 2:
         # Piano roll
         if internal.window.getString() == internalconstants.WINDOW_STR_PIANO_ROLL:
-            lights.setPadColour(2, 1, lightingconsts.COLOUR_DARK_GREY)
+            lights.setPadColour(2, 1, lightingconsts.colours["DARK GREY"])
         else:
             lights.setPadColour(2, 1, lightingconsts.WINDOW_PIANO_ROLL)
 
         # Redo
         if undo_type == UNDO_LAST:
-            lights.setPadColour(1, 0, lightingconsts.COLOUR_DARK_GREY)
+            lights.setPadColour(1, 0, lightingconsts.colours["DARK GREY"])
         else:
             lights.setPadColour(1, 0, lightingconsts.UI_REDO)
 
     if internal.window.getAnimationTick() > 3:
         # Mixer
         if internal.window.getString() == internalconstants.WINDOW_STR_MIXER:
-            lights.setPadColour(3, 1, lightingconsts.COLOUR_DARK_GREY)
+            lights.setPadColour(3, 1, lightingconsts.colours["DARK GREY"])
         else:
             lights.setPadColour(3, 1, lightingconsts.WINDOW_MIXER)
 
@@ -117,7 +117,7 @@ def redrawShift(lights):
     if internal.window.getAnimationTick() > 4:
         # Browser
         if internal.window.getString() == internalconstants.WINDOW_STR_BROWSER:
-            lights.setPadColour(4, 1, lightingconsts.COLOUR_DARK_GREY)
+            lights.setPadColour(4, 1, lightingconsts.colours["DARK GREY"])
         else:
             lights.setPadColour(4, 1, lightingconsts.WINDOW_BROWSER)
 
@@ -135,70 +135,71 @@ def process(command):
 
     command.actions.addProcessor("Primary Processor")
 
-    # If in extended mode
-    if internal.state.PORT == config.DEVICE_PORT_EXTENDED:
+    # Forward onto main processor for lighting
+    if command.type == eventconsts.TYPE_PAD:
+        internal.sendInternalMidiMessage(command.status, command.note, command.value)
+        command.actions.appendAction("Forward to basic script processor")
 
-        # Pads down (white light)
-        if command.type == eventconsts.TYPE_BASIC_PAD or command.type == eventconsts.TYPE_PAD:
-            if command.value: # Press down
-                internal.notemanager.pads.press(command.coord_X, command.coord_Y)
-            else:
-                internal.notemanager.pads.lift(command.coord_X, command.coord_Y)
+    # Pads down (white light)
+    if command.type == eventconsts.TYPE_BASIC_PAD or command.type == eventconsts.TYPE_PAD:
+        if command.value: # Press down
+            internal.notemanager.pads.press(command.coord_X, command.coord_Y)
+        else:
+            internal.notemanager.pads.lift(command.coord_X, command.coord_Y)
 
-        # Shift button (in control for pads (window switcher))
-        if command.id == config.SHIFT_BUTTON:
-            if command.is_lift:
-                internal.extendedMode.revert(eventconsts.INCONTROL_PADS)
-            else:
-                internal.extendedMode.setVal(True, eventconsts.INCONTROL_PADS)
+    # Shift button (in control for pads (window switcher))
+    if command.id == config.SHIFT_BUTTON:
+        if command.is_lift:
+            internal.extendedMode.revert(eventconsts.INCONTROL_PADS)
+        else:
+            internal.extendedMode.setVal(True, eventconsts.INCONTROL_PADS)
 
-        # Shift down - Window switcher
-        if command.shifted and command.type == eventconsts.TYPE_PAD and command.is_lift:
-            
-            processShift(command)
-
-            
-
-        # Right click menu
-        if ui.isInPopupMenu() and command.type == eventconsts.TYPE_PAD and command.is_lift and (internal.window.getString() != internalconstants.WINDOW_STR_SCRIPT_OUTPUT):
-            
-            processPopup(command)
-
-        #
-        # Extended Mode signals
-        #
-
-        # All
-        if command.id == eventconsts.SYSTEM_EXTENDED:
-            internal.extendedMode.recieve(not command.is_lift)
-            command.actions.appendAction("Set Extended Mode to " + str(not command.is_lift))
-            command.handled = True
-
-        # Knobs
-        if command.id == eventconsts.INCONTROL_KNOBS:
-            internal.extendedMode.recieve(not command.is_lift, eventconsts.INCONTROL_KNOBS)
-            command.actions.appendAction("Set Extended Mode (Knobs) to " + str(not command.is_lift))
-            command.handled = True
+    # Shift down - Window switcher
+    if command.shifted and command.type == eventconsts.TYPE_PAD and command.is_lift:
         
-        # Faders
-        if command.id == eventconsts.INCONTROL_FADERS:
-            internal.extendedMode.recieve(not command.is_lift, eventconsts.INCONTROL_FADERS)
-            command.actions.appendAction("Set Extended Mode (Faders) to " + str(not command.is_lift))
-            command.handled = True
+        processShift(command)
+
         
-        # Pads
-        if command.id == eventconsts.INCONTROL_PADS:
-            internal.extendedMode.recieve(not command.is_lift, eventconsts.INCONTROL_PADS)
-            command.actions.appendAction("Set Extended Mode (Pads) to " + str(not command.is_lift))
-            command.handled = True
+
+    # Right click menu
+    if ui.isInPopupMenu() and command.type == eventconsts.TYPE_PAD and command.is_lift and (internal.window.getString() != internalconstants.WINDOW_STR_SCRIPT_OUTPUT):
         
-        # That random event on the knobs button
-        if command.id == eventconsts.SYSTEM_MISC:
-            command.handled = True
+        processPopup(command)
+
+    # Note Processor Menu
+    noteprocessors.processNoteModeMenu(command)
+
+    #
+    # Extended Mode signals
+    #
+
+    # All
+    if command.id == eventconsts.SYSTEM_EXTENDED:
+        internal.extendedMode.recieve(not command.is_lift)
+        command.actions.appendAction("Set Extended Mode to " + str(not command.is_lift))
+        command.handled = True
+
+    # Knobs
+    if command.id == eventconsts.INCONTROL_KNOBS:
+        internal.extendedMode.recieve(not command.is_lift, eventconsts.INCONTROL_KNOBS)
+        command.actions.appendAction("Set Extended Mode (Knobs) to " + str(not command.is_lift))
+        command.handled = True
     
-    # Add did not handle flag if not handled
-    if command.handled is False: 
-        command.actions.appendAction("[Did not handle]")
+    # Faders
+    if command.id == eventconsts.INCONTROL_FADERS:
+        internal.extendedMode.recieve(not command.is_lift, eventconsts.INCONTROL_FADERS)
+        command.actions.appendAction("Set Extended Mode (Faders) to " + str(not command.is_lift))
+        command.handled = True
+    
+    # Pads
+    if command.id == eventconsts.INCONTROL_PADS:
+        internal.extendedMode.recieve(not command.is_lift, eventconsts.INCONTROL_PADS)
+        command.actions.appendAction("Set Extended Mode (Pads) to " + str(not command.is_lift))
+        command.handled = True
+    
+    # That random event on the knobs button
+    if command.id == eventconsts.SYSTEM_MISC:
+        command.handle("Handle misc event")
 
 def processShift(command):
     if command.note == eventconsts.Pads[0][1]: 

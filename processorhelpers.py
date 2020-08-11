@@ -532,6 +532,13 @@ class ProcessedEvent:
         """
         self.actions.appendAction(action, False, False)
 
+    def addProcessor(self, name):
+        """Adds an event processor to the processor list
+
+        Args:
+            name (str): Name of processor
+        """
+        self.actions.addProcessor(name)
     
     def getInfo(self):
         """Returns info about event
@@ -626,8 +633,11 @@ class ProcessedEvent:
         elif self.type is eventconsts.TYPE_FADER_BUTTON or self.type is eventconsts.TYPE_BASIC_FADER_BUTTON: 
             a = "Fader Button"
             b = self.getID_FaderButton()
-        elif self.type is eventconsts.TYPE_PAD or self.type is eventconsts.TYPE_BASIC_PAD: 
+        elif self.type is eventconsts.TYPE_PAD: 
             a = "Pad"
+            b = self.getID_Pads()
+        elif self.type is eventconsts.TYPE_BASIC_PAD:
+            a = "Pad (Basic)"
             b = self.getID_Pads()
         elif self.type is eventconsts.TYPE_BASIC_EVENT:
             a = "Basic Event"
