@@ -401,7 +401,6 @@ class ErrorState:
             sendCompleteInternalMidiMessage(internalconstants.MESSAGE_ERROR_RECOVER)
         
         if getPortExtended():
-            print("Here")
             extendedMode.ignore_all = False
             extendedMode.setVal(True)
             

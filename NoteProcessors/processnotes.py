@@ -141,6 +141,5 @@ def processNoteModeMenu(command):
                 command.handle("Open note mode menu")
 
 def setModeByIndex(index):
-    print("here")
     internal.noteMode.setState(getattr(noteprocessors, customProcessors[index]).NAME)
 

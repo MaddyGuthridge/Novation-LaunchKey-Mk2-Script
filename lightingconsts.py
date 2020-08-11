@@ -67,7 +67,6 @@ class ColourContainer:
         
         # Trim unnessesary data
         rgb = int.from_bytes(rgb.to_bytes(8, byteorder="big")[-3:], byteorder="big")
-        print(rgb)
         
         # Extract r, g, b values
         r = rgb >> 16
