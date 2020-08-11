@@ -135,7 +135,7 @@ def process(command):
 
     command.actions.addProcessor("Primary Processor")
 
-    # Forward onto main processor for lighting
+    # Forward onto basic processor for things
     if command.type == eventconsts.TYPE_PAD:
         internal.sendInternalMidiMessage(command.status, command.note, command.value)
         command.actions.appendAction("Forward to basic script processor")
@@ -195,7 +195,8 @@ def process(command):
     if command.id == eventconsts.INCONTROL_PADS:
         internal.extendedMode.recieve(not command.is_lift, eventconsts.INCONTROL_PADS)
         if command.is_lift:
-            noteprocessors.processnotes.switchNoteModeMenu(False)
+            # Close select note mode menu
+            noteprocessors.processnotes.switchNoteModeMenu(False, True)
         command.handle("Set Extended Mode (Pads) to " + str(not command.is_lift))
     
     # That random event on the knobs button

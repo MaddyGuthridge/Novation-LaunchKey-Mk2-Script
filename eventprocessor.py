@@ -101,10 +101,17 @@ def processBasic(command):
     internal.sendCompleteInternalMidiMessage(internalconstants.MESSAGE_RESET_INTERNAL_CONTROLLER)
 
     try:
-
         if command.recieved_internal:
             processReceived(command)
             return
+        
+        # Process key mappings
+        controllerprocessors.process(command)
+        
+        # Call primary processor
+        processfirst_basic.process(command)
+        
+        if command.handled: return
 
         # Send to note processors
         noteprocessors.process(command)
@@ -115,11 +122,6 @@ def processBasic(command):
         # For note events quit now
         if command.type == eventconsts.TYPE_NOTE:
             return
-        
-        # Call primary processor
-        processfirst_basic.process(command)
-
-        if command.handled: return
 
         # Only call plugin and window processors if it is safe to do so | Currently disabled due to errors
         if command.pme_system_safe or True:

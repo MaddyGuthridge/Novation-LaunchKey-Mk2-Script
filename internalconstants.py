@@ -128,5 +128,6 @@ SHIFT_IGNORE_TYPES = [eventconsts.TYPE_INCONTROL, eventconsts.TYPE_INTERNAL_EVEN
                       eventconsts.TYPE_SYSEX_EVENT, eventconsts.TYPE_SYSTEM_MSG, eventconsts.TYPE_UNRECOGNISED]
 
 
-
+OMNI_CHANNEL_STATUS = 0xD
+INTERNAL_CHANNEL_STATUS = 0xE
 

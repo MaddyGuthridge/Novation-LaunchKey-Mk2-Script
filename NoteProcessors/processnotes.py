@@ -9,7 +9,7 @@ Author: Miguel Guthridge
 #
 # Add custom event processors to this list
 #
-imports = ["default", "error", "scale"]
+imports = ["default", "error", "scale", "omni"]
 #
 #
 #
@@ -43,10 +43,15 @@ noteModeMenu = processorhelpers.UiModeHandler(len(customProcessors) // 16 + 1)
 
 note_menu_active = False
 
-def switchNoteModeMenu(newMode):
+def switchNoteModeMenu(newMode, quiet=False):
     global note_menu_active
     note_menu_active = newMode
     noteModeMenu.resetMode()
+    if not quiet:
+        if newMode:
+            internal.extendedMode.setVal(True, eventconsts.INCONTROL_PADS)
+        else:
+            internal.extendedMode.revert(eventconsts.INCONTROL_PADS)
 
 def process(command):
     for x in customProcessorsAll:
@@ -83,7 +88,8 @@ def redrawNoteModeMenu(lights):
         redrawTo = min(len(customProcessors) - 16*noteModeMenu.getMode(), 16)
         
         for ctr in range(16*noteModeMenu.getMode(), 16*noteModeMenu.getMode() + redrawTo):
-            
+            if ctr >= internal.window.getAnimationTick():
+                break
             x = ctr % 8
             y = ctr // 8
             
@@ -108,12 +114,10 @@ def processNoteModeMenu(command):
             
             if note_menu_active:
                 if command.is_double_click:
-                    internal.extendedMode.revert(eventconsts.INCONTROL_PADS)
                     switchNoteModeMenu(False)
                     command.handle("Close note mode menu")
                 else:
                     if noteModeMenu.num_modes == 1:
-                        internal.extendedMode.revert(eventconsts.INCONTROL_PADS)
                         switchNoteModeMenu(False)
                         command.handle("Close note mode menu")
                     else:
@@ -121,7 +125,7 @@ def processNoteModeMenu(command):
                         command.handle("Next note mode menu")
             
             elif not note_menu_active:
-                internal.extendedMode.setVal(True, eventconsts.INCONTROL_PADS)
+                
                 switchNoteModeMenu(True)
                 command.handle("Open note mode menu")
         
@@ -130,10 +134,9 @@ def processNoteModeMenu(command):
             note_mode_index = noteModeMenu.getMode()*16 + command.coord_X + 8*command.coord_Y
             
             if note_mode_index < len(customProcessors):
-                setModeByIndex(note_mode_index)
                 internal.sendCompleteInternalMidiMessage(internalconstants.MESSAGE_INPUT_MODE_SELECT + (note_mode_index << 16))
                 switchNoteModeMenu(False)
-                internal.extendedMode.revert(eventconsts.INCONTROL_PADS)
+                setModeByIndex(note_mode_index)
                 command.handle("Select note mode")
             
             else:

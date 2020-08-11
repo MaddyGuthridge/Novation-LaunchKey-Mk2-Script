@@ -64,10 +64,10 @@ class ColourContainer:
         Returns:
             str: colour name (key)
         """
-        
-        # Trim unnessesary data
-        rgb = int.from_bytes(rgb.to_bytes(8, byteorder="big")[-3:], byteorder="big")
-        
+                
+        # Trim unnessesary data (bitwise and with 3-bytes of 1)
+        rgb = rgb&((1 << 24) - 1)
+                
         # Extract r, g, b values
         r = rgb >> 16
         g = (rgb >> 8) - (r << 8)
@@ -122,25 +122,25 @@ colours.addColour("OFF", 0, 0x000000)
 colours.addColour("TRANSPARENT", -1, 0x000000)
 colours.addColour("WHITE", 3, 0xFFFFFF)
 
-colours.addColour("RED", 5, 0xFF2900)
-colours.addColour("GREEN", 25, 0xFF2900)
-colours.addColour("TEAL", 77, 0x00F88D)
-colours.addColour("PINK", 53, 0xFF40FF)
-colours.addColour("BLUE", 45, 0x0433FF)
-colours.addColour("YELLOW", 13, 0x0433FF)
-colours.addColour("PURPLE", 49, 0x6435FF)
-colours.addColour("LILAC", 116, 0x9E7DFF)
-colours.addColour("ORANGE", 84, 0x9E7DFF)
+colours.addColour("RED", 5, 0x94323E)
+colours.addColour("GREEN", 25, 0x289536)
+colours.addColour("TEAL", 77, 0x4A958C)
+colours.addColour("PINK", 53, 0xA05096)
+colours.addColour("BLUE", 45, 0x3C69B4)
+colours.addColour("YELLOW", 13, 0xACAC39)
+colours.addColour("PURPLE", 49, 0x6439AC)
+colours.addColour("LILAC", 116, 0x8861CA)
+colours.addColour("ORANGE", 84, 0xBF8F40)
 
-colours.addColour("LIGHT YELLOW", 109, 0xFFE400)
-colours.addColour("LIGHT BLUE", 37, 0x00B7FF)
-colours.addColour("LIGHT LILAC", 115, 0xA7ABFF)
-colours.addColour("LIGHT LIGHT BLUE", 40, 0x509CFF)
+colours.addColour("LIGHT YELLOW", 109, 0xD1D176)
+colours.addColour("LIGHT BLUE", 37, 0x3F9EBE)
+colours.addColour("LIGHT LILAC", 115, 0xB3A1D0)
+colours.addColour("LIGHT LIGHT BLUE", 40, 0x98CCDD)
 
-colours.addColour("DARK GREY", 1, 0x509CFF)
-colours.addColour("DARK PURPLE", 51, 0x0C0641)
-colours.addColour("DARK BLUE", 47, 0x0C0641)
-colours.addColour("DARK RED", 59, 0x0C0641)
+colours.addColour("DARK GREY", 1, 0x485156)
+colours.addColour("DARK PURPLE", 51, 0x48297B)
+colours.addColour("DARK BLUE", 47, 0x323294)
+colours.addColour("DARK RED", 59, 0x602028)
 
 
 # Define colour pallettes used by light show

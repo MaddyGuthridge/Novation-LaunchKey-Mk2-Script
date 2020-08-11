@@ -129,7 +129,7 @@ def process(command):
     Args:
         command (ProcessedEvent): An event for your function to modify/act on.
     """
-    command.addProcessor("Scale Snapping")
+    command.addProcessor("Scale Processor")
     
     if not INIT_COMPLETE:
         processInit(command)
@@ -169,16 +169,19 @@ def redraw(lights):
     if not INIT_COMPLETE:
         if not CUSTOM_SCALE:
             for ctr in range(min(len(scales.scale_class_list), 7)):
-                colour = scales.scale_class_list[ctr].colour
-                if SCALE_CLASS == ctr:
-                    pulse = lightingconsts.MODE_PULSE
-                else:
-                    pulse = lightingconsts.MODE_ON
-                lights.setPadColour(ctr, 0, colour, pulse)
+                if (ctr < internal.window.getAnimationTick() and SCALE_CLASS == -1) or SCALE_CLASS != -1:
+                    colour = scales.scale_class_list[ctr].colour
+                    if SCALE_CLASS == ctr:
+                        pulse = lightingconsts.MODE_PULSE
+                    else:
+                        pulse = lightingconsts.MODE_ON
+                    lights.setPadColour(ctr, 0, colour, pulse)
             
             if SCALE_CLASS != -1:
                 if len(scales.scale_class_list[SCALE_CLASS].scale_list) > 1:
                     for ctr in range(min(len(scales.scale_class_list[SCALE_CLASS].scale_list), 8)):
+                        if ctr >= internal.window.getAnimationTick():
+                            break
                         colour = scales.scale_class_list[SCALE_CLASS].scale_list[ctr].colour
                         if SCALE_TO_USE_INDEX == ctr:
                             pulse = lightingconsts.MODE_PULSE
@@ -222,7 +225,9 @@ def processInit(command):
         
         if y == 0:
             if x == 7:
+                internal.window.resetAnimationTick()
                 if not CUSTOM_SCALE:
+                    SCALE_CLASS = -1
                     CUSTOM_SCALE = True
                     command.handle("Entered custom scale mode")
                 else:
@@ -238,6 +243,8 @@ def processInit(command):
                         command.handle("Exited custom scale mode")
             
             elif x < len(scales.scale_class_list):
+                internal.window.resetAnimationTick()
+                
                 SCALE_CLASS = x
                 SCALE_TO_USE_INDEX = -1
                 command.handle("Set scale class to " + scales.scale_class_list[x].name)

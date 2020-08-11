@@ -356,7 +356,7 @@ class ProcessedEvent:
         self.status_nibble = event.status >> 4              # Get first half of status byte
         self.channel = event.status & int('00001111', 2)    # Get 2nd half of status byte
         
-        if self.channel == 14:
+        if self.channel == internalconstants.INTERNAL_CHANNEL_STATUS:
             self.recieved_internal = True
 
         # PME Flags to make sure errors don't happen or something
