@@ -80,6 +80,9 @@ class TGeneric():
             event.data1 = command.note
             event.data2 = command.value
         
+        if command.handled:
+            event.handled = True
+        
         internal.performance.eventClock.stop()
 
         # Print output

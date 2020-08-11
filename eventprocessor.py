@@ -116,6 +116,9 @@ def processBasic(command):
         # Send to note processors
         noteprocessors.process(command)
         
+        if command.type == eventconsts.TYPE_PAD:
+            command.handle("Post-note-processor pad catch", True)
+        
         if command.handled:
             return
 

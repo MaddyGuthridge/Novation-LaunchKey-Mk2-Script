@@ -34,20 +34,23 @@ def process(command):
     #---------------------------------
     # Pads
     #---------------------------------
-    if command.type == eventconsts.TYPE_PAD and command.is_lift:
-        # UI Mode
-        if command.coord_Y == 1 and command.coord_X == 0:
-            ui_mode.nextMode()
-            internal.window.resetAnimationTick()
-            command.handle("Channel Rack: Next UI mode")
-            if ui_mode.getMode():
-                gridBits.drawHighlight()
+    if command.type == eventconsts.TYPE_PAD:
+        if command.is_lift:
+            # UI Mode
+            if command.coord_Y == 1 and command.coord_X == 0:
+                ui_mode.nextMode()
+                internal.window.resetAnimationTick()
+                command.handle("Channel Rack: Next UI mode")
+                if ui_mode.getMode():
+                    gridBits.drawHighlight()
 
-        elif ui_mode.getMode() == 1:
-            process_bit_mode(command)
+            elif ui_mode.getMode() == 1:
+                process_bit_mode(command)
 
-        elif ui_mode.getMode() == 0:
-            process_menu_mode(command)
+            elif ui_mode.getMode() == 0:
+                process_menu_mode(command)
+        else:
+            command.handle("Pads press catch-all")
 
     #---------------------------------
     # Faders
