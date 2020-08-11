@@ -167,6 +167,8 @@ def process(command):
     # Note Processor Menu
     noteprocessors.processNoteModeMenu(command)
 
+    noteprocessors.process(command)
+
     #
     # Extended Mode signals
     #

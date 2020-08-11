@@ -17,6 +17,8 @@ COLOUR = lightingconsts.colours["DARK GREY"]
 
 SILENT = False
 
+FORWARD_NOTES = False
+
 def process(command):
     """
     command.actions.addProcessor("Default Note Handler")
@@ -33,5 +35,14 @@ def process(command):
         internal.notesDown.noteOff(command)
         command.handle("Note off")
     """
+    pass
+
+def redraw(lights):
+    pass
+
+def activeStart():
+    pass
+
+def activeEnd():
     pass
 

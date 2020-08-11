@@ -116,7 +116,6 @@ MESSAGE_SHIFT_USE = 0x0101BE
 
 MESSAGE_INPUT_MODE_SELECT = 0x02BE # Mode number as velocity
 
-
 #---------------------------------
 # Note States
 #---------------------------------

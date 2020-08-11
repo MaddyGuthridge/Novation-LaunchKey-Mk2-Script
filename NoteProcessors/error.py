@@ -17,7 +17,9 @@ NAME = internalconstants.NOTE_STATE_ERROR
 
 COLOUR = lightingconsts.colours["ORANGE"]
 
-SILENT = False
+SILENT = True
+
+FORWARD_NOTES = False
 
 def process(command):
     command.actions.addProcessor("Error note handler")
@@ -44,4 +46,13 @@ def process(command):
             command.handle("All notes off")
     else:
         command.handle("Device in error state")
+
+def redraw(lights):
+    pass
+
+def activeStart():
+    pass
+
+def activeEnd():
+    pass
 

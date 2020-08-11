@@ -9,7 +9,7 @@ Author: Miguel Guthridge
 #
 # Add custom event processors to this list
 #
-imports = ["default", "error"]
+imports = ["default", "error", "scale"]
 #
 #
 #
@@ -52,6 +52,10 @@ def process(command):
     for x in customProcessorsAll:
         object_to_call = getattr(noteprocessors, x)
         if object_to_call.NAME == internal.noteMode.getState():
+            
+            if object_to_call.FORWARD_NOTES and command.type == eventconsts.TYPE_NOTE and not internal.getPortExtended():
+                internal.sendCompleteInternalMidiMessage(command.getDataMIDI())
+            
             object_to_call.process(command)
         
             if command.handled: return
@@ -70,6 +74,10 @@ def redrawNoteModeMenu(lights):
         light_mode = lightingconsts.MODE_ON
     
     lights.setPadColour(8, 1, getattr(noteprocessors, customProcessorsAll[note_mode_index]).COLOUR, state=light_mode)
+    
+    # Redraw menus for current note input
+    if not note_menu_active:
+        getattr(noteprocessors, customProcessorsAll[note_mode_index]).redraw(lights)
     
     if note_menu_active:
         redrawTo = min(len(customProcessors) - 16*noteModeMenu.getMode(), 16)
@@ -94,6 +102,8 @@ def processNoteModeMenu(command):
     global note_menu_active
     
     if command.type is eventconsts.TYPE_PAD and command.is_lift:
+        
+        # Note menu button
         if command.getPadCoord() == (8, 1):
             
             if note_menu_active:
@@ -109,7 +119,8 @@ def processNoteModeMenu(command):
                 internal.extendedMode.setVal(True, eventconsts.INCONTROL_PADS)
                 switchNoteModeMenu(True)
                 command.handle("Open note mode menu")
-                
+        
+        # Note menu open
         elif note_menu_active:
             note_mode_index = noteModeMenu.getMode()*16 + command.coord_X + 8*command.coord_Y
             
@@ -141,5 +152,15 @@ def processNoteModeMenu(command):
                 command.handle("Open note mode menu")
 
 def setModeByIndex(index):
+    current_name = internal.noteMode.getState()
+    for ctr in range(len(customProcessorsAll)):
+        if getattr(noteprocessors, customProcessorsAll[ctr]).NAME == current_name:
+            note_mode_index = ctr
+            break
+    # Deactivate old note mode
+    getattr(noteprocessors, customProcessorsAll[note_mode_index]).activeEnd()
+    
     internal.noteMode.setState(getattr(noteprocessors, customProcessors[index]).NAME)
 
+    # Activate new note mode
+    getattr(noteprocessors, customProcessors[index]).activeStart()
