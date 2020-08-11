@@ -13,7 +13,8 @@ import lightingconsts
 
 NAME = internalconstants.NOTE_STATE_NORMAL
 
-COLOUR = lightingconsts.colours["DARK GREY"]
+COLOUR = lightingconsts.colours["WHITE"]
+DEFAULT_COLOUR = lightingconsts.colours["DARK GREY"]
 
 SILENT = False
 

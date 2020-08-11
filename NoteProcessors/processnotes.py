@@ -92,7 +92,7 @@ def redrawNoteModeMenu(lights):
             else:
                 light_mode = lightingconsts.MODE_ON
             
-            lights.setPadColour(x, y, getattr(noteprocessors, customProcessors[ctr]).COLOUR, state=light_mode)
+            lights.setPadColour(x, y, getattr(noteprocessors, customProcessors[ctr]).DEFAULT_COLOUR, state=light_mode)
             
             
         lights.solidifyAll()

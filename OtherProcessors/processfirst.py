@@ -167,6 +167,9 @@ def process(command):
     # Note Processor Menu
     noteprocessors.processNoteModeMenu(command)
 
+    if command.handled:
+        return
+
     noteprocessors.process(command)
 
     #

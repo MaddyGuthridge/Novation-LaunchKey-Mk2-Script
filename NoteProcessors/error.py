@@ -17,6 +17,8 @@ NAME = internalconstants.NOTE_STATE_ERROR
 
 COLOUR = lightingconsts.colours["ORANGE"]
 
+DEFAULT_COLOUR = lightingconsts.colours["RED"]
+
 SILENT = True
 
 FORWARD_NOTES = False

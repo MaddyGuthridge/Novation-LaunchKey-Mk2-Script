@@ -16,6 +16,10 @@ import lightingconsts
 NAME = "Template"
 
 # The colour used to represent your mode
+DEFAULT_COLOUR = lightingconsts.colours["PURPLE"]
+
+# The colour used to represent your mode while active... 
+# you can change this while your script is running
 COLOUR = lightingconsts.colours["PURPLE"]
 
 # Whether your mode should be unlisted in the note mode menu
@@ -54,5 +58,7 @@ def activeStart():
 def activeEnd():
     """Called wen your note mode is no-longer active
     """
-    pass
+    global COLOUR
+    # Reset current colour to default
+    COLOUR = DEFAULT_COLOUR
 
