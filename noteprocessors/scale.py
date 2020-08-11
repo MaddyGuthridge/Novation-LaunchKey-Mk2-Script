@@ -68,10 +68,12 @@ scales = ScaleMgr()
 
 scales.addScaleClass("Major", lightingconsts.colours["YELLOW"])
 scales.addScale("Major", lightingconsts.colours["YELLOW"], [0, 2, 4, 5, 7, 9, 11])
+scales.addScale("Wholetone", lightingconsts.colours["TEAL"], [0, 2, 4, 6, 8, 10])
 
 scales.addScaleClass("Minor", lightingconsts.colours["ORANGE"])
 scales.addScale("Natural Minor", lightingconsts.colours["ORANGE"], [0, 2, 3, 5, 7, 8, 10])
 scales.addScale("Harmonic Minor", lightingconsts.colours["RED"], [0, 2, 3, 5, 7, 8, 11])
+scales.addScale("Melodic Minor", lightingconsts.colours["PINK"], [0, 2, 3, 5, 7, 9, 11])
 
 scales.addScaleClass("Blues", lightingconsts.colours["LIGHT BLUE"])
 scales.addScale("Major Blues", lightingconsts.colours["LIGHT BLUE"], [0, 2, 3, 4, 7, 9])
@@ -80,10 +82,29 @@ scales.addScale("Minor Blues", lightingconsts.colours["BLUE"], [0, 3, 5, 6, 7, 1
 scales.addScaleClass("Pentatonic", lightingconsts.colours["RED"])
 scales.addScale("Major Pentatonic", lightingconsts.colours["YELLOW"], [0, 2, 4, 7, 9])
 scales.addScale("Minor Pentatonic", lightingconsts.colours["RED"], [0, 3, 5, 7, 10])
+scales.addScale("Ryukyu", lightingconsts.colours["PURPLE"], [0, 4, 5, 7, 11])
+
+scales.addScaleClass("Non-western", lightingconsts.colours["BLUE"])
+scales.addScale("Egyptian", lightingconsts.colours["ORANGE"], [0, 2, 5, 7, 10])
+scales.addScale("Arabic", lightingconsts.colours["RED"], [0, 2, 4, 6, 8, 10])
+scales.addScale("Gypsy", lightingconsts.colours["TEAL"], [0, 2, 3, 6, 7, 8, 11])
+
+scales.addScaleClass("Modal", lightingconsts.colours["PURPLE"])
+scales.addScale("Ionian", lightingconsts.colours["YELLOW"], [0, 2, 4, 5, 7, 9, 11])
+scales.addScale("Dorian", lightingconsts.colours["PINK"], [0, 2, 3, 5, 7, 9, 10])
+scales.addScale("Phrygian", lightingconsts.colours["LILAC"], [0, 1, 3, 5, 7, 8, 10])
+scales.addScale("Lydian", lightingconsts.colours["GREEN"], [0, 2, 4, 6, 7, 9, 11])
+scales.addScale("Mixolydian", lightingconsts.colours["TEAL"], [0, 2, 4, 5, 7, 9, 10])
+scales.addScale("Aolian", lightingconsts.colours["RED"], [0, 2, 3, 5, 7, 8, 10])
+scales.addScale("Locrian", lightingconsts.colours["ORANGE"], [0, 1, 3, 5, 6, 8, 10])
+
+
 
 INIT_COMPLETE = False
 INIT_HAVE_ROOT = False
 INIT_HAVE_SCALE = False
+
+CUSTOM_SCALE = False
 
 SCALE_CLASS = -1
 
@@ -146,23 +167,26 @@ def redraw(lights):
     """
     global INIT_COMPLETE, SCALE_CLASS
     if not INIT_COMPLETE:
-        for ctr in range(len(scales.scale_class_list)):
-            colour = scales.scale_class_list[ctr].colour
-            if SCALE_CLASS == ctr:
-                pulse = lightingconsts.MODE_PULSE
-            else:
-                pulse = lightingconsts.MODE_ON
-            lights.setPadColour(ctr, 0, colour, pulse)
+        if not CUSTOM_SCALE:
+            for ctr in range(min(len(scales.scale_class_list), 7)):
+                colour = scales.scale_class_list[ctr].colour
+                if SCALE_CLASS == ctr:
+                    pulse = lightingconsts.MODE_PULSE
+                else:
+                    pulse = lightingconsts.MODE_ON
+                lights.setPadColour(ctr, 0, colour, pulse)
+            
+            if SCALE_CLASS != -1:
+                if len(scales.scale_class_list[SCALE_CLASS].scale_list) > 1:
+                    for ctr in range(min(len(scales.scale_class_list[SCALE_CLASS].scale_list), 8)):
+                        colour = scales.scale_class_list[SCALE_CLASS].scale_list[ctr].colour
+                        if SCALE_TO_USE_INDEX == ctr:
+                            pulse = lightingconsts.MODE_PULSE
+                        else:
+                            pulse = lightingconsts.MODE_ON
+                        lights.setPadColour(ctr, 1, colour, pulse)
         
-        if SCALE_CLASS != -1:
-            if len(scales.scale_class_list[SCALE_CLASS].scale_list) > 1:
-                for ctr in range(len(scales.scale_class_list[SCALE_CLASS].scale_list)):
-                    colour = scales.scale_class_list[SCALE_CLASS].scale_list[ctr].colour
-                    if SCALE_TO_USE_INDEX == ctr:
-                        pulse = lightingconsts.MODE_PULSE
-                    else:
-                        pulse = lightingconsts.MODE_ON
-                    lights.setPadColour(ctr, 1, colour, pulse)
+        lights.setPadColour(7, 0, lightingconsts.colours["GREEN"])
         
         lights.solidifyAll()
 
@@ -175,7 +199,9 @@ def activeEnd():
     """Called wen your note mode is no-longer active
     """
     global INIT_COMPLETE, INIT_HAVE_ROOT, INIT_HAVE_SCALE, SCALE_TO_USE, \
-    ROOT_NOTE, FORWARD_NOTES, SCALE_CLASS, COLOUR, SCALE_TO_USE_INDEX
+        ROOT_NOTE, FORWARD_NOTES, SCALE_CLASS, COLOUR, SCALE_TO_USE_INDEX, \
+            CUSTOM_SCALE
+    
     INIT_COMPLETE = False
     INIT_HAVE_ROOT = False
     INIT_HAVE_SCALE = False
@@ -183,16 +209,35 @@ def activeEnd():
     SCALE_CLASS = -1
     COLOUR = DEFAULT_COLOUR
     SCALE_TO_USE_INDEX = -1
+    CUSTOM_SCALE = False
+    SCALE_TO_USE = []
 
 
 def processInit(command):
     global INIT_COMPLETE, INIT_HAVE_ROOT, INIT_HAVE_SCALE, SCALE_TO_USE, ROOT_NOTE, \
-        FORWARD_NOTES, SCALE_CLASS, COLOUR, CURRENT_SCALE_COLOUR, SCALE_TO_USE_INDEX
+        FORWARD_NOTES, SCALE_CLASS, COLOUR, CURRENT_SCALE_COLOUR, SCALE_TO_USE_INDEX, \
+            CUSTOM_SCALE
     if command.type == eventconsts.TYPE_PAD and command.is_lift:
         x, y = command.getPadCoord()
         
         if y == 0:
-            if x < len(scales.scale_class_list):
+            if x == 7:
+                if not CUSTOM_SCALE:
+                    CUSTOM_SCALE = True
+                    command.handle("Entered custom scale mode")
+                else:
+                    if len(SCALE_TO_USE):
+                        command.handle("Use custom scale")
+                        # Enter scale mode
+                        ROOT_NOTE = 0
+                        INIT_HAVE_SCALE = True
+                        INIT_HAVE_ROOT = True
+                        CURRENT_SCALE_COLOUR = lightingconsts.colours["GREEN"]
+                    else:
+                        CUSTOM_SCALE = False
+                        command.handle("Exited custom scale mode")
+            
+            elif x < len(scales.scale_class_list):
                 SCALE_CLASS = x
                 SCALE_TO_USE_INDEX = -1
                 command.handle("Set scale class to " + scales.scale_class_list[x].name)
@@ -216,9 +261,17 @@ def processInit(command):
             else: command.handle("Catch-all")
             
     if command.type == eventconsts.TYPE_NOTE:
-        ROOT_NOTE = command.note % 12
-        INIT_HAVE_ROOT = True
-        command.handle("Set root note to" + str(ROOT_NOTE))
+        if CUSTOM_SCALE:
+            note = command.note % 12
+            if not note in SCALE_TO_USE:
+                SCALE_TO_USE.append(note)
+            command.handle("Add note to custom scale")
+        
+        else:
+            ROOT_NOTE = command.note % 12
+            INIT_HAVE_ROOT = True
+            command.handle("Set root note to" + str(ROOT_NOTE))
+        
         
     if INIT_HAVE_ROOT and INIT_HAVE_SCALE:
         INIT_COMPLETE = True

@@ -124,6 +124,7 @@ colours.addColour("WHITE", 3, 0xFFFFFF)
 
 colours.addColour("RED", 5, 0xFF2900)
 colours.addColour("GREEN", 25, 0xFF2900)
+colours.addColour("TEAL", 77, 0x00F88D)
 colours.addColour("PINK", 53, 0xFF40FF)
 colours.addColour("BLUE", 45, 0x0433FF)
 colours.addColour("YELLOW", 13, 0x0433FF)
@@ -133,7 +134,7 @@ colours.addColour("ORANGE", 84, 0x9E7DFF)
 
 colours.addColour("LIGHT YELLOW", 109, 0xFFE400)
 colours.addColour("LIGHT BLUE", 37, 0x00B7FF)
-colours.addColour("LIGHT_LILAC", 115, 0xA7ABFF)
+colours.addColour("LIGHT LILAC", 115, 0xA7ABFF)
 colours.addColour("LIGHT LIGHT BLUE", 40, 0x509CFF)
 
 colours.addColour("DARK GREY", 1, 0x509CFF)

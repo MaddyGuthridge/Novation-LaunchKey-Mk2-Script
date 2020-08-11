@@ -112,8 +112,13 @@ def processNoteModeMenu(command):
                     switchNoteModeMenu(False)
                     command.handle("Close note mode menu")
                 else:
-                    noteModeMenu.nextMode()
-                    command.handle("Next note mode menu")
+                    if noteModeMenu.num_modes == 1:
+                        internal.extendedMode.revert(eventconsts.INCONTROL_PADS)
+                        switchNoteModeMenu(False)
+                        command.handle("Close note mode menu")
+                    else:
+                        noteModeMenu.nextMode()
+                        command.handle("Next note mode menu")
             
             elif not note_menu_active:
                 internal.extendedMode.setVal(True, eventconsts.INCONTROL_PADS)
