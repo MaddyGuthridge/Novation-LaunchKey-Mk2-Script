@@ -151,11 +151,13 @@ def process(command):
     if command.id == config.SHIFT_BUTTON:
         if command.is_lift:
             internal.extendedMode.revert(eventconsts.INCONTROL_PADS)
+            internal.extendedMode.revert(eventconsts.INCONTROL_FADERS)
         else:
             internal.extendedMode.setVal(True, eventconsts.INCONTROL_PADS)
+            internal.extendedMode.setVal(True, eventconsts.INCONTROL_FADERS)
 
     # Shift down - Window switcher
-    if command.shifted and command.type == eventconsts.TYPE_PAD and command.is_lift:
+    if command.shifted:
         
         processShift(command)
 
@@ -204,52 +206,59 @@ def process(command):
         command.handle("Handle misc event")
 
 def processShift(command):
-    if command.note == eventconsts.Pads[0][1]: 
-        ui.showWindow(internalconstants.WINDOW_PLAYLIST)
-        command.handle("Switched window to Playlist")
-        
-    elif command.note == eventconsts.Pads[1][1]: 
-        ui.showWindow(internalconstants.WINDOW_CHANNEL_RACK)
-        command.handle("Switched window to Channel rack")
-        
-    elif command.note == eventconsts.Pads[2][1]: 
-        ui.showWindow(internalconstants.WINDOW_PIANO_ROLL)
-        command.handle("Switched window to Piano roll")
-        
-    elif command.note == eventconsts.Pads[3][1]: 
-        ui.showWindow(internalconstants.WINDOW_MIXER)
-        command.handle("Switched window to Mixer")
-        
-    elif command.note == eventconsts.Pads[4][1]: 
-        ui.showWindow(internalconstants.WINDOW_BROWSER)
-        command.handle("Switched window to Browser")
-        
-    elif command.note == eventconsts.Pads[6][0]: 
-        ui.selectWindow(True)
-        command.handle("Previous window")
     
-    elif command.note == eventconsts.Pads[7][0]: 
-        ui.selectWindow(False)
-        command.handle("Next window")
-        
-    elif command.note == eventconsts.Pads[0][0]: 
-        general.undoUp()
-        command.handle("Undo")
-        
-    elif command.note == eventconsts.Pads[1][0]: 
-        general.undoDown()
-        command.handle("Redo")
+    if command.type == eventconsts.TYPE_FADER_BUTTON:
+        internal.snap.processSnapMode(command)
+    elif command.type == eventconsts.TYPE_PAD:
+        if command.is_lift:
+            if command.note == eventconsts.Pads[0][1]: 
+                ui.showWindow(internalconstants.WINDOW_PLAYLIST)
+                command.handle("Switched window to Playlist")
+                
+            elif command.note == eventconsts.Pads[1][1]: 
+                ui.showWindow(internalconstants.WINDOW_CHANNEL_RACK)
+                command.handle("Switched window to Channel rack")
+                
+            elif command.note == eventconsts.Pads[2][1]: 
+                ui.showWindow(internalconstants.WINDOW_PIANO_ROLL)
+                command.handle("Switched window to Piano roll")
+                
+            elif command.note == eventconsts.Pads[3][1]: 
+                ui.showWindow(internalconstants.WINDOW_MIXER)
+                command.handle("Switched window to Mixer")
+                
+            elif command.note == eventconsts.Pads[4][1]: 
+                ui.showWindow(internalconstants.WINDOW_BROWSER)
+                command.handle("Switched window to Browser")
+                
+            elif command.note == eventconsts.Pads[6][0]: 
+                ui.selectWindow(True)
+                command.handle("Previous window")
+            
+            elif command.note == eventconsts.Pads[7][0]: 
+                ui.selectWindow(False)
+                command.handle("Next window")
+                
+            elif command.note == eventconsts.Pads[0][0]: 
+                general.undoUp()
+                command.handle("Undo")
+                
+            elif command.note == eventconsts.Pads[1][0]: 
+                general.undoDown()
+                command.handle("Redo")
 
-    elif command.note == eventconsts.Pads[7][1]:
-        transport.globalTransport(eventconsts.midi.FPT_F8, 1)
-        command.handle("Launch Plugin Picker")
+            elif command.note == eventconsts.Pads[7][1]:
+                transport.globalTransport(eventconsts.midi.FPT_F8, 1)
+                command.handle("Launch Plugin Picker")
 
-    elif command.note == eventconsts.Pads[3][0]:
-        transport.globalTransport(eventconsts.midi.FPT_Save, 1)
-        command.handle("Save project")
+            elif command.note == eventconsts.Pads[3][0]:
+                transport.globalTransport(eventconsts.midi.FPT_Save, 1)
+                command.handle("Save project")
+            else:
+                command.handle("Shift menu catch others")
 
-    else:
-        command.handle("Shift menu catch-all")
+        else:
+            command.handle("Shift menu catch press")
 
 def processPopup(command):
     # Always handle all presses

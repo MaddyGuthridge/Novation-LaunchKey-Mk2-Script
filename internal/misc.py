@@ -17,6 +17,7 @@ import eventconsts
 from .performance import idleClock
 from .logging import getLineBreak, debugLog, getTab
 from . import state
+from .snap import snap
 
 import controllerprocessors
 
@@ -24,6 +25,8 @@ def refreshProcessor():
     """Called on refresh
     """
     beat.refresh()
+    snap.refresh()
+    
 
 
 def idleProcessor():
