@@ -18,8 +18,8 @@ SCRIPT_NAME = "Novation LaunchKey Mk2 Controller Script"
 SCRIPT_AUTHOR = "Miguel Guthridge"
 SCRIPT_VERSION_MAJOR = 1
 SCRIPT_VERSION_MINOR = 3
-SCRIPT_VERSION_REVISION = 0
-MIN_FL_SCRIPT_VERSION = 4
+SCRIPT_VERSION_REVISION = 1
+MIN_FL_SCRIPT_VERSION = 7
 SCRIPT_URL = "https://github.com/MiguelGuthridge/Novation-LaunchKey-Mk2-Script"
 UPDATE_JSON_URL = "https://api.github.com/repos/MiguelGuthridge/Novation-LaunchKey-Mk2-Script/tags"
 
@@ -61,14 +61,9 @@ WINDOW_CHANNEL_RACK = midi.widChannelRack
 WINDOW_MIXER = midi.widMixer
 WINDOW_BROWSER = midi.widBrowser
 
-WINDOW_STR_PLAYLIST = "Playlist"
-WINDOW_STR_PIANO_ROLL = "Piano roll"
-WINDOW_STR_CHANNEL_RACK = "Channel Rack"
-WINDOW_STR_MIXER = "Mixer"
-WINDOW_STR_BROWSER = "Browser"
-
 WINDOW_STR_SCRIPT_OUTPUT = "Script output"
 WINDOW_STR_COLOUR_PICKER = "Color selector"
+FL_WINDOW_LIST = ["Mixer", "Channel rack", "Playlist", "Piano roll", "Browser"]
 #---------------------------------
 # Snapping constants
 #---------------------------------
