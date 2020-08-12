@@ -41,6 +41,9 @@ ENABLE_SUSTAINED_SHIFT = True
 # If enabled, sustained shifts will automatically lift when you press a button.
 AUTOCANCEL_SUSTAINED_SHIFT = False
 
+# Determines the navigation speed using the pitch bend wheel in the shift menu
+PITCH_BEND_JOG_SPEED = 0.05
+
 # Controls the frequency at which the script executes a full redraw (to fix dud lights)
 LIGHTS_FULL_REDRAW_FREQUENCY = 5
 # If enabled, animations will be disabled
@@ -60,6 +63,6 @@ TAB_LENGTH = 16 # How much spacing to add in console output
 CHAOTIC_EVIL_ERROR_NOTE_HANDLER = True
 
 # Controls which console messages are printed. Add things from internalconstants
-CONSOLE_DEBUG_MODE = [internalconstants.DEBUG_EVENT_DATA, internalconstants.DEBUG_EVENT_ACTIONS]
+CONSOLE_DEBUG_MODE = []
 
 DEBUG_HARD_CRASHING = True

@@ -11,7 +11,7 @@ import internalconstants
 
 from .windowstate import window
 from .messages import sendCompleteInternalMidiMessage
-from .state import PORT
+from .state import getPortExtended
 
 
 class ShiftMgr:
@@ -24,7 +24,7 @@ class ShiftMgr:
         self.used = False
 
     def press(self, double_click):
-        if PORT == config.DEVICE_PORT_EXTENDED:
+        if getPortExtended():
             sendCompleteInternalMidiMessage(internalconstants.MESSAGE_SHIFT_DOWN)
         self.is_down = True
         self.used = False
@@ -39,7 +39,7 @@ class ShiftMgr:
         if double_click and config.ENABLE_SUSTAINED_SHIFT:
             self.sustained = True
         else:
-            if PORT == config.DEVICE_PORT_EXTENDED:
+            if getPortExtended():
                 sendCompleteInternalMidiMessage(internalconstants.MESSAGE_SHIFT_UP)
         self.is_down = False
         window.resetAnimationTick()
@@ -47,7 +47,7 @@ class ShiftMgr:
 
     def use(self, lift = False):
         if self.is_down or self.sustained:
-            if PORT == config.DEVICE_PORT_BASIC:
+            if not getPortExtended():
                 sendCompleteInternalMidiMessage(internalconstants.MESSAGE_SHIFT_USE)
             self.used = True
             if lift and config.AUTOCANCEL_SUSTAINED_SHIFT:

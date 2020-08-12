@@ -6,6 +6,8 @@ Contains variables and objects to manage the state of the script.
 Author: Miguel Guthridge
 """
 
+import math
+
 import device
 import ui
 import general
@@ -25,6 +27,76 @@ DEVICE_TYPE = internalconstants.DEVICE_NOT_SET
 PORT = -1 # Set in initialisation function then left constant
 
 SHARED_INIT_STATE = internalconstants.INIT_INCOMPLETE
+
+
+class PitchBendMgr:
+    """Maintains state of pitch bend wheel in basic mode script.
+    Note that pitch bend events aren't forwarded to the extended mode script so this will be useless there.
+    """
+    value = 64
+    direction = 0
+    def setVal(self, new_value):
+        """Update current pitch bend value
+
+        Args:
+            new_value (int): Midi data value
+        """
+        if self.value < new_value:
+            self.direction = 1
+        elif self.value > new_value:
+            self.direction = -1
+        else:
+            self.direction = 0
+        self.value = new_value
+    
+    def getVal(self):
+        """Return current pitch bend value
+
+        Returns:
+            int: Midi data value
+        """
+        return self.value
+    
+    def getParsedVal(self):
+        """Return current pitch bend value adjusted so that centre is zero
+
+        Returns:
+            int: Data value adjusted
+        """
+        return self.value - 64
+
+    def getDirection(self):
+        """Returns direction that pitch bend wheel is moving
+
+        Returns:
+            int: 0 for stationary, 1 for increasing, -1 for decreasing
+        """
+        return self.direction
+
+pitchBend = PitchBendMgr()
+
+def idleShift():
+    """Controls pitchbend wheel navigation
+    """
+    
+    pitch_val = pitchBend.getParsedVal()
+    
+    if pitch_val == 0:
+        multiplier = 0
+    elif pitch_val > 0:
+        multiplier = 1
+    elif pitch_val < 0:
+        multiplier = -1
+    
+    send_float = abs(pitch_val) * config.PITCH_BEND_JOG_SPEED
+    
+    if not window.getAbsoluteTick() % abs(65 - pitch_val):
+        send_val = math.ceil(send_float)
+    else:
+        send_val = math.floor(send_float)
+    
+    ui.jog(multiplier * send_val)
+
 
 def getPortExtended():
     return PORT == config.DEVICE_PORT_EXTENDED

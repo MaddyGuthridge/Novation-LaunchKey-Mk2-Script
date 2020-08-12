@@ -259,6 +259,8 @@ def processShift(command):
 
         else:
             command.handle("Shift menu catch press")
+        
+        
 
 def processPopup(command):
     # Always handle all presses

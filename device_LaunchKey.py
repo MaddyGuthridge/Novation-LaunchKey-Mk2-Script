@@ -91,6 +91,9 @@ class TGeneric():
     def OnIdle(self):
         internal.idleProcessor()
         
+        if internal.shift.getDown():
+            internal.state.idleShift()
+        
         
 
 
