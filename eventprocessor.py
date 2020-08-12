@@ -34,7 +34,6 @@ num_ct = 0
 """
 
 
-# Recieve event and forward onto relative processors
 def processExtended(command):
     """Processes event: used in extended Script
 
@@ -88,7 +87,11 @@ def processExtended(command):
         internal.errors.triggerError(e)
 
 def processBasic(command):
+    """Processes ParsedEvents in basic mode script
 
+    Args:
+        command (ParsedEvent): a parsed MIDI event
+    """
     # Send event to reset other controller
     internal.sendCompleteInternalMidiMessage(internalconstants.MESSAGE_RESET_INTERNAL_CONTROLLER)
 
@@ -129,8 +132,13 @@ def processBasic(command):
     except Exception as e:
         internal.errors.triggerError(e)
 
-# Processes events received internally
+
 def processReceived(command):
+    """Processes events recieved internally (from other script)
+
+    Args:
+        command (ParsedEvent): A parsed MIDI event
+    """
     command.actions.addProcessor("Internal event processor")
 
     data = command.getDataMIDI()
@@ -166,6 +174,8 @@ def processReceived(command):
 
 # Called after a window is activated
 def activeStart():
+    """Activates a new window or plugin
+    """
     # Only in extended mode:
     if internal.state.PORT == config.DEVICE_PORT_EXTENDED:
         if internal.window.plugin_focused:
@@ -173,8 +183,10 @@ def activeStart():
         else:
             windowprocessors.activeStart()
 
-# Called just before active window is deactivated
+
 def activeEnd():
+    """Deactivates an old window or plugin
+    """
     # Only in extended mode:
     if internal.state.PORT == config.DEVICE_PORT_EXTENDED:
         if internal.window.plugin_focused:
@@ -183,7 +195,8 @@ def activeEnd():
             windowprocessors.activeEnd()
 
 def redraw():
-        
+    """Creates LightMap object and forwards it to various redraw functions to gather data about next lighting redraw.
+    """
     lights = lighting.LightMap()
 
     if internal.errors.getError():
