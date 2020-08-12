@@ -79,7 +79,7 @@ def process(command):
         internal.sendInternalMidiMessage(command.status, command.note, command.value)
 
         # Map drums to match FPC default layout
-        change_pads(command)
+        changePads(command)
 
 
     
@@ -88,7 +88,7 @@ def process(command):
 
 
 # Change pads to default note layout for FPC
-def change_pads(command):
+def changePads(command):
     if REMAP_DRUMS:
         if command.note is eventconsts.BasicPads[0][1]:
             command.edit(processorhelpers.RawEvent(command.status, FPC_DRUM_CONSTS[3][0], command.value))

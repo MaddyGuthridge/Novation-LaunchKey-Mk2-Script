@@ -92,8 +92,8 @@ class TGeneric():
         # Update active window (ui.onRefresh() isnt working properly)
         internal.ActiveWindow = ui.getFocusedFormCaption()
 
-        # Process the event into processedEvent format
-        command = processorhelpers.ProcessedEvent(event)
+        # Process the event into ParsedEvent format
+        command = processorhelpers.ParsedEvent(event)
 
         # Print event before processing
         internal.printCommand(command)

@@ -68,7 +68,7 @@ def process(command):
     """Called when processing commands. 
 
     Args:
-        command (ProcessedEvent): contains useful information about the event. 
+        command (ParsedEvent): contains useful information about the event. 
             Use this to determing what actions your processor will take.
     """
     

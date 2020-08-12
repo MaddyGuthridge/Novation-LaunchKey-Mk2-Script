@@ -36,18 +36,10 @@ num_ct = 0
 
 # Recieve event and forward onto relative processors
 def processExtended(command):
+    """Processes event: used in extended Script
 
-    """
-    global num_sys_safe
-    global num_sys
-    global num_ct
-    
-    num_sys_safe += command.pme_system_safe
-    num_sys += command.pme_system
-    num_ct += 1
-    
-    print("Sys rate:      ", num_sys/num_ct)
-    print("Sys safe rate: ", num_sys_safe/num_ct)
+    Args:
+        command (ParsedEvent): a parsed MIDI event
     """
 
     try:
@@ -80,10 +72,10 @@ def processExtended(command):
         if command.pme_system_safe or True:
 
             # Shouldn't be called in extended mode
-            """ # Attempt to process event using custom processors for plugins
-            processplugins.process(command)
+            # Attempt to process event using custom processors for plugins
+            #processplugins.process(command)
 
-            if command.handled: return"""
+            #if command.handled: return
 
             # Process content from windows
             windowprocessors.process(command)

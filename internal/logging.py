@@ -47,20 +47,20 @@ def debugLog(message, level = 0):
 
 
 def printCommand(command):
-    """Prints ProcessedEvent information
+    """Prints ParsedEvent information
 
     Args:
-        command (ProcessedEvent): Event to print data of
+        command (ParsedEvent): Event to print data of
     """
     command.printInfo()
     return
 
 
 def printCommandOutput(command):
-    """Print actions taken on a ProcessedEvent
+    """Print actions taken on a ParsedEvent
 
     Args:
-        command (ProcessedEvent): Event to print actions of
+        command (ParsedEvent): Event to print actions of
     """
     command.printOutput()
     debugLog(getLineBreak(), internalconstants.DEBUG_EVENT_DATA)

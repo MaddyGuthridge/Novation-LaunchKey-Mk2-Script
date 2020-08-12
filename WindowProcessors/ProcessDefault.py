@@ -42,7 +42,7 @@ def process(command):
     """Called to process an event.
 
     Args:
-        command (ProcessedEvent): object containing data about the event and the actions taken to handle it.
+        command (ParsedEvent): object containing data about the event and the actions taken to handle it.
     """
     #command.actions.addProcessor("[None] Processor")
 

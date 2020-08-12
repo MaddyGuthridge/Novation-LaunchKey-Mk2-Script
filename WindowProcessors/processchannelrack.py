@@ -45,10 +45,10 @@ def process(command):
                     gridBits.drawHighlight()
 
             elif ui_mode.getMode() == 1:
-                process_bit_mode(command)
+                processBitMode(command)
 
             elif ui_mode.getMode() == 0:
-                process_menu_mode(command)
+                processMenuMode(command)
         else:
             command.handle("Pads press catch-all")
 
@@ -95,7 +95,7 @@ def process(command):
     return
 
 # Process when in grid bits
-def process_bit_mode(command):
+def processBitMode(command):
     current_track = channels.channelNumber()
     #---------------------------------
     # Pads
@@ -143,7 +143,7 @@ def process_bit_mode(command):
             command.handled = True
 
 # Process when in menu
-def process_menu_mode(command):
+def processMenuMode(command):
     coord = [command.coord_X, command.coord_Y]
 
     # Next/prev track
@@ -193,15 +193,15 @@ def redraw(lights):
         lights.setPadColour(0, 1, ui_button_colour)    
 
         if current_ui_mode == 0:
-            redraw_menu_mode(lights)
+            redrawMenuMode(lights)
 
         elif current_ui_mode == 1:
-            redraw_bit_mode(lights)
+            redrawBitMode(lights)
 
     return
 
 # Redraw when in menu
-def redraw_menu_mode(lights):
+def redrawMenuMode(lights):
     
     # Set colours for controls
     if internal.window.getAnimationTick() >= 1:
@@ -221,7 +221,7 @@ def redraw_menu_mode(lights):
         lights.setPadColour(7, 1, lightingconsts.UI_ACCEPT, 2)           # To piano roll
 
 # Redraw when in grid bits
-def redraw_bit_mode(lights):
+def redrawBitMode(lights):
     setGridBits(lights)
 
     # Set colours for controls
@@ -259,7 +259,7 @@ def topWindowEnd():
 
 # Internal functions
 
-class gridBitMgr:
+class GridBitMgr:
     scroll = 0
     zoom = 1
     
@@ -305,7 +305,7 @@ class gridBitMgr:
         self.zoom = 1
         self.drawHighlight()
 
-gridBits = gridBitMgr()
+gridBits = GridBitMgr()
 
 def setGridBits(lights):
     current_track = channels.channelNumber()

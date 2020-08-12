@@ -33,7 +33,7 @@ def process(command):
     """Called with an event to be processed by your note processor. Events aren't filtered so you'll want to make sure your processor checks that events are notes.
 
     Args:
-        command (ProcessedEvent): An event for your function to modify/act on.
+        command (ParsedEvent): An event for your function to modify/act on.
     """
     command.addProcessor("Template Processor")
     # If command is a note

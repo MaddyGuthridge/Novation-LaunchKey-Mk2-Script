@@ -36,7 +36,7 @@ def topPluginStart():
     if internal.state.PORT == config.DEVICE_PORT_EXTENDED:
         for x in imports:
             object_to_call = getattr(pluginprocessors, x)
-            if can_handle(object_to_call):
+            if canHandle(object_to_call):
                 object_to_call.topPluginStart()
     return
 
@@ -46,7 +46,7 @@ def topPluginEnd():
     if internal.state.PORT == config.DEVICE_PORT_EXTENDED:
         for x in imports:
             object_to_call = getattr(pluginprocessors, x)
-            if can_handle(object_to_call):
+            if canHandle(object_to_call):
                 object_to_call.topPluginEnd()
     return
 
@@ -54,7 +54,7 @@ def topPluginEnd():
 def activeStart():
     for x in imports:
         object_to_call = getattr(pluginprocessors, x)
-        if can_handle(object_to_call):
+        if canHandle(object_to_call):
             object_to_call.activeStart()
     return
 
@@ -62,25 +62,25 @@ def activeStart():
 def activeEnd():
     for x in imports:
         object_to_call = getattr(pluginprocessors, x)
-        if can_handle(object_to_call):
+        if canHandle(object_to_call):
             object_to_call.activeEnd()
     return
 
 def redraw(lights):
     for x in imports:
         object_to_call = getattr(pluginprocessors, x)
-        if can_handle(object_to_call):
+        if canHandle(object_to_call):
             object_to_call.redraw(lights)
 
 def process(command):
     for x in imports:
         object_to_call = getattr(pluginprocessors, x)
-        if can_handle(object_to_call):
+        if canHandle(object_to_call):
             object_to_call.process(command)
         
         if command.handled: return
 
-def can_handle(object_to_call):
+def canHandle(object_to_call):
     for x in range(len(object_to_call.plugins)):
         if object_to_call.plugins[x] == internal.window.active_plugin:
             return True

@@ -65,8 +65,8 @@ class TGeneric():
         internal.performance.eventClock.start()
         
         
-        # Process the event into processedEvent format
-        command = processorhelpers.ProcessedEvent(event)
+        # Process the event into ParsedEvent format
+        command = processorhelpers.ParsedEvent(event)
         
         # Print event before processing
         internal.printCommand(command)

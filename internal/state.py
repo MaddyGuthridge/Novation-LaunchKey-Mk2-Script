@@ -488,7 +488,7 @@ class ErrorState:
         """Handles extended mode events when in an error state
 
         Args:
-            command (ProcessedEvent): An event
+            command (ParsedEvent): An event
         """
         command.handle("Device in error state")
     

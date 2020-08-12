@@ -109,7 +109,7 @@ class ExtensibleNote():
 
         Args:
             root_note (note event): the note that the user pressed (or a modified version of it). 
-                Can be of type RawEvent, ProcessedEvent or FLMidiMessage.
+                Can be of type RawEvent, ParsedEvent or FLMidiMessage.
                 
             extended_notes (list of note events): List of notes that should also be pressed. Can be of 
                 same types as root_note, but RawEvent is recommended for performance reasons.
@@ -330,11 +330,11 @@ class RawEvent:
         self.shift = shift
 
 
-class ProcessedEvent:
+class ParsedEvent:
     """Stores data about an event, including useful parsed data
     """
     def __init__(self, event):
-        """Create ProcessedEvent from event object
+        """Create ParsedEvent from event object
 
         Args:
             event (MIDI Event): FL Studio MIDI Event

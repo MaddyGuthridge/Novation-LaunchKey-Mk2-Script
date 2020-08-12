@@ -64,7 +64,7 @@ class SnapMgr:
         """Process fader button events to set snap mode
 
         Args:
-            command (ProcessedEvent): Event to process, must be fader button
+            command (ParsedEvent): Event to process, must be fader button
         """
         snap_mode = -1
         

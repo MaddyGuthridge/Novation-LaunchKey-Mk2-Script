@@ -133,7 +133,7 @@ def processSysEx(event):
     """Process SysEx events (which are always responses to universal device enquiries since the script doesn't really do any others)
 
     Args:
-        event (ProcessedEvent): processed MIDI Sysex Event
+        event (ParsedEvent): processed MIDI Sysex Event
     """
     
     # Check if it matches device specifications
