@@ -70,14 +70,14 @@ def redrawShift(lights):
 
     if internal.window.getAnimationTick() > 0:
         # Playlist
-        if internal.window.getString() == internalconstants.WINDOW_STR_PLAYLIST:
+        if internal.window.getString() == internalconstants.FL_WINDOW_LIST[internalconstants.WINDOW_PLAYLIST]:
             lights.setPadColour(0, 1, lightingconsts.colours["DARK GREY"])
         else:
             lights.setPadColour(0, 1, lightingconsts.WINDOW_PLAYLIST)
 
     if internal.window.getAnimationTick() > 1:
         # Channel Rack
-        if internal.window.getString() == internalconstants.WINDOW_STR_CHANNEL_RACK:
+        if internal.window.getString() == internalconstants.FL_WINDOW_LIST[internalconstants.WINDOW_CHANNEL_RACK]:
             lights.setPadColour(1, 1, lightingconsts.colours["DARK GREY"])
         else:
             lights.setPadColour(1, 1, lightingconsts.WINDOW_CHANNEL_RACK)
@@ -90,7 +90,7 @@ def redrawShift(lights):
 
     if internal.window.getAnimationTick() > 2:
         # Piano roll
-        if internal.window.getString() == internalconstants.WINDOW_STR_PIANO_ROLL:
+        if internal.window.getString() == internalconstants.FL_WINDOW_LIST[internalconstants.WINDOW_PIANO_ROLL]:
             lights.setPadColour(2, 1, lightingconsts.colours["DARK GREY"])
         else:
             lights.setPadColour(2, 1, lightingconsts.WINDOW_PIANO_ROLL)
@@ -103,7 +103,7 @@ def redrawShift(lights):
 
     if internal.window.getAnimationTick() > 3:
         # Mixer
-        if internal.window.getString() == internalconstants.WINDOW_STR_MIXER:
+        if internal.window.getString() == internalconstants.FL_WINDOW_LIST[internalconstants.WINDOW_MIXER]:
             lights.setPadColour(3, 1, lightingconsts.colours["DARK GREY"])
         else:
             lights.setPadColour(3, 1, lightingconsts.WINDOW_MIXER)
@@ -116,7 +116,7 @@ def redrawShift(lights):
         
     if internal.window.getAnimationTick() > 4:
         # Browser
-        if internal.window.getString() == internalconstants.WINDOW_STR_BROWSER:
+        if internal.window.getString() == internalconstants.FL_WINDOW_LIST[internalconstants.WINDOW_BROWSER]:
             lights.setPadColour(4, 1, lightingconsts.colours["DARK GREY"])
         else:
             lights.setPadColour(4, 1, lightingconsts.WINDOW_BROWSER)
