@@ -48,10 +48,7 @@ def processExtended(command):
             processReceived(command)
             return
 
-        # Process error events
-        if internal.errors.getError():
-            internal.errors.eventProcessError(command)
-            return
+        
 
         # Reset idle timer
         if not ((command.type is eventconsts.TYPE_BASIC_PAD or command.type is eventconsts.TYPE_PAD or command.type is eventconsts.TYPE_TRANSPORT) and not command.is_lift):
@@ -64,6 +61,11 @@ def processExtended(command):
         
         # Call primary processor
         processfirst.process(command)
+
+        # Process error events
+        if internal.errors.getError():
+            internal.errors.eventProcessError(command)
+            return
 
         if command.handled: return
 
@@ -152,8 +154,12 @@ def processReceived(command):
         command.handle("Trigger error state")
     
     elif data == internalconstants.MESSAGE_ERROR_RECOVER:
-        internal.errors.recoverError(True)
+        internal.errors.recoverError(False, True)
         command.handle("Recover from error state")
+        
+    elif data == internalconstants.MESSAGE_ERROR_RECOVER_DEBUG:
+        internal.errors.recoverError(True, True)
+        command.handle("Recover from error state, enable debugging")
         
     elif data == internalconstants.MESSAGE_SHIFT_DOWN:
         internal.shift.setDown(True)

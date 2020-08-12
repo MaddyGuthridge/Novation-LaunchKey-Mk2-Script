@@ -294,8 +294,8 @@ class ExtendedMgr:
             newMode (bool): new extended mode
             option (eventID, optional): Control set ID. Defaults to eventconsts.SYSTEM_EXTENDED.
         """
-        if self.ignore_all:
-            return
+        #if self.ignore_all:
+        #    return
         
         # Set all
         if option == eventconsts.SYSTEM_EXTENDED:
@@ -377,6 +377,7 @@ class ErrorState:
         e: Any exception triggered by anything
     """
     error = False
+    error_count = 0
 
     def triggerError(self, e):
         """Triggers an error state
@@ -388,6 +389,7 @@ class ErrorState:
             e: That same exception
         """
         self.error = True
+        self.error_count += 1
 
         # Set other script into error state too
         sendCompleteInternalMidiMessage(internalconstants.MESSAGE_ERROR_CRASH)
@@ -395,27 +397,20 @@ class ErrorState:
         noteMode.setState(internalconstants.NOTE_STATE_ERROR)
 
         if PORT == config.DEVICE_PORT_EXTENDED:
-            # Force remove from in-control mode
-            extendedMode.forceEnd()
+            try:
+                if config.DEBUG_HARD_CRASHING:
+                    # Force remove from in-control mode
+                    extendedMode.forceEnd()
 
-            # Set pad lights
-            lightMap = lighting.LightMap()
-            lightMap.setFromMatrix(lightingconsts.ERROR_COLOURS, 2)
-            lighting.state.setFromMap(lightMap)
+                # Set pad lights
+                lightMap = lighting.LightMap()
+                lightMap.setFromMatrix(lightingconsts.ERROR_COLOURS, 2)
+                lighting.state.setFromMap(lightMap)
+            except:
+                pass
 
         # Print error message
-        print("")
-        print("")
-        print(getLineBreak())
-        print(getLineBreak())
-        print("Unfortunately, an error occurred, and the script has crashed.")
-        print("Please save a copy of this output to a text file, and create an issue on the project's GitHub page:")
-        print("          " + internalconstants.SCRIPT_URL)
-        print("Then, please restart both scripts by clicking `Reload script` in the Script output window.")
-        print(getLineBreak())
-        print(getLineBreak())
-        print("")
-        print("")
+        self.printError(False, e.args)
 
         if config.DEBUG_HARD_CRASHING:
             raise e
@@ -428,26 +423,20 @@ class ErrorState:
         noteMode.setState(internalconstants.NOTE_STATE_ERROR)
 
         if PORT == config.DEVICE_PORT_EXTENDED:
-            # Force remove from in-control mode
-            extendedMode.forceEnd()
+            try:
+                # Force remove from in-control mode
+                extendedMode.forceEnd()
 
-            # Set pad lights
-            lightMap = lighting.LightMap()
-            lightMap.setFromMatrix(lightingconsts.ERROR_COLOURS, 2)
-            lighting.state.setFromMap(lightMap)
+                # Set pad lights
+                lightMap = lighting.LightMap()
+                lightMap.setFromMatrix(lightingconsts.ERROR_COLOURS, 2)
+                lighting.state.setFromMap(lightMap)
+            except:
+                pass
+            
+        self.printError(True)
 
-        # Print error message
-        print("")
-        print("")
-        print(getLineBreak())
-        print(getLineBreak())
-        print("Unfortunately, an error occurred, and the script has crashed.")
-        print("Please refer to the other script output for the error info and instructions to report the error, ", end="")
-        print("then restart both scripts by clicking `Reload script` in the Script output window.")
-        print(getLineBreak())
-        print(getLineBreak())
-        print("")
-        print("")
+        
 
     def getError(self):
         """Gets whether the script is in an error state
@@ -464,13 +453,47 @@ class ErrorState:
             lights (LightMap): Object containining lighting state during redraw
         """
         lights.setFromMatrix(lightingconsts.ERROR_COLOURS)
-        lights.setPadColour(8, 1, lightingconsts.colours["ORANGE"])
+        if not config.DEBUG_HARD_CRASHING:
+            lights.setPadColour(8, 0, lightingconsts.colours["ORANGE"])
+            lights.setPadColour(8, 1, lightingconsts.colours["GREEN"])
         lights.solidifyAll()
 
-    def recoverError(self, received=False):
+    def printError(self, fromOther, error=""):
+        # Print error message
+        print("")
+        print("")
+        print(getLineBreak())
+        print(getLineBreak())
+        print("Unfortunately, an error occurred, and the script has crashed.")
+        if config.DEBUG_HARD_CRASHING:
+            if fromOther:
+                print("Please refer to the other script output for the error info and instructions to report the error, ", end="")
+            else:
+                print("Please save a copy of this output to a text file, and create an issue on the project's GitHub page:")
+                print("          " + internalconstants.SCRIPT_URL)
+            print("then restart both scripts by clicking `Reload script` in the Script output window.")
+        else:
+            print("Please restart the script by pressing the green pad, or restart the script with debugging enabled ", end="")
+            print("by pressing the orange pad. If possible, try to recreate the issue with debugging enabled.")
+        if error != "":
+            print(getLineBreak())
+            print("Error code:", error)
+        print(getLineBreak())
+        print(getLineBreak())
+        print("")
+        print("")
+
+    def recoverError(self, enter_debug, received=False):
         self.error = False
+        
+        if enter_debug:
+            enterDebugMode()
+        
         if not received:
-            sendCompleteInternalMidiMessage(internalconstants.MESSAGE_ERROR_RECOVER)
+            if enter_debug:
+                sendCompleteInternalMidiMessage(internalconstants.MESSAGE_ERROR_RECOVER_DEBUG)
+            else:
+                sendCompleteInternalMidiMessage(internalconstants.MESSAGE_ERROR_RECOVER)
         
         if getPortExtended():
             extendedMode.ignore_all = False
@@ -490,9 +513,15 @@ class ErrorState:
         Args:
             command (ParsedEvent): An event
         """
-        command.handle("Device in error state")
+        if config.DEBUG_HARD_CRASHING or getPortExtended():
+            command.handle("Device in error state")
+        
     
 errors = ErrorState()
+
+def enterDebugMode():
+    config.DEBUG_HARD_CRASHING = True
+    config.CONSOLE_DEBUG_MODE = internalconstants.FORCE_DEBUG_MODES_LIST
 
 
 from .messages import sendUniversalDeviceEnquiry, sendCompleteInternalMidiMessage, sendMidiMessage

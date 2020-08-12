@@ -124,7 +124,7 @@ def processNoteModeMenu(command):
                         noteModeMenu.nextMode()
                         command.handle("Next note mode menu")
             
-            elif not note_menu_active:
+            elif not note_menu_active and not internal.errors.getError():
                 
                 switchNoteModeMenu(True)
                 command.handle("Open note mode menu")

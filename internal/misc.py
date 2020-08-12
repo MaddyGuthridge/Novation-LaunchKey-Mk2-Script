@@ -42,11 +42,11 @@ def idleProcessor():
     debugLog(getTab("Idle Tick:", 2) + str(window.getIdleTick()), internalconstants.DEBUG_ANIMATION_IDLE_TIMERS)
     debugLog("", internalconstants.DEBUG_ANIMATION_IDLE_TIMERS)
 
-    # Update active window
-    window.update()
-    
-    # If in a right-click menu, reset idle timer
-    
+    try:
+        # Update active window
+        window.update()
+    except Exception as e:
+        state.errors.triggerError(e)
 
     # Stop performance timer
     idleClock.stop()

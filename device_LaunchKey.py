@@ -45,10 +45,14 @@ class TGeneric():
         return
 
     def OnInit(self):
-
-        # Run shared init functions
-        internal.sharedInit()
-
+        
+        try:
+            if internal.state.SHARED_INIT_STATE is internalconstants.INIT_INCOMPLETE:
+                # Run shared init functions
+                internal.sharedInit()
+        except Exception as e:
+            internal.errors.triggerError(e)
+        
         print('Initialisation complete')
         print(internal.getLineBreak())
         print(internal.getLineBreak())

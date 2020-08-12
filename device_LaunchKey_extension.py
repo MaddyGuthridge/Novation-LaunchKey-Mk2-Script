@@ -36,6 +36,7 @@ import time
 # Other project files
 import config
 import internal
+import internalconstants
 import lighting
 import eventconsts
 import eventprocessor
@@ -54,20 +55,24 @@ class TGeneric():
 
     def OnInit(self):
 
-        # Run shared init functions
-        internal.sharedInit()
+        try:
+            if internal.state.SHARED_INIT_STATE is internalconstants.INIT_INCOMPLETE:
+                # Run shared init functions
+                internal.sharedInit()
 
-        # Set the device into Extended Mode
-        internal.extendedMode.setVal(True, force=True)
+            # Set the device into Extended Mode
+            internal.extendedMode.setVal(True, force=True)
 
-        # Run light show
-        lighting.lightShow()
+            # Run light show
+            lighting.lightShow()
 
-        # Process inControl preferences | Say it's external since we want the settings to be applied regardless
-        if config.START_IN_INCONTROL_KNOBS == False: internal.extendedMode.setVal(False, eventconsts.INCONTROL_KNOBS, from_internal=False) 
-        if config.START_IN_INCONTROL_FADERS == False: internal.extendedMode.setVal(False, eventconsts.INCONTROL_FADERS, from_internal=False) 
-        if config.START_IN_INCONTROL_PADS == False: internal.extendedMode.setVal(False, eventconsts.INCONTROL_PADS, from_internal=False) 
+            # Process inControl preferences | Say it's external since we want the settings to be applied regardless
+            if config.START_IN_INCONTROL_KNOBS == False: internal.extendedMode.setVal(False, eventconsts.INCONTROL_KNOBS, from_internal=False) 
+            if config.START_IN_INCONTROL_FADERS == False: internal.extendedMode.setVal(False, eventconsts.INCONTROL_FADERS, from_internal=False) 
+            if config.START_IN_INCONTROL_PADS == False: internal.extendedMode.setVal(False, eventconsts.INCONTROL_PADS, from_internal=False) 
         
+        except Exception as e:
+            internal.errors.triggerError(e)
 
         print('Initialisation complete')
         print(internal.getLineBreak())
@@ -76,14 +81,17 @@ class TGeneric():
         print("")
 
     def OnDeInit(self):
-        lighting.lightShow()
-        # Return the device into Basic Mode
-        internal.extendedMode.setVal(False)
-        print('Deinitialisation complete')
-        print(internal.getLineBreak())
-        print(internal.getLineBreak())
-        print("")
-        print("")
+        try:
+            lighting.lightShow()
+            # Return the device into Basic Mode
+            internal.extendedMode.setVal(False)
+            print('Deinitialisation complete')
+            print(internal.getLineBreak())
+            print(internal.getLineBreak())
+            print("")
+            print("")
+        except Exception as e:
+            internal.errors.triggerError(e)
         
 
     def OnMidiIn(self, event):

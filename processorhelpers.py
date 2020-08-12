@@ -308,7 +308,11 @@ class ActionPrinter:
                 hint_msg = cur_msg
 
         if hint_msg != "":
-            ui.setHintMsg(hint_msg)
+            # Sometimes this fails...
+            try:
+                ui.setHintMsg(hint_msg)
+            except:
+                pass
         self.eventProcessors.clear()
 
 

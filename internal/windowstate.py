@@ -184,19 +184,12 @@ class WindowMgr:
                 special_flag = True
 
             if not special_flag:
-                last = -1
-                length = len(new_plugin)
-                for y in range(length):
-                    if new_plugin[y] is '(':
-                        last = y + 1
-                if last == -1 or last > length: # If no brackets found
-                    return False
-                
-                # Trim string
-                new_plugin = new_plugin[last: -2]
+                new_plugin = ui.getFocusedPluginName()
+
+            if new_plugin == "":
+                return False
 
             # If window changed
-            
             if new_plugin != self.active_plugin or self.plugin_focused == False:
 
                 # End active plugin
@@ -263,11 +256,7 @@ def getFlWindowString(index):
         str: FL Window name
     """
     if index == -1: return "NONE"
-    if index == internalconstants.WINDOW_MIXER: return internalconstants.WINDOW_STR_MIXER
-    if index == internalconstants.WINDOW_PLAYLIST: return internalconstants.WINDOW_STR_PLAYLIST
-    if index == internalconstants.WINDOW_CHANNEL_RACK: return internalconstants.WINDOW_STR_CHANNEL_RACK
-    if index == internalconstants.WINDOW_PIANO_ROLL: return internalconstants.WINDOW_STR_PIANO_ROLL
-    if index == internalconstants.WINDOW_BROWSER: return internalconstants.WINDOW_STR_BROWSER
+    return internalconstants.FL_WINDOW_LIST[index]
     
 from .shiftstate import shift
     

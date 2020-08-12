@@ -26,9 +26,13 @@ FORWARD_NOTES = False
 def process(command):
     command.actions.addProcessor("Error note handler")
     
-    if command.type is eventconsts.TYPE_BASIC_PAD and command.is_lift and command.getPadCoord() == (8, 1):
-        internal.errors.recoverError(False)
+    if (command.type is eventconsts.TYPE_BASIC_PAD or command.type == eventconsts.TYPE_PAD) and command.is_lift and command.getPadCoord() == (8, 1):
+        internal.errors.recoverError(False, True)
         command.handle("Recover error")
+        
+    elif (command.type is eventconsts.TYPE_BASIC_PAD or command.type == eventconsts.TYPE_PAD) and command.is_lift and command.getPadCoord() == (8, 0):
+        internal.errors.recoverError(True, True)
+        command.handle("Recover error, entered debug mode")
             
     elif config.CHAOTIC_EVIL_ERROR_NOTE_HANDLER and command.type is eventconsts.TYPE_NOTE:
         
@@ -47,10 +51,11 @@ def process(command):
             internal.notesDown.allNotesOff()
             command.handle("All notes off")
     else:
-        command.handle("Device in error state")
+        if not (command.type in internalconstants.SHIFT_IGNORE_TYPES):
+            command.handle("Device in error state")
 
 def redraw(lights):
-    pass
+    internal.errors.redrawError(lights)
 
 def activeStart():
     pass
