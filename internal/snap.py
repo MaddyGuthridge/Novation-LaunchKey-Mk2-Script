@@ -51,13 +51,13 @@ class SnapMgr:
         Args:
             new_mode (int): snap mode (index in snap mode drop down in FL)
         """
-        self.snap_mode = new_mode
-        ui.snapMode(new_mode)
+        ui.snapMode(new_mode - self.snap_mode)
+        
+        
         
     def toggleSnapMode(self):
         """Toggles whether snap mode is enabled
         """
-        self.snap_enabled = not self.snap_enabled
         ui.snapOnOff()
     
     def processSnapMode(self, command):
