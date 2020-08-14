@@ -208,5 +208,7 @@ class ShiftsMgr:
 shifts = ShiftsMgr()
 
 from .shifts.mainshift import MainShift
+from .shifts.debugshift import DebugShift
 
 shifts.addShift(MainShift, "MAIN")
+shifts.addShift(DebugShift, "DEBUG")

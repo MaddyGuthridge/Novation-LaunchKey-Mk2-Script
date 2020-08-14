@@ -60,8 +60,8 @@ TAB_LENGTH = 16 # How much spacing to add in console output
 CHAOTIC_EVIL_ERROR_NOTE_HANDLER = True
 
 # Controls which console messages are printed. Add things from internalconstants
-CONSOLE_DEBUG_MODE = [internalconstants.DEBUG_EVENT_ACTIONS, internalconstants.DEBUG_EVENT_DATA]
+CONSOLE_DEBUG_MODE = []
 
 # Whether script should stop entirely when it encounters an error.
-DEBUG_HARD_CRASHING = True
+DEBUG_HARD_CRASHING = False
 
