@@ -372,18 +372,7 @@ class ParsedEvent:
         # Bit-shift status and data bytes to get event ID
         self.id = (self.status + (self.note << 8))
 
-        self.shifted = False
-
         self.parse()  
-        
-        # Process shift button
-        if self.id == config.SHIFT_BUTTON:
-            if self.is_lift:
-                self.handled = internal.shift.lift(self.is_double_click)
-            else:
-                internal.shift.press(self.is_double_click)
-        elif internal.shift.getDown() and self.type not in internalconstants.SHIFT_IGNORE_TYPES:
-            self.shifted = internal.shift.use(self.is_lift)
 
         # Process sysex events
         if self.type is eventconsts.TYPE_SYSEX_EVENT:
@@ -585,14 +574,15 @@ class ParsedEvent:
             out += "[Long Press]"
             out = internal.getTab(out)
         
-        if self.shifted:
-            out += "[Shifted]"
+        if internal.shifts.query():
+            out += "[Shifted | " + internal.shifts.current_down + "]"
             out = internal.getTab(out)
         
+        """ # Add this back soon hopefully
         if self.id == config.SHIFT_BUTTON:
             out += "[Shift Key]"
             out = internal.getTab(out)
-
+        """
         return out
 
     

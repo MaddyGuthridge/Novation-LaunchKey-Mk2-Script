@@ -14,7 +14,7 @@ from .state import sharedInit, extendedMode, errors, getPortExtended
 from .messages import sendInternalMidiMessage, sendCompleteInternalMidiMessage, sendMidiMessage, sendCompleteMidiMessage, toMidiMessage
 from .logging import debugLog, getLineBreak, printCommand, printCommandOutput, getTab
 from .windowstate import window
-from .shiftstate import shift
+from .shiftstate import shifts
 from .misc import idleProcessor, beat, refreshProcessor, processSysEx
 from .notemanager import noteMode, notesDown
 from .snap import snap

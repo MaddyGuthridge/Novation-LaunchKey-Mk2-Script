@@ -59,9 +59,18 @@ def processExtended(command):
         # Process key mappings
         controllerprocessors.process(command)
         
+        # Process shifts
+        internal.shifts.processShift(command)
+        if command.handled: return
+        
+        # Process through shift processors
+        internal.shifts.process(command)
+        if command.handled: return
+        
         # Call primary processor
         processfirst.process(command)
-
+        if command.handled: return
+        
         # Process error events
         if internal.errors.getError():
             internal.errors.eventProcessError(command)
@@ -162,15 +171,15 @@ def processReceived(command):
         command.handle("Recover from error state, enable debugging")
         
     elif data == internalconstants.MESSAGE_SHIFT_DOWN:
-        internal.shift.setDown(True)
+        internal.shifts["MAIN"].setDown(True)
         command.handle("Press shift")
         
     elif data == internalconstants.MESSAGE_SHIFT_UP:
-        internal.shift.setDown(False)
+        internal.shifts["MAIN"].setDown(False)
         command.handle("Release shift")
         
     elif data == internalconstants.MESSAGE_SHIFT_USE:
-        internal.shift.use()
+        internal.shifts["MAIN"].use()
         command.handle("Use shift")
         
     elif command.id == internalconstants.MESSAGE_INPUT_MODE_SELECT:
@@ -215,6 +224,9 @@ def redraw():
 
         # Draws idle thing if idle
         lighting.idleLightshow(lights)
+        
+        # Redraw shift menus
+        internal.shifts.redraw(lights)
 
         # Get UI from primary processor
         processfirst.redraw(lights)

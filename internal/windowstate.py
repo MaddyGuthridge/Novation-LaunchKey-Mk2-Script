@@ -168,7 +168,7 @@ class WindowMgr:
             # Start new window active
             eventprocessor.activeStart()
 
-            if not shift.getDown():   
+            if not shifts["MAIN"].query():   
                 self.resetAnimationTick()
             self.resetIdleTick()
             return True
@@ -216,7 +216,7 @@ class WindowMgr:
                 # Start new plugin active
                 eventprocessor.activeStart()
 
-                if not shift.getDown():   
+                if not shifts["MAIN"].query():   
                     self.resetAnimationTick()
                 self.resetIdleTick()
                 return True
@@ -259,5 +259,5 @@ def getFlWindowString(index):
     if index == -1: return "NONE"
     return internalconstants.FL_WINDOW_LIST[index]
     
-from .shiftstate import shift
+from .shiftstate import shifts
     

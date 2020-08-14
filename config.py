@@ -14,12 +14,9 @@ import internalconstants
 # USER VARIABLES
 #-------------------------------
 
-# Shift button allows override of standard functions.
-# Change this to change which button is treated as the shift button
-SHIFT_BUTTON = eventconsts.TRANSPORT_LOOP
-
 # Check for updates online. Change to False if you don't want to be notified or something
 CHECK_UPDATES = True
+# THIS DOESN'T WORK YET :(
 
 # Enable idle light show
 IDLE_LIGHTS_ENABLED = True
@@ -63,8 +60,8 @@ TAB_LENGTH = 16 # How much spacing to add in console output
 CHAOTIC_EVIL_ERROR_NOTE_HANDLER = True
 
 # Controls which console messages are printed. Add things from internalconstants
-CONSOLE_DEBUG_MODE = []
+CONSOLE_DEBUG_MODE = [internalconstants.DEBUG_EVENT_ACTIONS, internalconstants.DEBUG_EVENT_DATA]
 
 # Whether script should stop entirely when it encounters an error.
-DEBUG_HARD_CRASHING = False
+DEBUG_HARD_CRASHING = True
 

@@ -95,7 +95,7 @@ class TGeneric():
     def OnIdle(self):
         internal.idleProcessor()
         
-        if internal.shift.getDown():
+        if internal.shifts["MAIN"].query():
             internal.state.idleShift()
         
         
