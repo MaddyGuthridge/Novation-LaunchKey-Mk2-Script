@@ -61,7 +61,7 @@ def process(command):
         if command.coord_X < 8:
             new_status = (9 << 4) + internalconstants.OMNI_CHANNEL_STATUS
             command.edit(processorhelpers.RawEvent(new_status, PAD_MAPPINGS[command.coord_X][command.coord_Y], command.value))
-            command.handle("Switch pad to omni mode")
+            command.act("Switch pad to omni mode")
 
 
 def redraw(lights):

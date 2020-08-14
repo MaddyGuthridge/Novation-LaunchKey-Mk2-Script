@@ -175,6 +175,7 @@ class WindowMgr:
         
         else: # Check for changes to Plugin
             new_plugin = ui.getFocusedFormCaption()
+            
             old_plugin = self.active_plugin
             
             special_flag = False
