@@ -78,7 +78,7 @@ def process(command):
                 # Use coord_X number for keyswitch number
                 keyswitch_num = command.coord_X
 
-        command.edit(processorhelpers.RawEvent(0x90, keyswitch_num, command.value))
+        command.edit(processorhelpers.RawEvent(0x90, keyswitch_num, command.value), "Remap keyswitches")
 
     """ Link to parameters - Fix this once API updates
     if command.id == eventconsts.BASIC_FADER_1:
@@ -91,10 +91,6 @@ def process(command):
         command.edit(eventprocessor.rawEvent(0xB0, REVERB, command.value))
     """
 
-
-    # Add did not handle flag if not handled
-    if command.handled is False: 
-        command.actions.appendAction("[Did not handle]")
     return
 
 

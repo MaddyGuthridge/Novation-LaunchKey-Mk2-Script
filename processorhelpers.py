@@ -486,7 +486,7 @@ class ParsedEvent:
             elif self.is_lift is False and self.isBinary is True: 
                 self.is_double_click = isDoubleClickPress(self.id)
         
-    def edit(self, event):
+    def edit(self, event, reason):
         """Edit the event to change data
 
         Args:
@@ -512,9 +512,11 @@ class ParsedEvent:
 
         self.parse()
 
-        newEventStr = "Changed event: \n" + self.getInfo()
+        newEventStr = reason
+        if internal.consts.DEBUG.EVENT_DATA in config.CONSOLE_DEBUG_MODE:
+            newEventStr += "Changed event: \n" + self.getInfo()
 
-        self.actions.appendAction(newEventStr)
+        self.act(newEventStr)
     
     def handle(self, action, silent=False):
         """Handles the event
@@ -526,13 +528,13 @@ class ParsedEvent:
         self.handled = True
         self.actions.appendAction(action, silent, True)
 
-    def act(self, action):
+    def act(self, action, silent=True):
         """Adds an action to the event without handling it
 
         Args:
             action (str): The action taken
         """
-        self.actions.appendAction(action, False, False)
+        self.actions.appendAction(action, silent, False)
 
     def addProcessor(self, name):
         """Adds an event processor to the processor list

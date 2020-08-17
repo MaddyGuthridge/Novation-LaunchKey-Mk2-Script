@@ -16,7 +16,7 @@ def process(command):
     # Change fader automatically
     if command.type == eventconsts.TYPE_BASIC_FADER and command.coord_X == 8:
         if internal.extendedMode.query(eventconsts.INCONTROL_FADERS):
-            command.edit(processorhelpers.RawEvent(0xBF, 0x07, command.value))
+            command.edit(processorhelpers.RawEvent(0xBF, 0x07, command.value), "Remap fader")
         else:
             internal.sendCompleteInternalMidiMessage(command.getDataMIDI())
             command.handle("Send basic fader to basic processor")

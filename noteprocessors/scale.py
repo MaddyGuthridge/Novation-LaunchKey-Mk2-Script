@@ -155,7 +155,7 @@ def process(command):
                     break
             
         new_note = closest_note + octave*12 + closest_octave*12
-        command.edit(processorhelpers.RawEvent(command.status, new_note, command.value))
+        command.edit(processorhelpers.RawEvent(command.status, new_note, command.value), "Snap note")
     
     pass
 

@@ -81,5 +81,5 @@ def process(command):
             
             else:
                 # Always handle all pad commands
-                command.handle("Pads catch-all")
+                command.handle("Pads catch-all", silent=True)
 

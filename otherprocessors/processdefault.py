@@ -125,9 +125,4 @@ def process(command):
             command.actions.appendAction("Previous UI Element")
             command.handled = True
 
-    #--------------------------------------------------
-
-    # Add did not handle flag if not handled
-    if command.handled is False: 
-        command.actions.appendAction("[Did not handle]")
 

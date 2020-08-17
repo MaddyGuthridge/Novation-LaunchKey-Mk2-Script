@@ -106,9 +106,6 @@ def process(command):
             # quit the colour picker
             ui.escape()
 
-    # Add did not handle flag if not handled
-    if command.handled is False: 
-        command.actions.appendAction("[Did not handle]")
     return
 
 

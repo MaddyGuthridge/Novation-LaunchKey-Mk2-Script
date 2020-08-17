@@ -140,7 +140,7 @@ def processNoteModeMenu(command):
                 command.handle("Select note mode")
             
             else:
-                command.handle("Note mode catch-all")
+                command.handle("Note mode catch-all", silent=True)
 
     if command.type is eventconsts.TYPE_BASIC_PAD and command.is_lift:
         if command.getPadCoord() == (8, 1):

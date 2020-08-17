@@ -40,10 +40,7 @@ def process(command):
     # Forward onto main processor for lighting
     if command.type == eventconsts.TYPE_BASIC_PAD:
         internal.sendInternalMidiMessage(command.status, command.note, command.value)
-        command.actions.appendAction("Forward to extended script processor")
+        command.actions.appendAction("Forward to extended script processor", silent=True)
     
-    # Add did not handle flag if not handled
-    if command.handled is False: 
-        command.actions.appendAction("[Did not handle]")
 
 

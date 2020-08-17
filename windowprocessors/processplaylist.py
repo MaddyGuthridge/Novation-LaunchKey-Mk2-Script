@@ -48,7 +48,7 @@ def process(command):
                             transport.markerJumpJog(1)
                             command.handle("Transport: Jump to next marker")
                 else:
-                    command.handle("Catch transport skips")
+                    command.handle("Catch transport skips", silent=True)
             
 
 

@@ -57,7 +57,7 @@ def process(command):
     # Forward onto basic processor for things
     if command.type == eventconsts.TYPE_PAD:
         internal.sendInternalMidiMessage(command.status, command.note, command.value)
-        command.actions.appendAction("Forward to basic script processor")
+        command.actions.appendAction("Forward to basic script processor", silent=True)
 
     # Pads down (white light)
     if command.type == eventconsts.TYPE_BASIC_PAD or command.type == eventconsts.TYPE_PAD:
@@ -89,7 +89,7 @@ def process(command):
     # All
     if command.id == eventconsts.SYSTEM_EXTENDED:
         internal.extendedMode.recieve(not command.is_lift)
-        command.handle("Set Extended Mode to " + str(not command.is_lift))
+        command.handle("Set Extended Mode to " + str(not command.is_lift), silent=True)
 
     # Knobs
     if command.id == eventconsts.INCONTROL_KNOBS:
@@ -99,7 +99,7 @@ def process(command):
     # Faders
     if command.id == eventconsts.INCONTROL_FADERS:
         internal.extendedMode.recieve(not command.is_lift, eventconsts.INCONTROL_FADERS)
-        command.handle("Set Extended Mode (Faders) to " + str(not command.is_lift))
+        command.handle("Set Extended Mode (Faders) to " + str(not command.is_lift), silent=True)
     
     # Pads
     if command.id == eventconsts.INCONTROL_PADS:
@@ -107,11 +107,11 @@ def process(command):
         if command.is_lift:
             # Close select note mode menu
             noteprocessors.processnotes.switchNoteModeMenu(False, True)
-        command.handle("Set Extended Mode (Pads) to " + str(not command.is_lift))
+        command.handle("Set Extended Mode (Pads) to " + str(not command.is_lift), silent=True)
     
     # That random event on the knobs button
     if command.id == eventconsts.SYSTEM_MISC:
-        command.handle("Handle misc event")
+        command.handle("Handle misc event", silent=True)
        
         
 
@@ -142,4 +142,4 @@ def processPopup(command):
         command.handle("UI Enter")
 
     else:
-        command.handle("Right click menu catch-all")
+        command.handle("Right click menu catch-all", silent=True)

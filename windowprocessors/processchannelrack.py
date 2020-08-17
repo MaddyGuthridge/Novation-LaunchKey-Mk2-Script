@@ -105,7 +105,7 @@ def processBitMode(command):
         if command.coord_Y == 0 and command.coord_X != 8:
             
             if channels.channelCount() <= current_track:
-                command.handle("Channel out of range")
+                command.handle("Channel out of range", silent=True)
                 return
             
             gridBits.toggleBit(current_track, command.coord_X)
@@ -350,7 +350,7 @@ def setGridBits(lights):
 def processMuteSolo(channel, command):
 
     if channels.channelCount() <= channel:
-        command.handle("Channel out of range. Couldn't process mute")
+        command.handle("Channel out of range. Couldn't process mute", silent=True)
         return
 
     if command.value == 0: return
@@ -373,7 +373,7 @@ def processMuteSolo(channel, command):
 def setVolume(command, channel, value):
 
     if channels.channelCount() <= channel:
-        command.handle("Channel out of range. Couldn't set volume")
+        command.handle("Channel out of range. Couldn't set volume", silent=True)
         return
 
     volume = getVolumeSend(value)
@@ -385,7 +385,7 @@ def setVolume(command, channel, value):
 
 def setPan(command, channel, value):
     if channels.channelCount() <= channel:
-        command.handle("Channel out of range. Couldn't setpan")
+        command.handle("Channel out of range. Couldn't set pan", silent=True)
         return
 
     volume = getPanSend(value)
