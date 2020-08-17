@@ -166,7 +166,7 @@ def redraw(lights):
         lights (LightMap): The lights to draw to
     """
     global INIT_COMPLETE, SCALE_CLASS
-    if not INIT_COMPLETE:
+    if not INIT_COMPLETE and internal.extendedMode.query(eventconsts.INCONTROL_PADS):
         if not CUSTOM_SCALE:
             for ctr in range(min(len(scales.scale_class_list), 7)):
                 if (ctr < internal.window.getAnimationTick() and SCALE_CLASS == -1) or SCALE_CLASS != -1:
@@ -196,7 +196,7 @@ def redraw(lights):
 def activeStart():
     """Called when your note mode is made active
     """
-    pass
+    internal.extendedMode.setVal(True, eventconsts.INCONTROL_PADS)
 
 def activeEnd():
     """Called wen your note mode is no-longer active
@@ -272,12 +272,12 @@ def processInit(command):
             note = command.note % 12
             if not note in SCALE_TO_USE:
                 SCALE_TO_USE.append(note)
-            command.handle("Add note to custom scale")
+            command.act("Add note to custom scale")
         
         else:
             ROOT_NOTE = command.note % 12
             INIT_HAVE_ROOT = True
-            command.handle("Set root note to" + str(ROOT_NOTE))
+            command.act("Set root note to" + str(ROOT_NOTE))
         
         
     if INIT_HAVE_ROOT and INIT_HAVE_SCALE:
@@ -285,3 +285,4 @@ def processInit(command):
         FORWARD_NOTES = False
         setScale(ROOT_NOTE, SCALE_TO_USE)
         COLOUR = CURRENT_SCALE_COLOUR
+        internal.extendedMode.revert(eventconsts.INCONTROL_PADS)
