@@ -14,6 +14,8 @@ from ..state import extendedMode, enterDebugMode
 # Ticks until menu is drawn/handled
 ENABLE_AFTER = 10
 
+changed_incontrol = False
+
 class DebugShift(ShiftState):
     def __init__(self):
         """Creates instance of ShiftState object
@@ -56,8 +58,13 @@ class DebugShift(ShiftState):
 
         
     def redraw(self, lights):
+        global changed_incontrol
+        if window.getAnimationTick() == ENABLE_AFTER and not changed_incontrol and not extendedMode.query(eventconsts.INCONTROL_PADS):
+            print("Here")
+            extendedMode.setVal(True, eventconsts.INCONTROL_PADS)
+            changed_incontrol = True
 
-        if window.getAnimationTick() > ENABLE_AFTER:
+        if (window.getAnimationTick() > ENABLE_AFTER and extendedMode.query(eventconsts.INCONTROL_PADS)) or changed_incontrol:
             # Crash
             lights.setPadColour(0, 0, lightingconsts.colours["RED"])
 
@@ -73,9 +80,11 @@ class DebugShift(ShiftState):
             lights.solidifyAll()
 
     def onPress(self):
-        extendedMode.setVal(True, eventconsts.INCONTROL_PADS)
+        global changed_incontrol
+        changed_incontrol = False
         
     def onLift(self):
-        extendedMode.revert(eventconsts.INCONTROL_PADS)
+        if changed_incontrol:
+            extendedMode.revert(eventconsts.INCONTROL_PADS)
         
             

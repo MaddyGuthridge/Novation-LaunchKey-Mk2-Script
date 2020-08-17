@@ -10,6 +10,7 @@ Author: Miguel Guthridge
 import config
 from .messages import debugLog
 from . import consts
+from .windowstate import window
 
 class ShiftState:
     """Object for managing the state of a single shift menu.
@@ -61,21 +62,25 @@ class ShiftState:
                         self.is_sustained = False
                         debugLog("Exit sustained shift: " + self.name, consts.DEBUG.SHIFT_EVENTS)
                         self.onLift()
+                        window.resetAnimationTick()
                         command.handle("Exit sustained shift")
                     else:
                         self.onLift()
                         debugLog("Exit shift menu " + self.name, consts.DEBUG.SHIFT_EVENTS)
                         if self.is_used:
                             command.handle("Exit shift menu")
+                            window.resetAnimationTick()
                             self.is_used = False
                         else:
                             command.act("Exit shift menu")
+                            window.resetAnimationTick()
                 
             return 0
             
         else:
             self.is_down = True
             if not self.is_sustained:
+                window.resetAnimationTick()
                 self.onPress()
                 debugLog("Enter shift menu " + self.name,consts.DEBUG.SHIFT_EVENTS)
                 command.act("Enter shift menu")
