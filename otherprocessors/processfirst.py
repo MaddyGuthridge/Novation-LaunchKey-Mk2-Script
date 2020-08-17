@@ -12,7 +12,7 @@ import general
 import transport
 
 import config
-import internalconstants
+import internal.consts
 import processorhelpers
 import eventconsts
 import internal
@@ -30,7 +30,7 @@ def redraw(lights):
     return
 
 def redrawPopup(lights):
-    if not (internal.window.active_plugin == internalconstants.WINDOW_STR_SCRIPT_OUTPUT and internal.window.plugin_focused):
+    if not (internal.window.active_plugin == internal.consts.WINDOW_STR_SCRIPT_OUTPUT and internal.window.plugin_focused):
         
         if internal.window.getAnimationTick() > 0:
             lights.setPadColour(1, 1, lightingconsts.UI_NAV_VERTICAL)         # Down
@@ -70,7 +70,7 @@ def process(command):
 
 
     # Right click menu
-    if ui.isInPopupMenu() and command.type == eventconsts.TYPE_PAD and command.is_lift and (internal.window.getString() != internalconstants.WINDOW_STR_SCRIPT_OUTPUT):
+    if ui.isInPopupMenu() and command.type == eventconsts.TYPE_PAD and command.is_lift and (internal.window.getString() != internal.consts.WINDOW_STR_SCRIPT_OUTPUT):
         
         processPopup(command)
 

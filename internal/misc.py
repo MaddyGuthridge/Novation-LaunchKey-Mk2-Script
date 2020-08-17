@@ -11,7 +11,7 @@ import transport
 
 import lighting
 import lightingconsts
-import internalconstants
+from . import consts
 import eventconsts
 
 from .performance import idleClock
@@ -38,9 +38,9 @@ def idleProcessor():
     # Increment animation tick
     window.incrementTicks()
 
-    debugLog(getTab("Animation Tick:", 2) + str(window.getAnimationTick()), internalconstants.DEBUG_ANIMATION_IDLE_TIMERS)
-    debugLog(getTab("Idle Tick:", 2) + str(window.getIdleTick()), internalconstants.DEBUG_ANIMATION_IDLE_TIMERS)
-    debugLog("", internalconstants.DEBUG_ANIMATION_IDLE_TIMERS)
+    debugLog(getTab("Animation Tick:", 2) + str(window.getAnimationTick()), consts.DEBUG.ANIMATION_IDLE_TIMERS)
+    debugLog(getTab("Idle Tick:", 2) + str(window.getIdleTick()), consts.DEBUG.ANIMATION_IDLE_TIMERS)
+    debugLog("", consts.DEBUG.ANIMATION_IDLE_TIMERS)
 
     try:
         # Update active window
@@ -137,25 +137,25 @@ def processSysEx(event):
     """
     
     # Check if it matches device specifications
-    if event.sysex[:8] == internalconstants.DEVICE_RESPONSE_FIRST:
-        if event.sysex[8] == internalconstants.DEVICE_RESPONSE_25:
-            state.DEVICE_TYPE = internalconstants.DEVICE_KEYS_25
+    if event.sysex[:8] == consts.DEVICE_RESPONSE_FIRST:
+        if event.sysex[8] == consts.DEVICE_RESPONSE_25:
+            state.DEVICE_TYPE = consts.DEVICE_KEYS_25
 
-        elif event.sysex[8] == internalconstants.DEVICE_RESPONSE_49:
-            state.DEVICE_TYPE = internalconstants.DEVICE_KEYS_49
+        elif event.sysex[8] == consts.DEVICE_RESPONSE_49:
+            state.DEVICE_TYPE = consts.DEVICE_KEYS_49
 
-        elif event.sysex[8] == internalconstants.DEVICE_RESPONSE_61:
-            state.DEVICE_TYPE = internalconstants.DEVICE_KEYS_61
+        elif event.sysex[8] == consts.DEVICE_RESPONSE_61:
+            state.DEVICE_TYPE = consts.DEVICE_KEYS_61
         else:
-            state.DEVICE_TYPE = internalconstants.DEVICE_UNRECOGNISED
+            state.DEVICE_TYPE = consts.DEVICE_UNRECOGNISED
             print("If you're seeing this, create an issue on GitHub. ")
             print("Make sure to tell me your device info, and include a copy of the Syxex Event below.")
-            print("Link to GitHub Page: " + internalconstants.SCRIPT_URL)
+            print("Link to GitHub Page: " + consts.SCRIPT_URL)
 
         controllerprocessors.onInit()
         
     else:
-        state.DEVICE_TYPE = internalconstants.DEVICE_UNRECOGNISED
+        state.DEVICE_TYPE = consts.DEVICE_UNRECOGNISED
         print("ERROR - DEVICE NOT RECOGNISED")
         
 

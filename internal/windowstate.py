@@ -8,7 +8,7 @@ Author: Miguel Guthridge
 
 import ui
 
-import internalconstants
+from . import consts
 import config
 import eventprocessor
 
@@ -35,14 +35,14 @@ class WindowMgr:
     def resetAnimationTick(self):
         """Reset animation tick to zero (play animations again)
         """
-        debugLog("Reset animation timer", internalconstants.DEBUG_LIGHTING_RESET)
+        debugLog("Reset animation timer", consts.DEBUG.LIGHTING_RESET)
         self.animation_tick_number = 0
 
     
     def resetIdleTick(self):
         """Reset idle tick to zero (cancel light show)
         """
-        debugLog("Reset idle timer", internalconstants.DEBUG_LIGHTING_RESET)
+        debugLog("Reset idle timer", consts.DEBUG.LIGHTING_RESET)
         self.idle_tick_number = 0
 
     
@@ -124,20 +124,20 @@ class WindowMgr:
         
         old_window = self.active_fl_window
         # Update FL Window
-        if   ui.getFocused(internalconstants.WINDOW_MIXER):        
-            new_fl_window = internalconstants.WINDOW_MIXER
+        if   ui.getFocused(consts.WINDOW_MIXER):        
+            new_fl_window = consts.WINDOW_MIXER
 
-        elif ui.getFocused(internalconstants.WINDOW_PIANO_ROLL):   
-            new_fl_window = internalconstants.WINDOW_PIANO_ROLL
+        elif ui.getFocused(consts.WINDOW_PIANO_ROLL):   
+            new_fl_window = consts.WINDOW_PIANO_ROLL
 
-        elif ui.getFocused(internalconstants.WINDOW_CHANNEL_RACK): 
-            new_fl_window = internalconstants.WINDOW_CHANNEL_RACK
+        elif ui.getFocused(consts.WINDOW_CHANNEL_RACK): 
+            new_fl_window = consts.WINDOW_CHANNEL_RACK
 
-        elif ui.getFocused(internalconstants.WINDOW_PLAYLIST):     
-            new_fl_window = internalconstants.WINDOW_PLAYLIST
+        elif ui.getFocused(consts.WINDOW_PLAYLIST):     
+            new_fl_window = consts.WINDOW_PLAYLIST
 
-        elif ui.getFocused(internalconstants.WINDOW_BROWSER):      
-            new_fl_window = internalconstants.WINDOW_BROWSER
+        elif ui.getFocused(consts.WINDOW_BROWSER):      
+            new_fl_window = consts.WINDOW_BROWSER
         
         else: new_fl_window = -1
 
@@ -157,8 +157,8 @@ class WindowMgr:
             self.active_fl_window = new_fl_window
             self.plugin_focused =  False
 
-            debugLog("Active Window: " + getFlWindowString(self.active_fl_window), internalconstants.DEBUG_WINDOW_CHANGES)
-            debugLog("[Background: " + self.active_plugin + "]", internalconstants.DEBUG_WINDOW_CHANGES)
+            debugLog("Active Window: " + getFlWindowString(self.active_fl_window), consts.DEBUG.WINDOW_CHANGES)
+            debugLog("[Background: " + self.active_plugin + "]", consts.DEBUG.WINDOW_CHANGES)
             debugLog(getLineBreak())
 
             # Start new window
@@ -181,7 +181,7 @@ class WindowMgr:
             special_flag = False
 
             # Check for special windows
-            if new_plugin == internalconstants.WINDOW_STR_COLOUR_PICKER or new_plugin == internalconstants.WINDOW_STR_SCRIPT_OUTPUT:
+            if new_plugin == consts.WINDOW_STR_COLOUR_PICKER or new_plugin == consts.WINDOW_STR_SCRIPT_OUTPUT:
                 special_flag = True
 
             if not special_flag:
@@ -205,9 +205,9 @@ class WindowMgr:
                 self.plugin_focused = True
                 self.active_plugin = new_plugin
 
-                debugLog("Active Window: " + self.active_plugin, internalconstants.DEBUG_WINDOW_CHANGES)
-                debugLog("[Background: " + getFlWindowString(self.active_fl_window) + "]", internalconstants.DEBUG_WINDOW_CHANGES)
-                debugLog(getLineBreak(), internalconstants.DEBUG_WINDOW_CHANGES)
+                debugLog("Active Window: " + self.active_plugin, consts.DEBUG.WINDOW_CHANGES)
+                debugLog("[Background: " + getFlWindowString(self.active_fl_window) + "]", consts.DEBUG.WINDOW_CHANGES)
+                debugLog(getLineBreak(), consts.DEBUG.WINDOW_CHANGES)
 
                 # Start new plugin
                 if new_plugin != old_plugin:
@@ -257,7 +257,7 @@ def getFlWindowString(index):
         str: FL Window name
     """
     if index == -1: return "NONE"
-    return internalconstants.FL_WINDOW_LIST[index]
+    return consts.FL_WINDOW_LIST[index]
     
 from .shiftstate import shifts
     

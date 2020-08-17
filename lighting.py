@@ -21,7 +21,7 @@ import internal
 import eventconsts
 import eventprocessor
 import processorhelpers
-import internalconstants
+import internal.consts
 import config
 import lightingconsts
 
@@ -202,7 +202,7 @@ class Lights:
         """Reset all lights to off
         """
         internal.sendMidiMessage(0xBF, 0x00, 0x00)
-        internal.debugLog("Sent lighting reset signal", internalconstants.DEBUG_LIGHTING_RESET)
+        internal.debugLog("Sent lighting reset signal", internal.consts.DEBUG.LIGHTING_RESET)
         internal.window.resetAnimationTick()
         self.__init__()
 
@@ -264,11 +264,11 @@ class Lights:
 
         if internal.extendedMode.query(eventconsts.INCONTROL_PADS): 
             internal.sendMidiMessage(status, eventconsts.Pads[x][y], colour)
-            internal.debugLog("Sent lighting command [" + str(x) + ", " + str(y) + "] (InControl Enabled)", internalconstants.DEBUG_LIGHTING_MESSAGE)
+            internal.debugLog("Sent lighting command [" + str(x) + ", " + str(y) + "] (InControl Enabled)", internal.consts.DEBUG.LIGHTING_MESSAGE)
             
         else: 
             internal.sendMidiMessage(status, processorhelpers.convertPadMapping(eventconsts.Pads[x][y]), colour)
-            internal.debugLog("Sent lighting command [" + str(x) + ", " + str(y) + "] (InControl Disabled)", internalconstants.DEBUG_LIGHTING_MESSAGE)
+            internal.debugLog("Sent lighting command [" + str(x) + ", " + str(y) + "] (InControl Disabled)", internal.consts.DEBUG.LIGHTING_MESSAGE)
         
         if state < 0: # Send extra event to trigger flashing
             status_b = 0x1
@@ -277,11 +277,11 @@ class Lights:
             if internal.extendedMode.query(eventconsts.INCONTROL_PADS): 
                 
                 internal.sendMidiMessage(status, eventconsts.Pads[x][y], -state)
-                internal.debugLog("Sent light flash command [" + str(x) + ", " + str(y) + "] (InControl Enabled)", internalconstants.DEBUG_LIGHTING_MESSAGE)
+                internal.debugLog("Sent light flash command [" + str(x) + ", " + str(y) + "] (InControl Enabled)", internal.consts.DEBUG.LIGHTING_MESSAGE)
                 
             else: 
                 internal.sendMidiMessage(status, processorhelpers.convertPadMapping(eventconsts.Pads[x][y]), -state)
-                internal.debugLog("Sent light flash command [" + str(x) + ", " + str(y) + "] (InControl Disabled)", internalconstants.DEBUG_LIGHTING_MESSAGE)
+                internal.debugLog("Sent light flash command [" + str(x) + ", " + str(y) + "] (InControl Disabled)", internal.consts.DEBUG.LIGHTING_MESSAGE)
     
     
     def setFromMap(self, map):
@@ -315,11 +315,11 @@ def lightShow():
 
     sleepTime = 0.05
     x = 0
-    if internal.state.SHARED_INIT_STATE == internalconstants.INIT_OK:
+    if internal.state.SHARED_INIT_STATE == internal.consts.INIT_OK:
         rainbowColours = lightingconsts.PALLETE_NORMAL
-    elif  internal.state.SHARED_INIT_STATE == internalconstants.INIT_API_OUTDATED or internal.state.SHARED_INIT_STATE == internalconstants.INIT_PORT_MISMATCH:
+    elif  internal.state.SHARED_INIT_STATE == internal.consts.INIT_API_OUTDATED or internal.state.SHARED_INIT_STATE == internal.consts.INIT_PORT_MISMATCH:
         rainbowColours = lightingconsts.PALLETE_INIT_FAIL
-    elif internal.state.SHARED_INIT_STATE == internalconstants.INIT_UPDATE_AVAILABLE:
+    elif internal.state.SHARED_INIT_STATE == internal.consts.INIT_UPDATE_AVAILABLE:
         rainbowColours = lightingconsts.PALLETE_UPDATE
     else:
         rainbowColours = lightingconsts.PALLETE_INIT_FAIL

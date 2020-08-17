@@ -16,7 +16,7 @@ import ui
 import config
 import eventconsts
 import internal
-import internalconstants
+import internal.consts
 
 
 class UiModeHandler: 
@@ -287,7 +287,7 @@ class ActionPrinter:
         # Add some random processor if a processor doesn't exist for some reason
         if len(self.eventProcessors) == 0:
             self.addProcessor("NoProcessor")
-            internal.debugLog("Added NoProcessor Processor", internalconstants.DEBUG_WARNING_DEPRECIATED_FEATURE)
+            internal.debugLog("Added NoProcessor Processor", internal.consts.DEBUG.WARNING_DEPRECIATED_FEATURE)
         # Append the action
         self.eventProcessors[len(self.eventProcessors) - 1].appendAction(act, silent, handled)
 
@@ -296,7 +296,7 @@ class ActionPrinter:
         """
         # Log all actions taken
         for x in range(len(self.eventProcessors)):
-            internal.debugLog(self.eventProcessors[x].getString(), internalconstants.DEBUG_EVENT_ACTIONS)
+            internal.debugLog(self.eventProcessors[x].getString(), internal.consts.DEBUG.EVENT_ACTIONS)
 
         # Get hint message to set (ignores silent messages)
         hint_msg = ""
@@ -360,7 +360,7 @@ class ParsedEvent:
         self.status_nibble = event.status >> 4              # Get first half of status byte
         self.channel = event.status & int('00001111', 2)    # Get 2nd half of status byte
         
-        if self.channel == internalconstants.INTERNAL_CHANNEL_STATUS:
+        if self.channel == internal.consts.INTERNAL_CHANNEL_STATUS:
             self.recieved_internal = True
 
         # PME Flags to make sure errors don't happen or something
@@ -589,18 +589,18 @@ class ParsedEvent:
     def printInfo(self):
         """Prints string info about event
         """
-        internal.debugLog(self.getInfo(), internalconstants.DEBUG_EVENT_DATA)
+        internal.debugLog(self.getInfo(), internal.consts.DEBUG.EVENT_DATA)
     
     
     def printOutput(self):
         """Prints actions taken whilst handling event
         """
-        internal.debugLog("", internalconstants.DEBUG_EVENT_ACTIONS)
+        internal.debugLog("", internal.consts.DEBUG.EVENT_ACTIONS)
         self.actions.flush()
         if self.handled:
-            internal.debugLog("[Event was handled]", internalconstants.DEBUG_EVENT_ACTIONS)
+            internal.debugLog("[Event was handled]", internal.consts.DEBUG.EVENT_ACTIONS)
         else: 
-            internal.debugLog("[Event wasn't handled]", internalconstants.DEBUG_EVENT_ACTIONS)
+            internal.debugLog("[Event wasn't handled]", internal.consts.DEBUG.EVENT_ACTIONS)
 
     
     def getType(self):

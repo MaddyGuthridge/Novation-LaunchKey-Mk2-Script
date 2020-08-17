@@ -6,7 +6,7 @@ This script is a template note processor.
 Author: Miguel Guthridge
 """
 
-import internalconstants
+import internal.consts
 import eventconsts
 import internal
 import processorhelpers

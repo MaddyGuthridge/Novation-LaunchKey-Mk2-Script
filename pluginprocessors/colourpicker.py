@@ -15,7 +15,7 @@ import internal
 import eventconsts
 import eventprocessor
 import lightingconsts
-import internalconstants
+import internal.consts
 
 import ui
 import playlist
@@ -93,13 +93,13 @@ def process(command):
 
             colour = COLOUR_HEX_MAP[command.coord_X][command.coord_Y]
 
-            if internal.window.active_fl_window == internalconstants.WINDOW_PLAYLIST:
+            if internal.window.active_fl_window == internal.consts.WINDOW_PLAYLIST:
                 patterns.setPatternColor(patterns.patternNumber(), colour)
             
-            if internal.window.active_fl_window == internalconstants.WINDOW_MIXER:
+            if internal.window.active_fl_window == internal.consts.WINDOW_MIXER:
                 mixer.setTrackColor(mixer.trackNumber(), colour)
 
-            if internal.window.active_fl_window == internalconstants.WINDOW_CHANNEL_RACK:
+            if internal.window.active_fl_window == internal.consts.WINDOW_CHANNEL_RACK:
                 channels.setChannelColor(channels.channelNumber(), colour)
                 
             command.actions.appendAction("Set colour to " + str(colour))

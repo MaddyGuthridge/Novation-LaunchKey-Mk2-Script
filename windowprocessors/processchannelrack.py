@@ -14,7 +14,7 @@ import ui
 
 import lightingconsts
 import config
-import internalconstants
+import internal.consts
 import internal
 import eventconsts
 import processorhelpers
@@ -172,7 +172,7 @@ def processMenuMode(command):
 
     # To piano roll
     elif coord == [7, 1]:
-        ui.showWindow(internalconstants.WINDOW_PIANO_ROLL)
+        ui.showWindow(internal.consts.WINDOW_PIANO_ROLL)
         command.actions.appendAction("Sent to pianoroll")
         command.handled = True
 
@@ -379,7 +379,7 @@ def setVolume(command, channel, value):
     volume = getVolumeSend(value)
     channels.setChannelVolume(channel, volume)
     action = "Set " + channels.getChannelName(channel) + " volume to " + getVolumeValue(value)
-    if processorhelpers.didSnap(processorhelpers.toFloat(value), internalconstants.CHANNEL_VOLUME_SNAP_TO):
+    if processorhelpers.didSnap(processorhelpers.toFloat(value), internal.consts.CHANNEL_VOLUME_SNAP_TO):
         action += " [Snapped]"
     command.handle(action)
 
@@ -391,14 +391,14 @@ def setPan(command, channel, value):
     volume = getPanSend(value)
     channels.setChannelPan(channel, volume)
     action = "Set " + channels.getChannelName(channel) + " pan to " + getPanValue(value)
-    if processorhelpers.didSnap(processorhelpers.toFloat(value, -1), internalconstants.CHANNEL_PAN_SNAP_TO):
+    if processorhelpers.didSnap(processorhelpers.toFloat(value, -1), internal.consts.CHANNEL_PAN_SNAP_TO):
         action = "[Snapped]"
     command.handle(action)
 
 # Returns volume value set to send to FL Studio
 def getVolumeSend(inVal):
     if config.ENABLE_SNAPPING:
-        return processorhelpers.snap(processorhelpers.toFloat(inVal), internalconstants.CHANNEL_VOLUME_SNAP_TO)
+        return processorhelpers.snap(processorhelpers.toFloat(inVal), internal.consts.CHANNEL_VOLUME_SNAP_TO)
     else: return processorhelpers.toFloat(inVal)
 
 
@@ -411,7 +411,7 @@ def getVolumeValue(inVal):
 # Returns volume value set to send to FL Studio
 def getPanSend(inVal):
     if config.ENABLE_SNAPPING:
-        return processorhelpers.snap(processorhelpers.toFloat(inVal, -1), internalconstants.CHANNEL_PAN_SNAP_TO)
+        return processorhelpers.snap(processorhelpers.toFloat(inVal, -1), internal.consts.CHANNEL_PAN_SNAP_TO)
     else: return processorhelpers.toFloat(inVal, -1)
 
 

@@ -8,11 +8,11 @@ Author: Miguel Guthridge
 
 import eventconsts
 import internal
-import internalconstants
+import internal.consts
 
 def process(command):
     
     pass
 
 def onInit():
-    internal.debugLog("Running on 61-key model", internalconstants.DEBUG_DEVICE_TYPE)
+    internal.debugLog("Running on 61-key model", internal.consts.DEBUG.DEVICE_TYPE)

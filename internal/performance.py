@@ -8,7 +8,7 @@ Author: Miguel Guthridge
 
 import time
 
-import internalconstants
+from . import consts
 import config
 
 from .logging import getLineBreak
@@ -49,5 +49,5 @@ class PerformanceMontor:
         return self.total_time
 
 # Create instances of performance counters
-eventClock = PerformanceMontor("Event Processor", internalconstants.DEBUG_PROCESSOR_PERFORMANCE)
-idleClock = PerformanceMontor("Idle Processor", internalconstants.DEBUG_IDLE_PERFORMANCE)
+eventClock = PerformanceMontor("Event Processor", consts.DEBUG.PROCESSOR_PERFORMANCE)
+idleClock = PerformanceMontor("Idle Processor", consts.DEBUG.IDLE_PERFORMANCE)

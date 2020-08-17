@@ -4,7 +4,7 @@ import transport
 
 from ..shiftstate import ShiftState
 import eventconsts
-import internalconstants
+from .. import consts
 import lightingconsts
 from ..snap import snap
 from ..windowstate import window
@@ -36,27 +36,27 @@ class MainShift(ShiftState):
         elif command.type == eventconsts.TYPE_PAD:
             if command.is_lift:
                 if command.note == eventconsts.Pads[0][1]: 
-                    ui.showWindow(internalconstants.WINDOW_PLAYLIST)
+                    ui.showWindow(consts.WINDOW_PLAYLIST)
                     self.use()
                     command.handle("Switched window to Playlist")
                     
                 elif command.note == eventconsts.Pads[1][1]: 
-                    ui.showWindow(internalconstants.WINDOW_CHANNEL_RACK)
+                    ui.showWindow(consts.WINDOW_CHANNEL_RACK)
                     self.use()
                     command.handle("Switched window to Channel rack")
                     
                 elif command.note == eventconsts.Pads[2][1]: 
-                    ui.showWindow(internalconstants.WINDOW_PIANO_ROLL)
+                    ui.showWindow(consts.WINDOW_PIANO_ROLL)
                     self.use()
                     command.handle("Switched window to Piano roll")
                     
                 elif command.note == eventconsts.Pads[3][1]: 
-                    ui.showWindow(internalconstants.WINDOW_MIXER)
+                    ui.showWindow(consts.WINDOW_MIXER)
                     self.use()
                     command.handle("Switched window to Mixer")
                     
                 elif command.note == eventconsts.Pads[4][1]: 
-                    ui.showWindow(internalconstants.WINDOW_BROWSER)
+                    ui.showWindow(consts.WINDOW_BROWSER)
                     self.use()
                     command.handle("Switched window to Browser")
                     
@@ -114,14 +114,14 @@ class MainShift(ShiftState):
 
         if window.getAnimationTick() > 0:
             # Playlist
-            if window.getString() == internalconstants.FL_WINDOW_LIST[internalconstants.WINDOW_PLAYLIST]:
+            if window.getString() == consts.FL_WINDOW_LIST[consts.WINDOW_PLAYLIST]:
                 lights.setPadColour(0, 1, lightingconsts.colours["DARK GREY"])
             else:
                 lights.setPadColour(0, 1, lightingconsts.WINDOW_PLAYLIST)
 
         if window.getAnimationTick() > 1:
             # Channel Rack
-            if window.getString() == internalconstants.FL_WINDOW_LIST[internalconstants.WINDOW_CHANNEL_RACK]:
+            if window.getString() == consts.FL_WINDOW_LIST[consts.WINDOW_CHANNEL_RACK]:
                 lights.setPadColour(1, 1, lightingconsts.colours["DARK GREY"])
             else:
                 lights.setPadColour(1, 1, lightingconsts.WINDOW_CHANNEL_RACK)
@@ -134,7 +134,7 @@ class MainShift(ShiftState):
 
         if window.getAnimationTick() > 2:
             # Piano roll
-            if window.getString() == internalconstants.FL_WINDOW_LIST[internalconstants.WINDOW_PIANO_ROLL]:
+            if window.getString() == consts.FL_WINDOW_LIST[consts.WINDOW_PIANO_ROLL]:
                 lights.setPadColour(2, 1, lightingconsts.colours["DARK GREY"])
             else:
                 lights.setPadColour(2, 1, lightingconsts.WINDOW_PIANO_ROLL)
@@ -147,7 +147,7 @@ class MainShift(ShiftState):
 
         if window.getAnimationTick() > 3:
             # Mixer
-            if window.getString() == internalconstants.FL_WINDOW_LIST[internalconstants.WINDOW_MIXER]:
+            if window.getString() == consts.FL_WINDOW_LIST[consts.WINDOW_MIXER]:
                 lights.setPadColour(3, 1, lightingconsts.colours["DARK GREY"])
             else:
                 lights.setPadColour(3, 1, lightingconsts.WINDOW_MIXER)
@@ -160,7 +160,7 @@ class MainShift(ShiftState):
             
         if window.getAnimationTick() > 4:
             # Browser
-            if window.getString() == internalconstants.FL_WINDOW_LIST[internalconstants.WINDOW_BROWSER]:
+            if window.getString() == consts.FL_WINDOW_LIST[consts.WINDOW_BROWSER]:
                 lights.setPadColour(4, 1, lightingconsts.colours["DARK GREY"])
             else:
                 lights.setPadColour(4, 1, lightingconsts.WINDOW_BROWSER)
@@ -177,11 +177,11 @@ class MainShift(ShiftState):
     def onPress(self):
         extendedMode.setVal(True, eventconsts.INCONTROL_PADS)
         extendedMode.setVal(True, eventconsts.INCONTROL_FADERS)
-        sendCompleteInternalMidiMessage(internalconstants.MESSAGE_SHIFT_DOWN)
+        sendCompleteInternalMidiMessage(consts.MESSAGE_SHIFT_DOWN)
         
     def onLift(self):
         extendedMode.revert(eventconsts.INCONTROL_PADS)
         extendedMode.revert(eventconsts.INCONTROL_FADERS)
-        sendCompleteInternalMidiMessage(internalconstants.MESSAGE_SHIFT_UP)
+        sendCompleteInternalMidiMessage(consts.MESSAGE_SHIFT_UP)
         
             

@@ -14,7 +14,7 @@ import utils
 
 import eventconsts
 import internal
-import internalconstants
+import internal.consts
 import config
 import lighting
 
@@ -104,7 +104,7 @@ def processBasic(command):
         command (ParsedEvent): a parsed MIDI event
     """
     # Send event to reset other controller
-    internal.sendCompleteInternalMidiMessage(internalconstants.MESSAGE_RESET_INTERNAL_CONTROLLER)
+    internal.sendCompleteInternalMidiMessage(internal.consts.MESSAGE_RESET_INTERNAL_CONTROLLER)
 
     try:
         if command.recieved_internal:
@@ -154,35 +154,35 @@ def processReceived(command):
 
     data = command.getDataMIDI()
 
-    if data == internalconstants.MESSAGE_RESET_INTERNAL_CONTROLLER:
+    if data == internal.consts.MESSAGE_RESET_INTERNAL_CONTROLLER:
         internal.window.resetIdleTick()
         command.handle("Reset idle tick", True)
 
-    elif data == internalconstants.MESSAGE_ERROR_CRASH:
+    elif data == internal.consts.MESSAGE_ERROR_CRASH:
         internal.errors.triggerErrorFromOtherScript()
         command.handle("Trigger error state")
     
-    elif data == internalconstants.MESSAGE_ERROR_RECOVER:
+    elif data == internal.consts.MESSAGE_ERROR_RECOVER:
         internal.errors.recoverError(False, True)
         command.handle("Recover from error state")
         
-    elif data == internalconstants.MESSAGE_ERROR_RECOVER_DEBUG:
+    elif data == internal.consts.MESSAGE_ERROR_RECOVER_DEBUG:
         internal.errors.recoverError(True, True)
         command.handle("Recover from error state, enable debugging")
         
-    elif data == internalconstants.MESSAGE_SHIFT_DOWN:
+    elif data == internal.consts.MESSAGE_SHIFT_DOWN:
         internal.shifts["MAIN"].setDown(True)
         command.handle("Press shift")
         
-    elif data == internalconstants.MESSAGE_SHIFT_UP:
+    elif data == internal.consts.MESSAGE_SHIFT_UP:
         internal.shifts["MAIN"].setDown(False)
         command.handle("Release shift")
         
-    elif data == internalconstants.MESSAGE_SHIFT_USE:
+    elif data == internal.consts.MESSAGE_SHIFT_USE:
         internal.shifts["MAIN"].use()
         command.handle("Use shift")
         
-    elif command.id == internalconstants.MESSAGE_INPUT_MODE_SELECT:
+    elif command.id == internal.consts.MESSAGE_INPUT_MODE_SELECT:
         noteprocessors.setModeByIndex(command.value)
         command.handle("Set note state")
         

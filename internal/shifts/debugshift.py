@@ -6,7 +6,7 @@ from ..shiftstate import ShiftState
 from ..windowstate import window
 import config
 import eventconsts
-import internalconstants
+from .. import consts
 import lightingconsts
 from lighting import triggerIdleLightshow
 from ..state import extendedMode, enterDebugMode

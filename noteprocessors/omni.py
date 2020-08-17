@@ -8,7 +8,7 @@ Author: Miguel Guthridge
 
 import channels
 
-import internalconstants
+import internal.consts
 import eventconsts
 import internal
 import processorhelpers
@@ -53,13 +53,13 @@ def process(command):
     # If command is a note
     if command.type is eventconsts.TYPE_NOTE:
         # Set status byte to channel 15 (Omni preview channel)
-        new_status = (command.status_nibble << 4) + internalconstants.OMNI_CHANNEL_STATUS
+        new_status = (command.status_nibble << 4) + internal.consts.OMNI_CHANNEL_STATUS
         command.edit(processorhelpers.RawEvent(new_status, command.note, command.value))
         command.handle("Switch note to omni-mode")
     
     elif command.type is eventconsts.TYPE_BASIC_PAD:
         if command.coord_X < 8:
-            new_status = (9 << 4) + internalconstants.OMNI_CHANNEL_STATUS
+            new_status = (9 << 4) + internal.consts.OMNI_CHANNEL_STATUS
             command.edit(processorhelpers.RawEvent(new_status, PAD_MAPPINGS[command.coord_X][command.coord_Y], command.value))
             command.act("Switch pad to omni mode")
 

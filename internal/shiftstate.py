@@ -8,8 +8,8 @@ Author: Miguel Guthridge
 """
 
 import config
-import internalconstants
 from .messages import debugLog
+from . import consts
 
 class ShiftState:
     """Object for managing the state of a single shift menu.
@@ -54,11 +54,11 @@ class ShiftState:
                 if command.is_double_click and self.enable_sustain and config.ENABLE_SUSTAINED_SHIFT:
                     self.is_sustained = True
                     command.handle("Enter sustained shift")
-                    debugLog("Enter sustained shift: " + self.name, internalconstants.DEBUG_SHIFT_EVENTS)
+                    debugLog("Enter sustained shift: " + self.name, consts.DEBUG.SHIFT_EVENTS)
                     return 1
                 else:
                     self.onLift()
-                    debugLog("Exit shift menu " + self.name, internalconstants.DEBUG_SHIFT_EVENTS)
+                    debugLog("Exit shift menu " + self.name, consts.DEBUG.SHIFT_EVENTS)
                     if self.is_used:
                         command.handle("Exit shift menu")
                         self.is_used = False
@@ -71,10 +71,10 @@ class ShiftState:
             self.is_down = True
             if self.is_sustained:
                 self.is_sustained = False
-                debugLog("Exit sustained shift: " + self.name, internalconstants.DEBUG_SHIFT_EVENTS)
+                debugLog("Exit sustained shift: " + self.name, consts.DEBUG.SHIFT_EVENTS)
             else:
                 self.onPress()
-                debugLog("Enter shift menu " + self.name, internalconstants.DEBUG_SHIFT_EVENTS)
+                debugLog("Enter shift menu " + self.name,consts.DEBUG.SHIFT_EVENTS)
                 command.act("Enter shift menu")
                 
                 
@@ -88,12 +88,12 @@ class ShiftState:
         """
         if self.is_down:
             self.is_used = True
-            debugLog("Use shift: " + self.name, internalconstants.DEBUG_SHIFT_EVENTS)
+            debugLog("Use shift: " + self.name, consts.DEBUG.SHIFT_EVENTS)
             return True
         elif self.is_sustained:
-            debugLog("Use sustained shift: " + self.name, internalconstants.DEBUG_SHIFT_EVENTS)
+            debugLog("Use sustained shift: " + self.name, consts.DEBUG.SHIFT_EVENTS)
             if config.AUTOCANCEL_SUSTAINED_SHIFT:
-                debugLog("Exit sustained shift: " + self.name, internalconstants.DEBUG_SHIFT_EVENTS)
+                debugLog("Exit sustained shift: " + self.name, consts.DEBUG.SHIFT_EVENTS)
                 self.is_sustained = False
                 self.onLift()
             else:

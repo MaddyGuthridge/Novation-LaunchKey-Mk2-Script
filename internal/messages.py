@@ -9,7 +9,7 @@ Author: Miguel Guthridge
 import device
 
 import config
-import internalconstants
+from . import consts
 
 from .logging import debugLog, getLineBreak
 
@@ -46,7 +46,7 @@ def sendCompleteMidiMessage(message, str_event_out = ""):
         message (int): MIDI message
         str_event_out (str, optional): What to print about the message. Defaults to "".
     """
-    debugLog("Dispatched external MIDI message " + str_event_out + " (" + str(message) + ")", internalconstants.DEBUG_DISPATCH_EVENT)
+    debugLog("Dispatched external MIDI message " + str_event_out + " (" + str(message) + ")", consts.DEBUG.DISPATCH_EVENT)
     device.midiOutMsg(message)
 
 
@@ -57,7 +57,7 @@ def sendCompleteInternalMidiMessage(message, str_event_out = ""):
         message (int): MIDI message
         str_event_out (str, optional): What to print about the message. Defaults to "".
     """
-    debugLog("Dispatched internal MIDI message: " + str_event_out + " (" + str(message) + ")", internalconstants.DEBUG_DISPATCH_EVENT)
+    debugLog("Dispatched internal MIDI message: " + str_event_out + " (" + str(message) + ")", consts.DEBUG.DISPATCH_EVENT)
     device.dispatch(0, message)
 
 
@@ -78,5 +78,5 @@ def toMidiMessage(status, data1, data2):
 def sendUniversalDeviceEnquiry():
     """Sends a universal device enquiry to the controller.
     """
-    device.midiOutSysex(internalconstants.DEVICE_ENQUIRY_MESSAGE)
+    device.midiOutSysex(consts.DEVICE_ENQUIRY_MESSAGE)
 

@@ -16,17 +16,18 @@ from .logging import getLineBreak, debugLog
 from .notemanager import noteMode
 
 import config
-import internalconstants
-# import updatecheck # Currently modules are unavailable
+from . import consts
+from .snap import snap
+# import .updatecheck # Currently modules are unavailable
 import lighting
 import lightingconsts
 import eventconsts
 
-DEVICE_TYPE = internalconstants.DEVICE_NOT_SET
+DEVICE_TYPE = consts.DEVICE_NOT_SET
 
 PORT = -1 # Set in initialisation function then left constant
 
-SHARED_INIT_STATE = internalconstants.INIT_INCOMPLETE
+SHARED_INIT_STATE = consts.INIT_INCOMPLETE
 
 
 class PitchBendMgr:
@@ -107,7 +108,7 @@ def getVersionStr():
     Returns:
         str: Version number
     """
-    return str(internalconstants.SCRIPT_VERSION_MAJOR) + '.' + str(internalconstants.SCRIPT_VERSION_MINOR) + '.' + str(internalconstants.SCRIPT_VERSION_REVISION)
+    return str(consts.SCRIPT_VERSION_MAJOR) + '.' + str(consts.SCRIPT_VERSION_MINOR) + '.' + str(consts.SCRIPT_VERSION_REVISION)
 
 def sharedInit():
     """Performs initialisation actions common to both scripts
@@ -115,7 +116,10 @@ def sharedInit():
     global PORT
     global SHARED_INIT_STATE
 
-    SHARED_INIT_STATE = internalconstants.INIT_OK
+    SHARED_INIT_STATE = consts.INIT_OK
+
+    # Refresh snap mode
+    snap.refresh()
 
     PORT = device.getPortNumber()
 
@@ -123,8 +127,8 @@ def sharedInit():
 
     print(getLineBreak())
 
-    print(internalconstants.SCRIPT_NAME + " - Version: " + getVersionStr())
-    print(" - " + internalconstants.SCRIPT_AUTHOR)
+    print(consts.SCRIPT_NAME + " - Version: " + getVersionStr())
+    print(" - " + consts.SCRIPT_AUTHOR)
     print("")
     print("Running in FL Studio Version: " + ui.getVersion())
 
@@ -132,24 +136,24 @@ def sharedInit():
     # Check for script updates - UNCOMMENT THIS WHEN MODULES ADDED
     """
     if updatecheck.check():
-        SHARED_INIT_STATE = internalconstants.INIT_UPDATE_AVAILABLE
+        SHARED_INIT_STATE = consts.INIT_UPDATE_AVAILABLE
         printLineBreak()
         print("An update to this script is available!")
-        print("Follow this link to download it: " + internalconstants.SCRIPT_URL)
+        print("Follow this link to download it: " + consts.SCRIPT_URL)
         printLineBreak()
     """
     
     if PORT != config.DEVICE_PORT_BASIC and PORT != config.DEVICE_PORT_EXTENDED:
         print("It appears that the device ports are not configured correctly. Please edit config.py to rectify this.")
-        SHARED_INIT_STATE = internalconstants.INIT_PORT_MISMATCH
+        SHARED_INIT_STATE = consts.INIT_PORT_MISMATCH
 
     # Check FL Scripting version
     midi_script_version = general.getVersion()
-    print("FL Studio Scripting version: " + str(midi_script_version) + ". Minimum recommended version: " + str(internalconstants.MIN_FL_SCRIPT_VERSION))
+    print("FL Studio Scripting version: " + str(midi_script_version) + ". Minimum recommended version: " + str(consts.MIN_FL_SCRIPT_VERSION))
     # Outdated FL version
-    if midi_script_version < internalconstants.MIN_FL_SCRIPT_VERSION:
+    if midi_script_version < consts.MIN_FL_SCRIPT_VERSION:
         print("You may encounter issues using this script. Consider updating to the latest version FL Studio.")
-        SHARED_INIT_STATE = internalconstants.INIT_API_OUTDATED
+        SHARED_INIT_STATE = consts.INIT_API_OUTDATED
 
     # Check debug mode
     if config.CONSOLE_DEBUG_MODE != []:
@@ -257,7 +261,7 @@ class ExtendedMgr:
                 sendMidiMessage(0x9F, 0x0C, 0x00)
         
         # On 25-key model, link the fader to the knobs
-        elif DEVICE_TYPE == internalconstants.DEVICE_KEYS_25 and (option == eventconsts.INCONTROL_FADERS or option == eventconsts.INCONTROL_KNOBS):
+        elif DEVICE_TYPE == consts.DEVICE_KEYS_25 and (option == eventconsts.INCONTROL_FADERS or option == eventconsts.INCONTROL_KNOBS):
             if newMode is True:
                 sendMidiMessage(0x9F, 0x0D, 0x7F)
             elif newMode is False:
@@ -318,7 +322,7 @@ class ExtendedMgr:
             lighting.state.reset()
 
         # On 25-key model, link the fader to the knobs
-        elif DEVICE_TYPE == internalconstants.DEVICE_KEYS_25 and (option == eventconsts.INCONTROL_FADERS or option == eventconsts.INCONTROL_KNOBS):
+        elif DEVICE_TYPE == consts.DEVICE_KEYS_25 and (option == eventconsts.INCONTROL_FADERS or option == eventconsts.INCONTROL_KNOBS):
             self.prev_inControl_Knobs.append(self.inControl_Knobs)
             if newMode is True:
                 self.inControl_Knobs = True
@@ -392,9 +396,9 @@ class ErrorState:
         self.error_count += 1
 
         # Set other script into error state too
-        sendCompleteInternalMidiMessage(internalconstants.MESSAGE_ERROR_CRASH)
+        sendCompleteInternalMidiMessage(consts.MESSAGE_ERROR_CRASH)
 
-        noteMode.setState(internalconstants.NOTE_STATE_ERROR)
+        noteMode.setState(consts.NOTE_STATE_ERROR)
 
         if PORT == config.DEVICE_PORT_EXTENDED:
             try:
@@ -420,7 +424,7 @@ class ErrorState:
         """
         self.error = True
 
-        noteMode.setState(internalconstants.NOTE_STATE_ERROR)
+        noteMode.setState(consts.NOTE_STATE_ERROR)
 
         if PORT == config.DEVICE_PORT_EXTENDED:
             try:
@@ -470,7 +474,7 @@ class ErrorState:
                 print("Please refer to the other script output for the error info and instructions to report the error, ", end="")
             else:
                 print("Please save a copy of this output to a text file, and create an issue on the project's GitHub page:")
-                print("          " + internalconstants.SCRIPT_URL)
+                print("          " + consts.SCRIPT_URL)
             print("then restart both scripts by clicking `Reload script` in the Script output window.")
         else:
             print("Please restart the script by pressing the green pad, or restart the script with debugging enabled ", end="")
@@ -491,15 +495,15 @@ class ErrorState:
         
         if not received:
             if enter_debug:
-                sendCompleteInternalMidiMessage(internalconstants.MESSAGE_ERROR_RECOVER_DEBUG)
+                sendCompleteInternalMidiMessage(consts.MESSAGE_ERROR_RECOVER_DEBUG)
             else:
-                sendCompleteInternalMidiMessage(internalconstants.MESSAGE_ERROR_RECOVER)
+                sendCompleteInternalMidiMessage(consts.MESSAGE_ERROR_RECOVER)
         
         if getPortExtended():
             extendedMode.ignore_all = False
             extendedMode.setVal(True)
             
-        noteMode.setState(internalconstants.NOTE_STATE_NORMAL)
+        noteMode.setState(consts.NOTE_STATE_NORMAL)
         
         #config.DEBUG_HARD_CRASHING = True
             
@@ -521,7 +525,7 @@ errors = ErrorState()
 
 def enterDebugMode():
     config.DEBUG_HARD_CRASHING = True
-    config.CONSOLE_DEBUG_MODE = internalconstants.FORCE_DEBUG_MODES_LIST
+    config.CONSOLE_DEBUG_MODE = consts.FORCE_DEBUG_MODES_LIST
 
 
 from .messages import sendUniversalDeviceEnquiry, sendCompleteInternalMidiMessage, sendMidiMessage

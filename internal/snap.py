@@ -15,7 +15,8 @@ import eventconsts
 class SnapMgr:
     
     def __init__(self):
-        self.refresh()
+        self.snap_mode = -1
+        self.snap_enabled = False
 
     def refresh(self):
         """Refreshes snap mode

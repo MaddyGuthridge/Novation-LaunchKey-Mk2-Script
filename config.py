@@ -8,7 +8,7 @@ Consider making a backup of this file before editing it.
 Author: Miguel Guthridge
 """
 import eventconsts
-import internalconstants
+from internal.consts import DEBUG
 
 #-------------------------------
 # USER VARIABLES
@@ -59,7 +59,7 @@ TAB_LENGTH = 16 # How much spacing to add in console output
 # For fun when the script crashes
 CHAOTIC_EVIL_ERROR_NOTE_HANDLER = True
 
-# Controls which console messages are printed. Add things from internalconstants
+# Controls which console messages are printed. Add things from the DEBUG object
 CONSOLE_DEBUG_MODE = []
 
 # Whether script should stop entirely when it encounters an error.

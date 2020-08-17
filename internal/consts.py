@@ -80,23 +80,23 @@ CHANNEL_PAN_SNAP_TO = 0.0 # Snap channel pans to Centred
 #---------------------------------
 # Debug level constants
 #---------------------------------
+class DEBUG:
+    ERROR = "Errors"
+    PROCESSOR_PERFORMANCE = "Processor performance"
+    LIGHTING_RESET = "Lighting reset"
+    LIGHTING_MESSAGE = "Lighting message"
+    DISPATCH_EVENT = "Dispatch event"
+    IDLE_PERFORMANCE = "Idle Performance"
+    ANIMATION_IDLE_TIMERS = "Timers"
+    EVENT_DATA = "Event data"
+    EVENT_ACTIONS = "Event actions"
+    WINDOW_CHANGES = "Window changed"
+    WARNING_DEPRECIATED_FEATURE = "Depreciated feature"
+    DEVICE_TYPE = "Device type"
+    NOTE_MODE = "Note mode"
+    SHIFT_EVENTS = "Shift events"
 
-DEBUG_ERROR = "Errors"
-DEBUG_PROCESSOR_PERFORMANCE = "Processor performance"
-DEBUG_LIGHTING_RESET = "Lighting reset"
-DEBUG_LIGHTING_MESSAGE = "Lighting message"
-DEBUG_DISPATCH_EVENT = "Dispatch event"
-DEBUG_IDLE_PERFORMANCE = "Idle Performance"
-DEBUG_ANIMATION_IDLE_TIMERS = "Timers"
-DEBUG_EVENT_DATA = "Event data"
-DEBUG_EVENT_ACTIONS = "Event actions"
-DEBUG_WINDOW_CHANGES = "Window changed"
-DEBUG_WARNING_DEPRECIATED_FEATURE = "Depreciated feature"
-DEBUG_DEVICE_TYPE = "Device type"
-DEBUG_NOTE_MODE = "Note mode"
-DEBUG_SHIFT_EVENTS = "Shift events"
-
-FORCE_DEBUG_MODES_LIST = [DEBUG_ERROR, DEBUG_EVENT_DATA, DEBUG_EVENT_ACTIONS, DEBUG_WINDOW_CHANGES, DEBUG_WARNING_DEPRECIATED_FEATURE, DEBUG_NOTE_MODE]
+FORCE_DEBUG_MODES_LIST = [DEBUG.ERROR, DEBUG.EVENT_DATA, DEBUG.EVENT_ACTIONS, DEBUG.WINDOW_CHANGES, DEBUG.WARNING_DEPRECIATED_FEATURE, DEBUG.NOTE_MODE]
 
 #---------------------------------
 # Data for internal communication
@@ -129,3 +129,5 @@ SHIFT_IGNORE_TYPES = [eventconsts.TYPE_INCONTROL, eventconsts.TYPE_INTERNAL_EVEN
 OMNI_CHANNEL_STATUS = 0xD
 INTERNAL_CHANNEL_STATUS = 0xE
 
+
+LOG_TAB_LENGTH = 16

@@ -6,19 +6,19 @@ Contains objects and classes to manage notes and note modes, as well as pad pres
 Author: Miguel Guthridge
 """
 
-import internalconstants
+from . import consts
 import channels
 
 from internal.logging import debugLog
 
 class NoteModeState:
-    current_state = internalconstants.NOTE_STATE_NORMAL
+    current_state = consts.NOTE_STATE_NORMAL
 
     def getState(self):
         return self.current_state
 
     def setState(self, newState):
-        debugLog("Set note mode state to " + newState, internalconstants.DEBUG_NOTE_MODE)
+        debugLog("Set note mode state to " + newState, consts.DEBUG.NOTE_MODE)
         # Add some checks to ensure not setting into a bad state
         self.current_state = newState
 

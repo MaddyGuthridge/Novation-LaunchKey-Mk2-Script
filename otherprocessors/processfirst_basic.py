@@ -10,7 +10,7 @@ import ui
 import general
 
 import config
-import internalconstants
+import internal.consts
 import eventprocessor
 import eventconsts
 import internal

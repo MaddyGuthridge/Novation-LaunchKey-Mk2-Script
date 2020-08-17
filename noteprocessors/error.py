@@ -6,14 +6,14 @@ It includes the "Chaotic Evil Error Note Handler" which changes single note on e
 Author: Miguel Guthridge
 """
 
-import internalconstants
+import internal.consts
 import config
 import internal
 import processorhelpers
 import lightingconsts
 import eventconsts
 
-NAME = internalconstants.NOTE_STATE_ERROR
+NAME = internal.consts.NOTE_STATE_ERROR
 
 COLOUR = lightingconsts.colours["ORANGE"]
 
@@ -51,7 +51,7 @@ def process(command):
             internal.notesDown.allNotesOff()
             command.handle("All notes off")
     else:
-        if not (command.type in internalconstants.SHIFT_IGNORE_TYPES):
+        if not (command.type in internal.consts.SHIFT_IGNORE_TYPES):
             command.handle("Device in error state")
 
 def redraw(lights):

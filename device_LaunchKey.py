@@ -34,7 +34,7 @@ import utils
 import config
 import internal
 import eventprocessor
-import internalconstants
+import internal.consts
 import processorhelpers
 
 
@@ -47,7 +47,7 @@ class TGeneric():
     def OnInit(self):
         
         try:
-            if internal.state.SHARED_INIT_STATE is internalconstants.INIT_INCOMPLETE:
+            if internal.state.SHARED_INIT_STATE is internal.consts.INIT_INCOMPLETE:
                 # Run shared init functions
                 internal.sharedInit()
         except Exception as e:

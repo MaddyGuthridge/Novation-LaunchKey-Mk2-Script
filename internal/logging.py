@@ -6,8 +6,9 @@ This module contains functions for logging information, ans well as some helpers
 Author: Miguel Guthridge
 """
 
-import config
-import internalconstants
+
+from . import consts
+
 
 def getLineBreak():
     """
@@ -16,7 +17,7 @@ def getLineBreak():
     return "————————————————————————————————————————————————————"
 
 
-def getTab(string, multiplier = 1, length = config.TAB_LENGTH):
+def getTab(string, multiplier = 1, length = consts.LOG_TAB_LENGTH):
     """Returns your string plus spaces to make the string length equal to a multiple of the tab length defined in config.py
 
     Args:
@@ -40,9 +41,9 @@ def debugLog(message, level = 0):
 
     Args:
         message (str): what to log
-        level (int, optional): the message type. Should be in the form of internalconstants.DEBUG_SOME_MODE. Defaults to 0.
+        level (int, optional): the message type. Should be in the form of consts.DEBUG_SOME_MODE. Defaults to 0.
     """
-    if level in config.CONSOLE_DEBUG_MODE or level == internalconstants.DEBUG_ERROR:
+    if level in config.CONSOLE_DEBUG_MODE or level == consts.DEBUG.ERROR:
         print(message)
 
 
@@ -63,8 +64,7 @@ def printCommandOutput(command):
         command (ParsedEvent): Event to print actions of
     """
     command.printOutput()
-    debugLog(getLineBreak(), internalconstants.DEBUG_EVENT_DATA)
-    debugLog("", internalconstants.DEBUG_EVENT_DATA)
-    
-    
-    
+    debugLog(getLineBreak(), consts.DEBUG.EVENT_DATA)
+    debugLog("", consts.DEBUG.EVENT_DATA)
+
+import config

@@ -9,7 +9,7 @@ Author: Miguel Guthridge
 
 import config
 import internal
-import internalconstants
+import internal.consts
 
 import windowprocessors.processmixer
 import windowprocessors.processbrowser
@@ -24,16 +24,16 @@ def getWindowObject():
     Returns:
         module: active FL Window
     """
-    if internal.window.active_fl_window == internalconstants.WINDOW_MIXER:
+    if internal.window.active_fl_window == internal.consts.WINDOW_MIXER:
         return windowprocessors.processmixer
     
-    elif internal.window.active_fl_window == internalconstants.WINDOW_BROWSER:
+    elif internal.window.active_fl_window == internal.consts.WINDOW_BROWSER:
         return windowprocessors.processbrowser
     
-    elif internal.window.active_fl_window == internalconstants.WINDOW_CHANNEL_RACK:
+    elif internal.window.active_fl_window == internal.consts.WINDOW_CHANNEL_RACK:
         return windowprocessors.processchannelrack
 
-    elif internal.window.active_fl_window == internalconstants.WINDOW_PLAYLIST:
+    elif internal.window.active_fl_window == internal.consts.WINDOW_PLAYLIST:
         return windowprocessors.processplaylist
 
     else: return windowprocessors.processdefault

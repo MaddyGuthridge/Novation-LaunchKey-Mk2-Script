@@ -5,13 +5,13 @@ This script processes notes nomally.
 Author: Miguel Guthridge
 """
 
-import internalconstants
+import internal.consts
 import eventconsts
 import internal
 import processorhelpers
 import lightingconsts
 
-NAME = internalconstants.NOTE_STATE_NORMAL
+NAME = internal.consts.NOTE_STATE_NORMAL
 
 COLOUR = lightingconsts.colours["WHITE"]
 DEFAULT_COLOUR = lightingconsts.colours["DARK GREY"]

@@ -36,7 +36,7 @@ import time
 # Other project files
 import config
 import internal
-import internalconstants
+import internal.consts
 import lighting
 import eventconsts
 import eventprocessor
@@ -56,7 +56,7 @@ class TGeneric():
     def OnInit(self):
 
         try:
-            if internal.state.SHARED_INIT_STATE is internalconstants.INIT_INCOMPLETE:
+            if internal.state.SHARED_INIT_STATE is internal.consts.INIT_INCOMPLETE:
                 # Run shared init functions
                 internal.sharedInit()
 

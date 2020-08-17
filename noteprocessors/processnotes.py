@@ -16,7 +16,7 @@ imports = ["default", "error", "scale", "omni"]
 
 import config
 import internal
-import internalconstants
+import internal.consts
 import noteprocessors
 import processorhelpers
 import eventconsts
@@ -134,7 +134,7 @@ def processNoteModeMenu(command):
             note_mode_index = noteModeMenu.getMode()*16 + command.coord_X + 8*command.coord_Y
             
             if note_mode_index < len(customProcessors):
-                internal.sendCompleteInternalMidiMessage(internalconstants.MESSAGE_INPUT_MODE_SELECT + (note_mode_index << 16))
+                internal.sendCompleteInternalMidiMessage(internal.consts.MESSAGE_INPUT_MODE_SELECT + (note_mode_index << 16))
                 switchNoteModeMenu(False)
                 setModeByIndex(note_mode_index)
                 command.handle("Select note mode")

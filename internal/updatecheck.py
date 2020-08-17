@@ -9,7 +9,7 @@ Author: Miguel Guthridge
 import json
 import urllib.request
 
-import internalconstants
+from . import consts
 import internal
 
 
@@ -24,7 +24,7 @@ def check():
 
     need_update_flag = False
     try:
-        with urllib.request.urlopen(internalconstants.UPDATE_JSON_URL) as url:
+        with urllib.request.urlopen(consts.UPDATE_JSON_URL) as url:
             data = json.loads(url.read().decode())
     except:
         return False
@@ -35,11 +35,11 @@ def check():
     latest_min = int(latest_ver[1])
     latest_rev = int(latest_ver[2].split("-")[0])
 
-    if latest_maj > internalconstants.SCRIPT_VERSION_MAJOR:
+    if latest_maj > consts.SCRIPT_VERSION_MAJOR:
         need_update_flag = True
-    elif latest_min > internalconstants.SCRIPT_VERSION_MINOR:
+    elif latest_min > consts.SCRIPT_VERSION_MINOR:
         need_update_flag = True
-    elif latest_rev > internalconstants.SCRIPT_VERSION_REVISION:
+    elif latest_rev > consts.SCRIPT_VERSION_REVISION:
         need_update_flag = True
         
     return need_update_flag
