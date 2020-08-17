@@ -68,7 +68,7 @@ class BeatMgr:
         self.metronome_enabled = (general.getUseMetronome() == 1)
 
     
-    def toggle_metronome(self):
+    def toggleMetronome(self):
         """Toggle state of metronome
 
         Returns:
@@ -79,7 +79,7 @@ class BeatMgr:
         return self.metronome_enabled
 
 
-    def toggle_tempo_tap(self):
+    def toggleTempoTap(self):
         """Toggles tempo tapping
 
         Returns:
@@ -89,13 +89,13 @@ class BeatMgr:
         return self.is_tapping_tempo
 
 
-    def tap_tempo(self):
+    def tapTempo(self):
         """Taps tempo
         """
         transport.globalTransport(eventconsts.midi.FPT_TapTempo, True)
 
     
-    def set_beat(self, beat):
+    def setBeat(self, beat):
         """Sets beat number
 
         Args:

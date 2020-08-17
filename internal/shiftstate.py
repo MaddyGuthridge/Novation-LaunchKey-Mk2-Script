@@ -53,26 +53,29 @@ class ShiftState:
                 
                 if command.is_double_click and self.enable_sustain and config.ENABLE_SUSTAINED_SHIFT:
                     self.is_sustained = True
-                    command.handle("Enter sustained shift")
+                    command.act("Enter sustained shift")
                     debugLog("Enter sustained shift: " + self.name, consts.DEBUG.SHIFT_EVENTS)
                     return 1
                 else:
-                    self.onLift()
-                    debugLog("Exit shift menu " + self.name, consts.DEBUG.SHIFT_EVENTS)
-                    if self.is_used:
-                        command.handle("Exit shift menu")
-                        self.is_used = False
+                    if self.is_sustained:
+                        self.is_sustained = False
+                        debugLog("Exit sustained shift: " + self.name, consts.DEBUG.SHIFT_EVENTS)
+                        self.onLift()
+                        command.handle("Exit sustained shift")
                     else:
-                        command.act("Exit shift menu")
+                        self.onLift()
+                        debugLog("Exit shift menu " + self.name, consts.DEBUG.SHIFT_EVENTS)
+                        if self.is_used:
+                            command.handle("Exit shift menu")
+                            self.is_used = False
+                        else:
+                            command.act("Exit shift menu")
                 
             return 0
             
         else:
             self.is_down = True
-            if self.is_sustained:
-                self.is_sustained = False
-                debugLog("Exit sustained shift: " + self.name, consts.DEBUG.SHIFT_EVENTS)
-            else:
+            if not self.is_sustained:
                 self.onPress()
                 debugLog("Enter shift menu " + self.name,consts.DEBUG.SHIFT_EVENTS)
                 command.act("Enter shift menu")
@@ -230,6 +233,8 @@ shifts = ShiftsMgr()
 
 from .shifts.mainshift import MainShift
 from .shifts.debugshift import DebugShift
+from .shifts.recordshift import RecordShift
 
 shifts.addShift(MainShift, "MAIN")
 shifts.addShift(DebugShift, "DEBUG")
+shifts.addShift(RecordShift, "RECORD")

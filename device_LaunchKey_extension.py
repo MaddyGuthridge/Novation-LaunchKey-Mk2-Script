@@ -139,7 +139,7 @@ class TGeneric():
         return
     
     def OnUpdateBeatIndicator(self, beat):
-        internal.beat.set_beat(beat)
+        internal.beat.setBeat(beat)
         
         # Prevent idle lightshow from being triggered during playback
         internal.window.resetIdleTick()

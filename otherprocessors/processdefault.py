@@ -41,16 +41,16 @@ def process(command):
 
             # Double press: tap tempo
             if command.is_double_click:
-                internal.beat.toggle_metronome()
-                internal.beat.toggle_tempo_tap()
+                internal.beat.toggleMetronome()
+                internal.beat.toggleTempoTap()
                 command.actions.appendAction("Toggled Tempo Tapping")
 
             if internal.beat.is_tapping_tempo:
-                internal.beat.tap_tempo()
+                internal.beat.tapTempo()
                 command.actions.appendAction("Tapped Tempo")
             else:
                 # Toggle metronome back to original
-                internal.beat.toggle_metronome()
+                internal.beat.toggleMetronome()
                 command.actions.appendAction("Toggled Metronome")
             command.handled = True
     
