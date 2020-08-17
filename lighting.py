@@ -38,6 +38,9 @@ class LightMap:
     def reset(self):
         """Resets all lights to transparent
         """
+        # indicates whether entire map is solidified
+        self.is_solid = False
+        
         # 0 = unfrozen, 1 = frozen
         self.FrozenMap = [
             [0, 0],
@@ -160,9 +163,18 @@ class LightMap:
         """Prevents all pads from being overwritten (not including round pads). Call this at the end of your redraw functions 
         if you don't want other processors to possibly draw behind your UI.
         """
+        self.is_solid = True
         for x in range(len(self.FrozenMap) - 1): # Don't solidify round pads
             for y in range(len(self.FrozenMap[x])):
                 self.solidifyPad(x, y)
+
+    def isSolid(self):
+        """Returns whether map has been solidified
+
+        Returns:
+            bool: Answer
+        """
+        return self.is_solid
 
 
 class Lights:

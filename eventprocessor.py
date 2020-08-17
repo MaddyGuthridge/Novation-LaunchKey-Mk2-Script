@@ -219,29 +219,43 @@ def redraw():
         lighting.state.setFromMap(lights)
         return
 
-    # Error handling: set controller into an error state
-    try:
+    for i in range(1):
+        # Error handling: set controller into an error state
+        try:
 
-        # Draws idle thing if idle
-        lighting.idleLightshow(lights)
-        
-        # Redraw shift menus
-        internal.shifts.redraw(lights)
+            # Draws idle thing if idle
+            lighting.idleLightshow(lights)
+            
+            # Straight to drawing function if lightMap is solidified
+            if lights.isSolid(): break
+            
+            # Redraw shift menus
+            internal.shifts.redraw(lights)
+            
+            if lights.isSolid(): break
 
-        # Get UI from primary processor
-        processfirst.redraw(lights)
+            # Get UI from primary processor
+            processfirst.redraw(lights)
+            
+            if lights.isSolid(): break
 
-        # Get UI drawn from plugins
-        pluginprocessors.redraw(lights)
+            # Get UI drawn from plugins
+            pluginprocessors.redraw(lights)
+            
+            if lights.isSolid(): break
 
-        # Get UI drawn from windows
-        windowprocessors.redraw(lights)
+            # Get UI drawn from windows
+            windowprocessors.redraw(lights)
+            
+            if lights.isSolid(): break
 
-        # Get UI drawn from default processor
-        processdefault.redraw(lights)
+            # Get UI drawn from default processor
+            processdefault.redraw(lights)
+            
+            if lights.isSolid(): break
 
-    except Exception as e:
-        internal.errors.triggerError(e)
+        except Exception as e:
+            internal.errors.triggerError(e)
 
 
     # Call pads refresh function

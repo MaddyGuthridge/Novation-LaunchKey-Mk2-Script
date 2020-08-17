@@ -126,11 +126,14 @@ colours.addColour("RED", 5, 0x94323E)
 colours.addColour("GREEN", 25, 0x289536)
 colours.addColour("TEAL", 77, 0x4A958C)
 colours.addColour("PINK", 53, 0xA05096)
-colours.addColour("BLUE", 45, 0x3C69B4)
+colours.addColour("BLUE", 45, 0x294E8B)
 colours.addColour("YELLOW", 13, 0xACAC39)
 colours.addColour("PURPLE", 49, 0x6439AC)
 colours.addColour("LILAC", 116, 0x8861CA)
 colours.addColour("ORANGE", 84, 0xBF8F40)
+colours.addColour("VIOLET", 81, 0x4633FF)#
+colours.addColour("BROWN", 62, 0x8E6300)#
+colours.addColour("LIME", 75, 0x54B334)
 
 colours.addColour("LIGHT YELLOW", 109, 0xD1D176)
 colours.addColour("LIGHT BLUE", 37, 0x3F9EBE)
@@ -140,7 +143,16 @@ colours.addColour("LIGHT LIGHT BLUE", 40, 0x98CCDD)
 colours.addColour("DARK GREY", 1, 0x485156)
 colours.addColour("DARK PURPLE", 51, 0x48297B)
 colours.addColour("DARK BLUE", 47, 0x323294)
-colours.addColour("DARK RED", 59, 0x602028)
+colours.addColour("DARK RED", 59, 0x602028)#
+colours.addColour("DARK GREEN", 23, 0x1A5D23)#
+colours.addColour("INDIGO", 50, 0x1D137A)#
+
+colours.addColour("DULL BLUE", 92, 0x29738B)
+colours.addColour("DULL GREEN", 111, 0x6FBE00)#
+colours.addColour("DULL RED", 106, 0xBC1A00)#
+colours.addColour("DULL ORANGE", 126, 0xC37100)
+colours.addColour("DULL PINK", 82, 0x73298B)
+colours.addColour("DULL LIME", 85, 0x75A02E)
 
 
 # Define colour pallettes used by light show

@@ -77,6 +77,8 @@ def redraw(lights):
             lights.setPadColour(x, y, lightingconsts.colours.getClosestInt(channels.getChannelColor(ctr)))
 
         lights.solidifyAll()
+    else:
+        internal.extendedMode.setVal(False, eventconsts.INCONTROL_PADS)
 
 def activeStart():
     """Called when your note mode is made active
