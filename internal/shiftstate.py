@@ -8,6 +8,8 @@ Author: Miguel Guthridge
 """
 
 import config
+import internalconstants
+from .messages import debugLog
 
 class ShiftState:
     """Object for managing the state of a single shift menu.
@@ -22,6 +24,7 @@ class ShiftState:
         """
         self.name = "None"
         self.id_listen = 0
+        self.enable_sustain = True
         
         self.is_down = False
         self.is_sustained = False
@@ -45,11 +48,22 @@ class ShiftState:
         
         if command.is_lift:
             if self.is_down:
-                self.onLift()
+                
                 self.is_down = False
-                if self.is_used:
-                    command.act("Exit shift menu")
-                    self.is_used = False
+                
+                if command.is_double_click and self.enable_sustain and config.ENABLE_SUSTAINED_SHIFT:
+                    self.is_sustained = True
+                    command.handle("Enter sustained shift")
+                    debugLog("Enter sustained shift: " + self.name, internalconstants.DEBUG_SHIFT_EVENTS)
+                    return 1
+                else:
+                    self.onLift()
+                    debugLog("Exit shift menu " + self.name, internalconstants.DEBUG_SHIFT_EVENTS)
+                    if self.is_used:
+                        command.handle("Exit shift menu")
+                        self.is_used = False
+                    else:
+                        command.act("Exit shift menu")
                 
             return 0
             
@@ -57,12 +71,12 @@ class ShiftState:
             self.is_down = True
             if self.is_sustained:
                 self.is_sustained = False
+                debugLog("Exit sustained shift: " + self.name, internalconstants.DEBUG_SHIFT_EVENTS)
             else:
                 self.onPress()
+                debugLog("Enter shift menu " + self.name, internalconstants.DEBUG_SHIFT_EVENTS)
                 command.act("Enter shift menu")
-                if command.is_double_click:
-                    self.is_sustained = True
-                    command.handle("Enter sustained shift")
+                
                 
             return 1
         
@@ -74,12 +88,16 @@ class ShiftState:
         """
         if self.is_down:
             self.is_used = True
-            
+            debugLog("Use shift: " + self.name, internalconstants.DEBUG_SHIFT_EVENTS)
             return True
         elif self.is_sustained:
+            debugLog("Use sustained shift: " + self.name, internalconstants.DEBUG_SHIFT_EVENTS)
             if config.AUTOCANCEL_SUSTAINED_SHIFT:
+                debugLog("Exit sustained shift: " + self.name, internalconstants.DEBUG_SHIFT_EVENTS)
                 self.is_sustained = False
                 self.onLift()
+            else:
+                self.is_used = True
         else:
             return False
         
@@ -185,7 +203,10 @@ class ShiftsMgr:
             lights (LightMap): Lights to draw onto
         """
         if self.current_down != "":
-            self.menus[self.current_down].redraw(lights)
+            if self.menus[self.current_down].query():
+                self.menus[self.current_down].redraw(lights)
+            else:
+                self.current_down = ""
             
     def query(self):
         """Returns true if any shift button is down

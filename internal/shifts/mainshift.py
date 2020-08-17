@@ -23,6 +23,7 @@ class MainShift(ShiftState):
         self.name = "Shift"
         self.id_listen = eventconsts.TRANSPORT_LOOP
         
+        self.enable_sustain = True
         self.is_down = False
         self.is_sustained = False
         self.is_used = False
@@ -31,50 +32,62 @@ class MainShift(ShiftState):
         command.addProcessor("Main shift menu")
         if command.type == eventconsts.TYPE_FADER_BUTTON:
             snap.processSnapMode(command)
+            self.use()
         elif command.type == eventconsts.TYPE_PAD:
             if command.is_lift:
                 if command.note == eventconsts.Pads[0][1]: 
                     ui.showWindow(internalconstants.WINDOW_PLAYLIST)
+                    self.use()
                     command.handle("Switched window to Playlist")
                     
                 elif command.note == eventconsts.Pads[1][1]: 
                     ui.showWindow(internalconstants.WINDOW_CHANNEL_RACK)
+                    self.use()
                     command.handle("Switched window to Channel rack")
                     
                 elif command.note == eventconsts.Pads[2][1]: 
                     ui.showWindow(internalconstants.WINDOW_PIANO_ROLL)
+                    self.use()
                     command.handle("Switched window to Piano roll")
                     
                 elif command.note == eventconsts.Pads[3][1]: 
                     ui.showWindow(internalconstants.WINDOW_MIXER)
+                    self.use()
                     command.handle("Switched window to Mixer")
                     
                 elif command.note == eventconsts.Pads[4][1]: 
                     ui.showWindow(internalconstants.WINDOW_BROWSER)
+                    self.use()
                     command.handle("Switched window to Browser")
                     
                 elif command.note == eventconsts.Pads[6][0]: 
                     ui.selectWindow(True)
+                    self.use()
                     command.handle("Previous window")
                 
                 elif command.note == eventconsts.Pads[7][0]: 
                     ui.selectWindow(False)
+                    self.use()
                     command.handle("Next window")
                     
                 elif command.note == eventconsts.Pads[0][0]: 
                     general.undoUp()
+                    self.use()
                     command.handle("Undo")
                     
                 elif command.note == eventconsts.Pads[1][0]: 
                     general.undoDown()
+                    self.use()
                     command.handle("Redo")
 
                 elif command.note == eventconsts.Pads[7][1]:
                     transport.globalTransport(eventconsts.midi.FPT_F8, 1)
+                    self.use()
                     command.handle("Launch Plugin Picker")
 
                 elif command.note == eventconsts.Pads[3][0]:
                     transport.globalTransport(eventconsts.midi.FPT_Save, 1)
+                    self.use()
                     command.handle("Save project")
                 else:
                     command.handle("Shift menu catch others")
