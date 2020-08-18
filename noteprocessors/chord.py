@@ -6,11 +6,18 @@ This script plays individual notes as chords.
 Author: Miguel Guthridge
 """
 
+import _random
+
 import internal.consts
 import eventconsts
 from internal.notemanager import notesDown
 import processorhelpers
 import lightingconsts
+
+# Create random number generator
+rng = _random.Random()
+
+MAX_VEL_OFFSET = 10
 
 # The name of your mode
 NAME = "Chord"
@@ -85,10 +92,15 @@ def process(command):
             scale_pos = command.note - ROOT_NOTE
             
             notes_list = majorChords.getChord(scale_pos)
-            print(notes_list)
             notes_events = []
             for i in range(1, len(notes_list)):
-                notes_events.append(processorhelpers.RawEvent(command.status, notes_list[i] + ROOT_NOTE, command.value))
+                new_velocity = int(2*(rng.random() - 0.5) * MAX_VEL_OFFSET * (command.value/127)) + command.value
+                if new_velocity > 127:
+                    new_velocity = 127
+                elif new_velocity < 0:
+                    new_velocity = 0
+                    
+                notes_events.append(processorhelpers.RawEvent(command.status, notes_list[i] + ROOT_NOTE, new_velocity))
             
             send_notes = processorhelpers.ExtensibleNote(command, notes_events)
             command.act("Played chord")
