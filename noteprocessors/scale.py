@@ -1,7 +1,7 @@
 """
-noteprocessors > template.py
+noteprocessors > scale.py
 
-This script is a template note processor.
+This script snaps notes to the closest note in a scale.
 
 Author: Miguel Guthridge
 """

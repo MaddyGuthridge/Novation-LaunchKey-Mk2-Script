@@ -172,19 +172,19 @@ def processReceived(command):
         
     elif data == internal.consts.MESSAGE_SHIFT_DOWN:
         internal.shifts["MAIN"].setDown(True)
-        command.handle("Press shift")
+        command.handle("Press shift", True)
         
     elif data == internal.consts.MESSAGE_SHIFT_UP:
         internal.shifts["MAIN"].setDown(False)
-        command.handle("Release shift")
+        command.handle("Release shift", True)
         
     elif data == internal.consts.MESSAGE_SHIFT_USE:
         internal.shifts["MAIN"].use()
-        command.handle("Use shift")
+        command.handle("Use shift", True)
         
     elif command.id == internal.consts.MESSAGE_INPUT_MODE_SELECT:
         noteprocessors.setModeByIndex(command.value)
-        command.handle("Set note state")
+        command.handle("Set note state", True)
         
 
 # Called after a window is activated

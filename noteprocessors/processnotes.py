@@ -9,7 +9,7 @@ Author: Miguel Guthridge
 #
 # Add custom event processors to this list
 #
-imports = ["default", "error", "scale", "omni"]
+imports = ["default", "error", "scale", "chord", "omni"]
 #
 #
 #
@@ -33,8 +33,10 @@ for x in range(len(imports)):
         if not getattr(noteprocessors, imports[x]).SILENT:
             customProcessors.append(imports[x])
         print (" - Successfully imported: ", imports[x])
-    except ImportError:
+    except ImportError as e:
         print (" - Error importing: ", imports[x])
+        if config.DEBUG_HARD_CRASHING:
+            raise e
 print("Note Processor import complete")
 
 
@@ -137,7 +139,7 @@ def processNoteModeMenu(command):
                 internal.sendCompleteInternalMidiMessage(internal.consts.MESSAGE_INPUT_MODE_SELECT + (note_mode_index << 16))
                 switchNoteModeMenu(False)
                 setModeByIndex(note_mode_index)
-                command.handle("Select note mode")
+                command.handle("Set note mode to " + getattr(noteprocessors, customProcessors[note_mode_index]).NAME)
             
             else:
                 command.handle("Note mode catch-all", silent=True)
