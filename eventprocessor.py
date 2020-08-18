@@ -249,14 +249,15 @@ def redraw():
             
             if lights.isSolid(): break
 
-            # Get UI drawn from default processor
-            processdefault.redraw(lights)
+            
             
             if lights.isSolid(): break
 
         except Exception as e:
             internal.errors.triggerError(e)
 
+    # Get UI drawn from default processor
+    processdefault.redraw(lights)
 
     # Call pads refresh function
     lighting.state.setFromMap(lights)

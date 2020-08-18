@@ -36,9 +36,25 @@ SILENT = False
 # You can modify this during execution to make it only forward notes sometimes.
 FORWARD_NOTES = False
 
-ROOT_NOTE = 0
-SCALE_TYPE = "Major"
-ENABLE_RANDOMNESS = True
+ROOT_NOTE = -1
+ENABLE_RANDOMNESS = False
+
+INIT_COMPLETE = False
+
+#########################################################
+
+JAZZY_COLOURS = [
+    lightingconsts.colours["LIGHT YELLOW"],
+    lightingconsts.colours["YELLOW"],
+    lightingconsts.colours["LIME"],
+    lightingconsts.colours["GREEN"],
+    lightingconsts.colours["TEAL"],
+    lightingconsts.colours["LIGHT BLUE"],
+    lightingconsts.colours["BLUE"],
+    lightingconsts.colours["PURPLE"]
+]
+
+#########################################################
 
 MAJOR_CHORD = [0, 4, 7]
 MINOR_CHORD = [0, 3, 7]
@@ -66,8 +82,9 @@ DIM_MAJOR_SIXTH_CHORD = [0, 3, 6, 8]
 
 class Chord:
     
-    def __init__(self, notes):
+    def __init__(self, notes, can_change):
         self.notes = notes
+        self.can_change = can_change
         
     def getNotes(self, offset=0):
         ret = self.notes.copy()
@@ -78,87 +95,107 @@ class Chord:
 class ChordStack:
     def __init__(self):
         self.stack = []
+        self.recent_index = -1
     
-    def addChord(self, notes):
-        self.stack.append(Chord(notes))
+    def addChord(self, notes, can_change):
+        self.stack.append(Chord(notes, can_change))
     
-    def getNotes(self, offset=0, random=False):
+    def getNotes(self, offset, random, was_previous):
         if len(self.stack) == 0:
             return [offset]
-        if not random:
-            return self.stack[0].getNotes(offset)
+        
+        if was_previous and not self.stack[self.recent_index].can_change:
+            return self.stack[self.recent_index].getNotes(offset)
         else:
             access_index = round(rng.random() * (len(self.stack) - 1))
+            if access_index > chords.jazziness:
+                print(access_index)
+                access_index = 0
+            self.recent_index = access_index
             return self.stack[access_index].getNotes(offset)
-        
 
 class ChordSet:
     
-    def __init__(self, name):
+    def __init__(self, name, colour):
         self.name = name
+        self.colour = colour
+        self.recent_root = -1
         self.chords = [ChordStack() for i in range(12)]
     
-    def addChord(self, root, notes):
-        self.chords[root].addChord(notes)
+    def addChord(self, root, notes, can_change):
+        self.chords[root].addChord(notes, can_change)
         
     def getChord(self, root):
-        return self.chords[root % 12].getNotes(root, ENABLE_RANDOMNESS)
+        is_recent = (root == self.recent_root)
+        self.recent_root = root
+        return self.chords[root % 12].getNotes(root, ENABLE_RANDOMNESS, is_recent)
 
 class ChordMgr:
     def __init__(self):
         self.active = ""
-        self.recent = "" # Most recently added chord class
-        self.classes = dict()
+        self.active_index = -1
+        self.jazziness = 0
+        self.classes = []
     
-    def addChordClass(self, name):
-        self.classes[name] = ChordSet(name)
+    def addChordClass(self, name, colour):
+        self.classes.append(ChordSet(name, colour))
         self.recent = name
     
-    def addChord(self, root, notes):
-        self.classes[self.recent].addChord(root, notes)
+    def addChord(self, root, notes, can_change=True):
+        self.classes[-1].addChord(root, notes, can_change)
         
     def getChord(self, root):
-        return self.classes[self.active].getChord(root)
+        return self.classes[self.active_index].getChord(root)
         
-    def setMode(self, name):
-        self.active = name
+    def setMode(self, index):
+        if index >= 0:
+            self.active = self.classes[index].name
+        else:
+            self.active = ""
+        self.active_index = index
 
     def getMode(self):
-        return self.active
+        return self.active_index
+    
+    def setJazziness(self, val):
+        self.jazziness = val
+    
+    def getJazziness(self):
+        return self.jazziness
 
 chords = ChordMgr()
 
 #-----------
 # Major chord set
 #-----------
-chords.addChordClass("Major")
+chords.addChordClass("Major", lightingconsts.colours["YELLOW"])
 
 # Primary notes
 #--------------
-chords.addChord(0, MAJOR_CHORD)
+chords.addChord(0, MAJOR_CHORD, False)
 chords.addChord(0, MAJOR_MAJOR_SEVENTH_CHORD)
 chords.addChord(0, SUS2_CHORD)
 
-chords.addChord(2, MINOR_CHORD)
-chords.addChord(2, MAJOR_CHORD)
+chords.addChord(2, MINOR_CHORD, False)
+chords.addChord(2, MAJOR_CHORD, False)
 chords.addChord(2, MAJOR_MINOR_SEVENTH_CHORD)
 
 chords.addChord(4, MINOR_CHORD)
-chords.addChord(4, MINOR_MINOR_SEVENTH_CHORD)
+chords.addChord(4, MINOR_MINOR_SEVENTH_CHORD, False)
 
 chords.addChord(5, MAJOR_CHORD)
-chords.addChord(5, MAJOR_MAJOR_SEVENTH_CHORD)
-chords.addChord(5, MAJOR_MINOR_SEVENTH_CHORD)
-chords.addChord(5, MAJOR_MAJOR_SIXTH_CHORD)
-chords.addChord(5, MINOR_MAJOR_SIXTH_CHORD)
+chords.addChord(5, MAJOR_MAJOR_SEVENTH_CHORD, False)
+chords.addChord(5, MAJOR_MINOR_SEVENTH_CHORD, False)
+chords.addChord(5, MAJOR_MAJOR_SIXTH_CHORD, False)
+chords.addChord(5, MINOR_MAJOR_SIXTH_CHORD, False)
 chords.addChord(5, SUS4_CHORD)
 
-chords.addChord(7, MAJOR_CHORD)
+chords.addChord(7, MAJOR_CHORD, False)
 chords.addChord(7, SUS4_CHORD)
-chords.addChord(7, MAJOR_MINOR_SEVENTH_CHORD)
+chords.addChord(7, MAJOR_MINOR_SEVENTH_CHORD, False)
 
-chords.addChord(9, MINOR_CHORD)
-chords.addChord(9, MINOR_MINOR_SEVENTH_CHORD)
+chords.addChord(9, MINOR_CHORD, False)
+chords.addChord(9, MINOR_MINOR_SEVENTH_CHORD, False)
 chords.addChord(9, SUS4_CHORD)
 
 chords.addChord(11, DIM_CHORD)
@@ -168,21 +205,39 @@ chords.addChord(11, DIM_CHORD)
 chords.addChord(1, MAJOR_CHORD)
 
 chords.addChord(3, MAJOR_CHORD)
-chords.addChord(3, MAJOR_MAJOR_SIXTH_CHORD)
+chords.addChord(3, MAJOR_MAJOR_SIXTH_CHORD, False)
 
 chords.addChord(6, DIM_MAJOR_SEVENTH_CHORD)
 
-chords.addChord(8, MAJOR_MAJOR_SIXTH_CHORD)
-chords.addChord(8, MAJOR_CHORD)
+chords.addChord(8, MAJOR_MAJOR_SIXTH_CHORD, False)
+chords.addChord(8, MAJOR_CHORD, False)
 chords.addChord(8, SUS2_CHORD)
 
-chords.addChord(10, MAJOR_MAJOR_SIXTH_CHORD)
+chords.addChord(10, MAJOR_MAJOR_SIXTH_CHORD, False)
 chords.addChord(10, MAJOR_CHORD)
-chords.addChord(10, MAJOR_MAJOR_SEVENTH_CHORD)
+chords.addChord(10, MAJOR_MAJOR_SEVENTH_CHORD, False)
 
-chords.addChordClass("Minor")
+#-----------
+# Minor chord set
+#-----------
+chords.addChordClass("Minor", lightingconsts.colours["ORANGE"])
 
-chords.setMode("Major")
+# Primary notes
+#--------------
+chords.addChord(0, MINOR_CHORD)
+
+chords.addChord(2, DIM_CHORD)
+
+chords.addChord(3, MAJOR_CHORD)
+
+chords.addChord(5, MINOR_CHORD)
+
+chords.addChord(7, MAJOR_CHORD)
+
+chords.addChord(8, MAJOR_CHORD)
+
+chords.addChord(10, MAJOR_CHORD)
+
 
 def process(command):
     """Called with an event to be processed by your note processor. Events aren't filtered so you'll want to make sure your processor checks that events are notes.
@@ -191,8 +246,13 @@ def process(command):
         command (ParsedEvent): An event for your function to modify/act on.
     """
     command.addProcessor("Chord Processor")
+    
+    if not INIT_COMPLETE:
+        processInit(command)
+        return
+    
     # If command is a note
-    if command.type is eventconsts.TYPE_NOTE:
+    elif command.type is eventconsts.TYPE_NOTE:
         if not command.is_lift:
             # How far note is up scale
             scale_pos = command.note - ROOT_NOTE
@@ -200,12 +260,14 @@ def process(command):
             notes_list = chords.getChord(scale_pos)
             notes_events = []
             for i in range(1, len(notes_list)):
-                new_velocity = int(2*(rng.random() - 0.5) * MAX_VEL_OFFSET * (command.value/127)) + command.value
-                if new_velocity > 127:
-                    new_velocity = 127
-                elif new_velocity < 0:
-                    new_velocity = 0
-                    
+                if ENABLE_RANDOMNESS:
+                    new_velocity = int(2*(rng.random() - 0.5) * MAX_VEL_OFFSET * (command.value/127)) + command.value
+                    if new_velocity > 127:
+                        new_velocity = 127
+                    elif new_velocity < 0:
+                        new_velocity = 0
+                else:
+                    new_velocity = command.value
                 notes_events.append(processorhelpers.RawEvent(command.status, notes_list[i] + ROOT_NOTE, new_velocity))
             
             send_notes = processorhelpers.ExtensibleNote(command, notes_events)
@@ -218,23 +280,77 @@ def process(command):
     
     pass
 
+def processInit(command):
+    global ROOT_NOTE, ENABLE_RANDOMNESS, INIT_COMPLETE, FORWARD_NOTES
+    if command.type is eventconsts.TYPE_NOTE:
+        ROOT_NOTE = command.note % 12
+        command.act("Set root note to " + str(ROOT_NOTE))
+    elif command.type is eventconsts.TYPE_PAD:
+        if not command.is_lift:
+            coords = command.getPadCoord()
+            
+            if coords[1] == 0:
+                if coords[0] < len(chords.classes):
+                    chords.setMode(coords[0])
+                    command.handle("Set chord mode to " + chords.active)
+                else:
+                    command.handle("Init function catch-all", silent=True)
+                
+            elif coords == (6, 1):
+                jazz = round((float(command.value) / 127)**2 * 7)
+                chords.setJazziness(jazz)
+                command.handle("Set jazziness to " + str(jazz))
+            elif coords == (7, 1):
+                ENABLE_RANDOMNESS = not ENABLE_RANDOMNESS
+                command.handle("Set randomness to " + str(ENABLE_RANDOMNESS))
+            else:
+                command.handle("Init function catch-all", silent=True)
+            
+        else:
+            command.handle("Init function lift catch-all", silent=True)
+
+    if ROOT_NOTE != -1 and chords.getMode() != -1:
+        INIT_COMPLETE = True
+        FORWARD_NOTES = False
+        internal.extendedMode.revert(eventconsts.INCONTROL_PADS)
+
 def redraw(lights):
     """Called when a redraw is taking place. Use this to draw menus to allow your users to choose options. Most of the time, you should leave this empty.
 
     Args:
         lights (LightMap): The lights to draw to
     """
-    pass
+    if (not INIT_COMPLETE) and internal.extendedMode.query(eventconsts.INCONTROL_PADS):
+        for i in range(min(len(chords.classes), 8)):
+            mode = (i == chords.active_index) + 1
+            lights.setPadColour(i, 0, chords.classes[i].colour, mode)
+
+
+        lights.setPadColour(6, 1, JAZZY_COLOURS[chords.jazziness])
+        
+        if ENABLE_RANDOMNESS:
+            lights.setPadColour(7, 1, lightingconsts.colours["TEAL"])
+        else:
+            lights.setPadColour(7, 1, lightingconsts.colours["DARK GREY"])
+        
+        lights.solidifyAll()
 
 def activeStart():
     """Called when your note mode is made active
     """
-    pass
+    global FORWARD_NOTES, INIT_COMPLETE
+    FORWARD_NOTES = True
+    INIT_COMPLETE = False
+
 
 def activeEnd():
     """Called wen your note mode is no-longer active
     """
-    global COLOUR
+    global COLOUR, ENABLE_RANDOMNESS, ROOT_NOTE
     # Reset current colour to default
     COLOUR = DEFAULT_COLOUR
+    ROOT_NOTE = -1
+    ENABLE_RANDOMNESS = False
+    chords.setMode(-1)
+    
 

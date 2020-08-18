@@ -256,7 +256,7 @@ def processInit(command):
                     command.handle("Set scale to " + scales.scale_class_list[SCALE_CLASS].scale_list[0].name)
                     CURRENT_SCALE_COLOUR = scales.scale_class_list[SCALE_CLASS].scale_list[0].colour
                 
-            else: command.handle("Catch-all")
+            else: command.handle("Catch-all", silent=True)
         
         if y == 1 and SCALE_CLASS != -1:
             if x < len(scales.scale_class_list[SCALE_CLASS].scale_list):
@@ -265,7 +265,7 @@ def processInit(command):
                 SCALE_TO_USE_INDEX = x
                 command.handle("Set scale to " + scales.scale_class_list[SCALE_CLASS].scale_list[x].name)
                 CURRENT_SCALE_COLOUR = scales.scale_class_list[SCALE_CLASS].scale_list[x].colour
-            else: command.handle("Catch-all")
+            else: command.handle("Catch-all", silent=True)
             
     if command.type == eventconsts.TYPE_NOTE:
         if CUSTOM_SCALE:
