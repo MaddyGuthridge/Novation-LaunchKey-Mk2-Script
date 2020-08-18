@@ -38,11 +38,14 @@ FORWARD_NOTES = False
 
 ROOT_NOTE = 0
 SCALE_TYPE = "Major"
-ENABLE_RANDOMNESS = False
+ENABLE_RANDOMNESS = True
 
 MAJOR_CHORD = [0, 4, 7]
 MINOR_CHORD = [0, 3, 7]
 DIM_CHORD = [0, 3, 6]
+
+SUS2_CHORD = [0, 2, 7]
+SUS4_CHORD = [0, 5, 7]
 
 MAJOR_MAJOR_SEVENTH_CHORD = [0, 4, 7, 11]
 MAJOR_MINOR_SEVENTH_CHORD = [0, 4, 7, 10]
@@ -85,7 +88,7 @@ class ChordStack:
         if not random:
             return self.stack[0].getNotes(offset)
         else:
-            access_index = int(rng.random() * (len(self.stack) - 1))
+            access_index = round(rng.random() * (len(self.stack) - 1))
             return self.stack[access_index].getNotes(offset)
         
 
@@ -101,24 +104,85 @@ class ChordSet:
     def getChord(self, root):
         return self.chords[root % 12].getNotes(root, ENABLE_RANDOMNESS)
 
+class ChordMgr:
+    def __init__(self):
+        self.active = ""
+        self.recent = "" # Most recently added chord class
+        self.classes = dict()
+    
+    def addChordClass(self, name):
+        self.classes[name] = ChordSet(name)
+        self.recent = name
+    
+    def addChord(self, root, notes):
+        self.classes[self.recent].addChord(root, notes)
+        
+    def getChord(self, root):
+        return self.classes[self.active].getChord(root)
+        
+    def setMode(self, name):
+        self.active = name
 
-majorChords = ChordSet("Major")
+    def getMode(self):
+        return self.active
+
+chords = ChordMgr()
+
+#-----------
+# Major chord set
+#-----------
+chords.addChordClass("Major")
+
 # Primary notes
-majorChords.addChord(0, MAJOR_CHORD)
-majorChords.addChord(2, MINOR_CHORD)
-majorChords.addChord(4, MINOR_CHORD)
-majorChords.addChord(5, MAJOR_CHORD)
-majorChords.addChord(7, MAJOR_CHORD)
-majorChords.addChord(9, MINOR_CHORD)
-majorChords.addChord(11, DIM_CHORD)
+#--------------
+chords.addChord(0, MAJOR_CHORD)
+chords.addChord(0, MAJOR_MAJOR_SEVENTH_CHORD)
+chords.addChord(0, SUS2_CHORD)
+
+chords.addChord(2, MINOR_CHORD)
+chords.addChord(2, MAJOR_CHORD)
+chords.addChord(2, MAJOR_MINOR_SEVENTH_CHORD)
+
+chords.addChord(4, MINOR_CHORD)
+chords.addChord(4, MINOR_MINOR_SEVENTH_CHORD)
+
+chords.addChord(5, MAJOR_CHORD)
+chords.addChord(5, MAJOR_MAJOR_SEVENTH_CHORD)
+chords.addChord(5, MAJOR_MINOR_SEVENTH_CHORD)
+chords.addChord(5, MAJOR_MAJOR_SIXTH_CHORD)
+chords.addChord(5, MINOR_MAJOR_SIXTH_CHORD)
+chords.addChord(5, SUS4_CHORD)
+
+chords.addChord(7, MAJOR_CHORD)
+chords.addChord(7, SUS4_CHORD)
+chords.addChord(7, MAJOR_MINOR_SEVENTH_CHORD)
+
+chords.addChord(9, MINOR_CHORD)
+chords.addChord(9, MINOR_MINOR_SEVENTH_CHORD)
+chords.addChord(9, SUS4_CHORD)
+
+chords.addChord(11, DIM_CHORD)
 
 # Non-scale notes
-majorChords.addChord(3, MAJOR_CHORD)
-majorChords.addChord(6, DIM_MAJOR_SEVENTH_CHORD)
-majorChords.addChord(8, MAJOR_MAJOR_SIXTH_CHORD)
-majorChords.addChord(10, MAJOR_MAJOR_SIXTH_CHORD)
+#----------------
+chords.addChord(1, MAJOR_CHORD)
 
-minorChords = ChordSet("Minor")
+chords.addChord(3, MAJOR_CHORD)
+chords.addChord(3, MAJOR_MAJOR_SIXTH_CHORD)
+
+chords.addChord(6, DIM_MAJOR_SEVENTH_CHORD)
+
+chords.addChord(8, MAJOR_MAJOR_SIXTH_CHORD)
+chords.addChord(8, MAJOR_CHORD)
+chords.addChord(8, SUS2_CHORD)
+
+chords.addChord(10, MAJOR_MAJOR_SIXTH_CHORD)
+chords.addChord(10, MAJOR_CHORD)
+chords.addChord(10, MAJOR_MAJOR_SEVENTH_CHORD)
+
+chords.addChordClass("Minor")
+
+chords.setMode("Major")
 
 def process(command):
     """Called with an event to be processed by your note processor. Events aren't filtered so you'll want to make sure your processor checks that events are notes.
@@ -133,7 +197,7 @@ def process(command):
             # How far note is up scale
             scale_pos = command.note - ROOT_NOTE
             
-            notes_list = majorChords.getChord(scale_pos)
+            notes_list = chords.getChord(scale_pos)
             notes_events = []
             for i in range(1, len(notes_list)):
                 new_velocity = int(2*(rng.random() - 0.5) * MAX_VEL_OFFSET * (command.value/127)) + command.value
