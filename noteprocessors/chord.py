@@ -11,7 +11,7 @@ import math
 
 import internal.consts
 import eventconsts
-from internal.notemanager import notesDown
+from internal.notemanager import notesDown, pads
 import processorhelpers
 import lightingconsts
 
@@ -357,12 +357,15 @@ def processInit(command):
         if not command.is_lift:
             coords = command.getPadCoord()
             
-            if coords[1] == 0:
-                if coords[0] < len(chords.classes):
-                    chords.setMode(coords[0])
-                    command.handle("Set chord mode to " + chords.active)
+            if coords[1] == 0 and coords[0] < 8:
+                if pads.getVal(6, 1):
+                    chords.setJazziness(coords[0])
                 else:
-                    command.handle("Init function catch-all", silent=True)
+                    if coords[0] < len(chords.classes):
+                        chords.setMode(coords[0])
+                        command.handle("Set chord mode to " + chords.active)
+                    else:
+                        command.handle("Init function catch-all", silent=True)
                 
             elif coords == (6, 1):
                 jazz = round((float(command.value) / 127)**2 * 7)
@@ -390,9 +393,17 @@ def redraw(lights):
         lights (LightMap): The lights to draw to
     """
     if (not INIT_COMPLETE) and internal.extendedMode.query(eventconsts.INCONTROL_PADS):
-        for i in range(min(len(chords.classes), 8)):
-            mode = (i == chords.active_index) + 1
-            lights.setPadColour(i, 0, chords.classes[i].colour, mode)
+        if pads.getVal(6, 1):
+            for i in range(8):
+                colour = JAZZY_COLOURS[i]
+                mode = (chords.getJazziness() == i) + 1
+                lights.setPadColour(i, 0, colour, mode)
+                
+        else:
+            for i in range(min(len(chords.classes), 8)):
+                colour = chords.classes[i].colour
+                mode = (i == chords.active_index) + 1
+                lights.setPadColour(i, 0, colour, mode)
 
 
         lights.setPadColour(6, 1, JAZZY_COLOURS[chords.jazziness])
