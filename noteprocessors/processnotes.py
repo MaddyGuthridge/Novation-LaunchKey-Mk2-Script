@@ -76,11 +76,17 @@ def redrawNoteModeMenu(lights):
             break
     
     if note_menu_active:
-        light_mode = lightingconsts.MODE_PULSE
-    else:
+        colour = lightingconsts.colours["DARK GREY"]
         light_mode = lightingconsts.MODE_ON
+    else:
+        colour = getattr(noteprocessors, customProcessorsAll[note_mode_index]).COLOUR
     
-    lights.setPadColour(8, 1, getattr(noteprocessors, customProcessorsAll[note_mode_index]).COLOUR, state=light_mode)
+        if note_menu_active or not getattr(noteprocessors, customProcessorsAll[ctr]).INIT_COMPLETE:
+            light_mode = lightingconsts.MODE_PULSE
+        else:
+            light_mode = lightingconsts.MODE_ON
+    
+    lights.setPadColour(8, 1, colour, state=light_mode)
     
     # Redraw menus for current note input
     if not note_menu_active:

@@ -31,6 +31,8 @@ SILENT = False
 # You can modify this during execution to make it only forward notes sometimes.
 FORWARD_NOTES = False
 
+INIT_COMPLETE = False
+
 PAD_MAPPINGS = [
     [48, 62],
     [50, 64],
@@ -81,13 +83,17 @@ def redraw(lights):
 def activeStart():
     """Called when your note mode is made active
     """
+    global INIT_COMPLETE
     internal.extendedMode.setVal(False, eventconsts.INCONTROL_PADS)
+    INIT_COMPLETE = True
 
 def activeEnd():
     """Called wen your note mode is no-longer active
     """
-    global COLOUR
+    global COLOUR, INIT_COMPLETE
     # Reset current colour to default
     COLOUR = DEFAULT_COLOUR
     internal.extendedMode.revert(eventconsts.INCONTROL_PADS)
+    INIT_COMPLETE = False
+    
 

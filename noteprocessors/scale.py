@@ -29,6 +29,8 @@ SILENT = False
 
 FORWARD_NOTES = True
 
+INIT_COMPLETE = False
+
 #------------------------
 # Define scale types
 #------------------------
@@ -99,8 +101,6 @@ scales.addScale("Aolian", lightingconsts.colours["RED"], [0, 2, 3, 5, 7, 8, 10])
 scales.addScale("Locrian", lightingconsts.colours["ORANGE"], [0, 1, 3, 5, 6, 8, 10])
 
 
-
-INIT_COMPLETE = False
 INIT_HAVE_ROOT = False
 INIT_HAVE_SCALE = False
 

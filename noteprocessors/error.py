@@ -23,6 +23,8 @@ SILENT = True
 
 FORWARD_NOTES = False
 
+INIT_COMPLETE = True
+
 def process(command):
     command.actions.addProcessor("Error note handler")
     

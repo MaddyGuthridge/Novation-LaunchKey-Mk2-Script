@@ -22,6 +22,11 @@ DEFAULT_COLOUR = lightingconsts.colours["PURPLE"]
 # you can change this while your script is running
 COLOUR = lightingconsts.colours["PURPLE"]
 
+# Signifies whether the processor has completed its initialisation.
+# Change this to true somewhere in processInit() if your script requires events to configure it
+# otherwise change it here
+INIT_COMPLETE = False
+
 # Whether your mode should be unlisted in the note mode menu
 SILENT = False
 
@@ -36,10 +41,24 @@ def process(command):
         command (ParsedEvent): An event for your function to modify/act on.
     """
     command.addProcessor("Template Processor")
+    
+    # If the note processor isn't initialised, call the initialise function instead
+    if not INIT_COMPLETE:
+        processInit(command)
+        return
+    
     # If command is a note
     if command.type is eventconsts.TYPE_NOTE:
         pass
     
+    pass
+
+def processInit(command):
+    """Called if the INIT_COMPLETE flag is set to false
+
+    Args:
+        command (ParsedEvent): event to process
+    """
     pass
 
 def redraw(lights):
@@ -58,7 +77,8 @@ def activeStart():
 def activeEnd():
     """Called wen your note mode is no-longer active
     """
-    global COLOUR
+    global COLOUR, INIT_COMPLETE
     # Reset current colour to default
     COLOUR = DEFAULT_COLOUR
+    INIT_COMPLETE = False
 

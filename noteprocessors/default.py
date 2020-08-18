@@ -20,6 +20,8 @@ SILENT = False
 
 FORWARD_NOTES = False
 
+INIT_COMPLETE = True
+
 def process(command):
     """
     command.actions.addProcessor("Default Note Handler")
