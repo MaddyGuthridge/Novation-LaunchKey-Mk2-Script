@@ -82,6 +82,8 @@ MINOR_MINOR_SIXTH_CHORD = [0, 3, 7, 8]
 
 DIM_MAJOR_SIXTH_CHORD = [0, 3, 6, 8]
 
+############################################################
+
 class Chord:
     
     def __init__(self, notes, jazziness, can_change):
@@ -171,6 +173,8 @@ class ChordMgr:
 
 chords = ChordMgr()
 
+##############################################################
+
 #-----------
 # Major chord set
 #-----------
@@ -230,33 +234,45 @@ chords.addChordClass("Minor", lightingconsts.colours["ORANGE"])
 
 # Primary notes
 #--------------
-chords.addChord(0, MINOR_CHORD, 0)
+chords.addChord(0, MINOR_CHORD, 0, False)
+chords.addChord(0, SUS4_CHORD, 4)
 
 chords.addChord(2, DIM_CHORD, 0)
+chords.addChord(2, DIM_MAJOR_SIXTH_CHORD, 5, False)
 
-chords.addChord(3, MAJOR_CHORD, 0)
+chords.addChord(3, MAJOR_CHORD, 0, False)
+chords.addChord(3, SUS2_CHORD, 3)
 
-chords.addChord(5, MINOR_CHORD, 0)
+chords.addChord(5, MINOR_CHORD, 0, False)
+chords.addChord(5, MAJOR_CHORD, 1, False)
 
-chords.addChord(7, MAJOR_CHORD, 0)
+chords.addChord(7, MAJOR_CHORD, 0, False)
+chords.addChord(7, MINOR_CHORD, 0, False)
+chords.addChord(7, MAJOR_MINOR_SEVENTH_CHORD, 4, False)
 
-chords.addChord(8, MAJOR_CHORD, 0)
+chords.addChord(8, MAJOR_CHORD, 0, False)
+chords.addChord(8, MAJOR_MAJOR_SEVENTH_CHORD, 6, False)
 
-chords.addChord(10, MAJOR_CHORD, 0)
+chords.addChord(10, MAJOR_CHORD, 0, False)
+chords.addChord(10, SUS4_CHORD, 2)
 
 # Non-scale notes
 #----------------
 chords.addChord(1, MINOR_CHORD, 0)
 
 chords.addChord(4, DIM_CHORD, 0)
-chords.addChord(4, DIM_MAJOR_SIXTH_CHORD, 1)
+chords.addChord(4, DIM_MAJOR_SIXTH_CHORD, 1, False)
 
 chords.addChord(6, DIM_CHORD, 0)
-chords.addChord(6, DIM_MINOR_SEVENTH_CHORD, 3, False)
+chords.addChord(6, DIM_MINOR_SEVENTH_CHORD, 7, False)
 
 chords.addChord(9, DIM_CHORD, 0)
+chords.addChord(9, DIM_MAJOR_SIXTH_CHORD, 5, False)
 
-chords.addChord(11, DIM_CHORD, 0)
+chords.addChord(11, DIM_CHORD, 0, False)
+chords.addChord(11, DIM_MINOR_SEVENTH_CHORD, 6, False)
+
+#################################################################
 
 RECENT_NOTE_LOWER = -1
 RECENT_NOTE_UPPER = -1
