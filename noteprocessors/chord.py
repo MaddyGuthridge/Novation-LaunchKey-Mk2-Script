@@ -201,7 +201,7 @@ chords.addChord(5, MAJOR_MAJOR_SIXTH_CHORD, 5, False)
 chords.addChord(5, MINOR_MAJOR_SIXTH_CHORD, 6, False)
 
 chords.addChord(7, MAJOR_CHORD, 0, False)
-chords.addChord(7, SUS4_CHORD, 0)
+chords.addChord(7, SUS4_CHORD, 1)
 chords.addChord(7, MAJOR_MINOR_SEVENTH_CHORD, 2, False)
 
 chords.addChord(9, MINOR_CHORD, 0, False)
@@ -247,7 +247,7 @@ chords.addChord(5, MINOR_CHORD, 0, False)
 chords.addChord(5, MAJOR_CHORD, 1, False)
 
 chords.addChord(7, MAJOR_CHORD, 0, False)
-chords.addChord(7, MINOR_CHORD, 0, False)
+chords.addChord(7, MINOR_CHORD, 1, False)
 chords.addChord(7, MAJOR_MINOR_SEVENTH_CHORD, 4, False)
 
 chords.addChord(8, MAJOR_CHORD, 0, False)

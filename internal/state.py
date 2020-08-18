@@ -127,7 +127,7 @@ def sharedInit():
 
     print(getLineBreak())
 
-    print(consts.SCRIPT_NAME + " - Version: " + getVersionStr())
+    print(consts.SCRIPT_NAME + " - Version: " + getVersionStr() + " " + consts.SCRIPT_VERSION_SUFFIX)
     print(" - " + consts.SCRIPT_AUTHOR)
     print("")
     print("Running in FL Studio Version: " + ui.getVersion())
