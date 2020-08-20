@@ -8,7 +8,7 @@ Author: Miguel Guthridge
 """
 
 # Add names of plugins your script can process to this list
-PLUGINS = []
+PLUGINS = ["Slicex", "Fruity Slicer"]
 
 
 # Import any modules you might need
@@ -17,6 +17,7 @@ import internal
 import eventconsts
 import eventprocessor
 import lightingconsts
+import processorhelpers
 
 
 def topPluginStart():
@@ -27,7 +28,7 @@ def topPluginStart():
     if internal.getPortExtended():
         # internal.extendedMode.setVal(False, eventconsts.INCONTROL_FADERS) # Faders
         # internal.extendedMode.setVal(False, eventconsts.INCONTROL_KNOBS) # Knobs
-        # internal.extendedMode.setVal(False, eventconsts.INCONTROL_PADS) # Pads
+        internal.extendedMode.setVal(False, eventconsts.INCONTROL_PADS) # Pads
         pass
     return
 
@@ -39,7 +40,7 @@ def topPluginEnd():
     if internal.getPortExtended():
         # internal.extendedMode.revert(eventconsts.INCONTROL_FADERS) # Faders
         # internal.extendedMode.revert(eventconsts.INCONTROL_KNOBS) # Knobs
-        # internal.extendedMode.revert(eventconsts.INCONTROL_PADS) # Pads
+        internal.extendedMode.revert(eventconsts.INCONTROL_PADS) # Pads
         pass
     return
 
@@ -62,7 +63,12 @@ def redraw(lights):
         lights (LightMap): object containing state of lights for next redraw. 
             Modify the object using it's methods to set light colours.
     """
-    return
+    if internal.window.active_plugin == "Slicex":
+        colour = lightingconsts.colours["ORANGE"]
+    else:
+        colour = lightingconsts.colours["DULL BLUE"]
+    
+    processorhelpers.keyswitches.redraw(lights, colour, -1, -1, 0)
 
 def process(command):
     """Called when processing commands. 
@@ -73,9 +79,15 @@ def process(command):
     """
     
     # Add event processor to actions list (useful for debugging)
-    command.actions.addProcessor("Your Processor Name")
+    command.actions.addProcessor("Slicex Processor")
 
-    # When you handle your events, use command.handle("Some action") to handle events.
+    if command.type == eventconsts.TYPE_BASIC_PAD and command.coord_Y == 1:
+        keyswitch_num = processorhelpers.keyswitches.getNum(command.coord_X, command.coord_Y, -1, -1, 0)
+
+        if internal.window.active_plugin == "Slicex":
+            keyswitch_num += 60
+        
+        command.edit(processorhelpers.RawEvent(0x90, keyswitch_num, command.value), "Remap keyswitches")
 
     return
 

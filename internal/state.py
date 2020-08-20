@@ -100,6 +100,11 @@ def idleShift():
 
 
 def getPortExtended():
+    """Get whether the current script is running on the extended port
+
+    Returns:
+        bool: Whether the script is the extended port script
+    """
     return PORT == config.DEVICE_PORT_EXTENDED
 
 def getVersionStr():
@@ -463,7 +468,12 @@ class ErrorState:
         lights.solidifyAll()
 
     def printError(self, fromOther, error=""):
-        # Print error message
+        """Print an error message
+
+        Args:
+            fromOther (bool): whether the error occurred on the other script
+            error (str, optional): The error message. Defaults to "".
+        """
         print("")
         print("")
         print(getLineBreak())
@@ -488,6 +498,12 @@ class ErrorState:
         print("")
 
     def recoverError(self, enter_debug, received=False):
+        """Recover from an error
+
+        Args:
+            enter_debug (bool): Whether to enable debugging
+            received (bool, optional): Whether the command was recieved from other port. Defaults to False.
+        """
         self.error = False
         
         if enter_debug:
@@ -524,6 +540,8 @@ class ErrorState:
 errors = ErrorState()
 
 def enterDebugMode():
+    """Put the script into debug mode
+    """
     config.DEBUG_HARD_CRASHING = True
     config.CONSOLE_DEBUG_MODE = consts.FORCE_DEBUG_MODES_LIST
 

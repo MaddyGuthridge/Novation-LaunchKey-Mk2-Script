@@ -15,7 +15,11 @@ import controllerprocessors.key_49 as k49
 import controllerprocessors.key_61 as k61
 
 def process(command):
-    
+    """Process event based on number of keys in device
+
+    Args:
+        command (ParsedEvent): Event to process
+    """
     if internal.state.DEVICE_TYPE == internal.consts.DEVICE_KEYS_25:
         k25.process(command)
     
@@ -26,7 +30,8 @@ def process(command):
         k61.process(command)
 
 def onInit():
-    
+    """Initialise keys
+    """
     if internal.state.DEVICE_TYPE == internal.consts.DEVICE_KEYS_25:
         k25.onInit()
     

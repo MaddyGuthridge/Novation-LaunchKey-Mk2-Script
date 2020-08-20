@@ -30,9 +30,16 @@ class PerformanceMontor:
         self.num_events = 0
     
     def start(self):
+        """Start monitoring performance
+        """
         self.startTime = time.perf_counter()
     
     def stop(self):
+        """Stop monitoring performance
+
+        Returns:
+            float: Processing time
+        """
         self.endTime = time.perf_counter()
         process_time = self.endTime - self.startTime
         self.total_time += process_time
@@ -46,6 +53,11 @@ class PerformanceMontor:
         return process_time
     
     def total(self):
+        """Get total processing time
+
+        Returns:
+            float: total processing time
+        """
         return self.total_time
 
 # Create instances of performance counters

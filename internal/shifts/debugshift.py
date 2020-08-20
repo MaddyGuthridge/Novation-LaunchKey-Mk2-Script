@@ -1,3 +1,11 @@
+"""
+internal > shifts > debugshift.py
+
+Contains class to manage shift mode for debugging
+
+Author: Miguel Guthridge
+"""
+
 import general
 import ui
 import transport
@@ -33,6 +41,14 @@ class DebugShift(ShiftState):
         self.is_used = False
         
     def process(self, command):
+        """Process events when menu active
+
+        Args:
+            command (ParsedEvent): Event to process
+
+        Raises:
+            Exception: Manually initiated crash
+        """
         if window.getAnimationTick() > ENABLE_AFTER:
             command.addProcessor("Debug shift menu")
             if command.type == eventconsts.TYPE_PAD:
@@ -58,6 +74,11 @@ class DebugShift(ShiftState):
 
         
     def redraw(self, lights):
+        """Redraw lights
+
+        Args:
+            lights (LightMap): Lights to draw on
+        """
         global changed_incontrol
         if window.getAnimationTick() == ENABLE_AFTER and not changed_incontrol and not extendedMode.query(eventconsts.INCONTROL_PADS):
             print("Here")
@@ -80,10 +101,14 @@ class DebugShift(ShiftState):
             lights.solidifyAll()
 
     def onPress(self):
+        """When the shift button is pressed
+        """
         global changed_incontrol
         changed_incontrol = False
         
     def onLift(self):
+        """When the shift button is lifted
+        """
         if changed_incontrol:
             extendedMode.revert(eventconsts.INCONTROL_PADS)
         

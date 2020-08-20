@@ -169,6 +169,11 @@ PALLETE_UPDATE = [
     colours["GREEN"], colours["LIGHT BLUE"], colours["LIGHT BLUE"], colours["BLUE"], colours["OFF"]
     ] 
 
+# Define shading groups used to get gradient colour palletes
+BLUE_SHADES = [40, 36, 37, 41, 79, 45]
+GREEN_SHADES = [16, 75, 17, 122, 25, 87]
+PINK_SHADES = [4, 52, 56, 53, 95, 5]
+
 # Define UI colours
 UI_NAV_VERTICAL = colours["LIGHT BLUE"]
 UI_NAV_HORIZONTAL = colours["PURPLE"]

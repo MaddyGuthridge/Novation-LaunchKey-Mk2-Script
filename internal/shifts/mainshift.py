@@ -1,3 +1,11 @@
+"""
+internal > shifts > mainshift.py
+
+Contains class to manage shift mode for normal shift
+
+Author: Miguel Guthridge
+"""
+
 import general
 import ui
 import transport
@@ -29,6 +37,11 @@ class MainShift(ShiftState):
         self.is_used = False
         
     def process(self, command):
+        """Process events in shift menu
+
+        Args:
+            command (ParsedEvent): Event to process
+        """
         command.addProcessor("Main shift menu")
         if command.type == eventconsts.TYPE_FADER_BUTTON:
             snap.processSnapMode(command)
@@ -97,6 +110,11 @@ class MainShift(ShiftState):
 
         
     def redraw(self, lights):
+        """Redraw lights
+
+        Args:
+            lights (LightMap): Lights to draw on
+        """
 
         UNDO_LAST = 1
         UNDO_MIDDLE = 0
@@ -175,11 +193,15 @@ class MainShift(ShiftState):
         lights.solidifyAll()
 
     def onPress(self):
+        """When shift button pressed
+        """
         extendedMode.setVal(True, eventconsts.INCONTROL_PADS)
         extendedMode.setVal(True, eventconsts.INCONTROL_FADERS)
         sendCompleteInternalMidiMessage(consts.MESSAGE_SHIFT_DOWN)
         
     def onLift(self):
+        """When shift button lifted
+        """
         extendedMode.revert(eventconsts.INCONTROL_PADS)
         extendedMode.revert(eventconsts.INCONTROL_FADERS)
         sendCompleteInternalMidiMessage(consts.MESSAGE_SHIFT_UP)

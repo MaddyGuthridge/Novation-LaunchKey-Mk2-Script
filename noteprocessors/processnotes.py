@@ -32,7 +32,7 @@ for x in range(len(imports)):
         customProcessorsAll.append(imports[x])
         if not getattr(noteprocessors, imports[x]).SILENT:
             customProcessors.append(imports[x])
-        print (" - Successfully imported: ", imports[x])
+        print (" - Successfully imported:", str(getattr(noteprocessors, imports[x]).NAME))
     except ImportError as e:
         print (" - Error importing: ", imports[x])
         if config.DEBUG_HARD_CRASHING:

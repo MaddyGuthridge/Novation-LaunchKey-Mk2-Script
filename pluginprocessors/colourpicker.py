@@ -7,7 +7,7 @@ Currently, this doesn't work in the playlist as there is no way to get selected 
 Author: Miguel Guthridge
 """
 
-plugins = ["Color selector"]
+PLUGINS = ["Color selector"]
 
 
 import config

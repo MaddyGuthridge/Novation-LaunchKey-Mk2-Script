@@ -1,3 +1,11 @@
+"""
+internal > shifts > recordshift.py
+
+Contains class to manage shift mode for recording options
+
+Author: Miguel Guthridge
+"""
+
 import general
 import ui
 import transport
@@ -28,6 +36,11 @@ class RecordShift(ShiftState):
         self.is_used = False
         
     def process(self, command):
+        """Process commands in record shift menu
+
+        Args:
+            command (ParsedEvent): Event to process
+        """
         command.addProcessor("Record shift menu")
         if command.type == eventconsts.TYPE_PAD:
             if command.is_lift:
@@ -70,7 +83,11 @@ class RecordShift(ShiftState):
 
         
     def redraw(self, lights):
+        """Redraw in shift menu
 
+        Args:
+            lights (LightMap): Lights to draw onto
+        """
         if window.getAnimationTick() > 0:
             # Metronome
             mode = general.getUseMetronome() + 1
@@ -103,9 +120,13 @@ class RecordShift(ShiftState):
         lights.solidifyAll()
 
     def onPress(self):
+        """When shift button is pressed
+        """
         extendedMode.setVal(True, eventconsts.INCONTROL_PADS)
         
     def onLift(self):
+        """When shift button is lifted
+        """
         extendedMode.revert(eventconsts.INCONTROL_PADS)
         
             

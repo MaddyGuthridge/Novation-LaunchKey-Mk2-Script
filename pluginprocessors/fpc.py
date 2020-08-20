@@ -10,7 +10,7 @@ Author: Miguel Guthridge
 
 REMAP_DRUMS = True
 
-plugins = ["FPC"]
+PLUGINS = ["FPC"]
 
 # Matrix of FPC Drums [y][x] (I should probs fix this some time for the sake of consistency But I can't be bothered)
 FPC_DRUM_CONSTS = [

@@ -10,7 +10,7 @@ Author: Miguel Guthridge
 #
 # Add custom event processors to this list
 #
-imports = ["fpc", "bbcso"]
+imports = ["fpc", "spitfire_bbcso", "slicex"]
 #
 #
 #
@@ -25,7 +25,7 @@ customProcessors = []
 for x in range(len(imports)):
     try:
         customProcessors.append( __import__("pluginprocessors." + imports[x]) )
-        print (" - Successfully imported: " + imports[x])
+        print (" - Successfully imported:", getattr(pluginprocessors, imports[x]).PLUGINS)
     except ImportError:
         print (" - Error importing: " + imports[x])
 print("Plugin Processor import complete")
@@ -81,8 +81,8 @@ def process(command):
         if command.handled: return
 
 def canHandle(object_to_call):
-    for x in range(len(object_to_call.plugins)):
-        if object_to_call.plugins[x] == internal.window.active_plugin:
+    for x in range(len(object_to_call.PLUGINS)):
+        if object_to_call.PLUGINS[x] == internal.window.active_plugin:
             return True
 
     return False

@@ -13,7 +13,8 @@ from .messages import sendMidiMessage
 import eventconsts
 
 class SnapMgr:
-    
+    """Manages the state of FL Studio's snapping
+    """
     def __init__(self):
         self.snap_mode = -1
         self.snap_enabled = False

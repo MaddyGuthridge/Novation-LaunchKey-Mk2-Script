@@ -48,6 +48,7 @@ class ShiftState:
             return -1
         
         if command.is_lift:
+            # Lift up shift button
             if self.is_down:
                 
                 self.is_down = False
@@ -78,6 +79,7 @@ class ShiftState:
             return 0
             
         else:
+            # Press down shift button
             self.is_down = True
             if not self.is_sustained:
                 window.resetAnimationTick()
@@ -118,6 +120,11 @@ class ShiftState:
         return (self.is_down or self.is_sustained)
     
     def setDown(self, new_val):
+        """Set whether the shift menu is down
+
+        Args:
+            new_val (bool): New value
+        """
         self.is_sustained = False
         self.is_down = new_val
     
@@ -138,9 +145,13 @@ class ShiftState:
         pass
         
     def onPress(self):
+        """Called when the shift button is pressed
+        """
         pass
     
     def onLift(self):
+        """Called when the shift button is released
+        """
         pass
         
 class ShiftsMgr:

@@ -17,6 +17,7 @@ import config
 import eventconsts
 import internal
 import internal.consts
+import lightingconsts
 
 
 class UiModeHandler: 
@@ -856,4 +857,101 @@ class ParsedEvent:
         """
         return internal.toMidiMessage(self.status, self.note, self.value)
 
+#-------------------------
+# KEYSWITCH FUNCTIONS
+#-------------------------
 
+
+class KeyswitchMgr:
+    """Provides functionality relating to keyswitches. Can be used by any event processor.
+    """
+    palette_cache = [
+        [-1, -1],
+        [-1, -1],
+        [-1, -1],
+        [-1, -1],
+        [-1, -1],
+        [-1, -1],
+        [-1, -1],
+        [-1, -1]
+    ]
+
+    def redraw(self, lights, colour_palette, x_len=-1, y_len=-1, full_keyswitches=-1):
+        """Draw keyswitch lights
+
+        Args:
+            lights (LightMap): lights to draw onto
+            colour_palette (list/int): Colour or palette of colours
+            x_len (int, optional): how wide is each page of articulations. Defaults to -1.
+            y_len (int, optional): height of each page of articulations. Defaults to -1.
+            full_keyswitches (int, optional): whether to use full keyswitches. Defaults to -1.
+        """
+        animation_tick = internal.window.getAnimationTick()
+        if full_keyswitches == -1: full_keyswitches = config.USE_FULL_KEYSWITCHES
+        
+        # For 4x2 or 4x1 sets of keyswitches, use textured palette
+        if x_len == 4 and (y_len == 2 or y_len == 1) and type(colour_palette) is list:
+            if not (self.palette_cache[0][0] == colour_palette[0] and self.palette_cache[7][1] == colour_palette[5]):
+                self.palette_cache = [
+                    [colour_palette[0], colour_palette[1]],
+                    [colour_palette[1], colour_palette[2]],
+                    [colour_palette[2], colour_palette[3]],
+                    [colour_palette[3], colour_palette[4]],
+                    [colour_palette[1], colour_palette[2]],
+                    [colour_palette[2], colour_palette[3]],
+                    [colour_palette[3], colour_palette[4]],
+                    [colour_palette[4], colour_palette[5]]
+                ]
+            
+            if full_keyswitches:
+                for y in range(2):
+                    for x in range(8):
+                        if (x % 4) + y + 2*(x >= 4) < animation_tick:
+                            lights.setPadColour(x, y, self.palette_cache[x][y])
+            else:
+                for x in range(0, 8):
+                    if (x % 4) + 2*(x >= 4) < animation_tick:
+                        lights.setPadColour(x, 1, self.palette_cache[x][0])
+        
+        # Any other set size, just draw colours normally
+        else:
+            if type(colour_palette) is list:
+                colour = colour_palette[3]
+            else: 
+                colour = colour_palette
+            if full_keyswitches:
+                for y in range(2):
+                    for x in range(8):
+                        if x + y < animation_tick:
+                            lights.setPadColour(x, y, colour)
+            else:
+                for x in range(0, 8):
+                    if x < animation_tick:
+                        lights.setPadColour(x, 1, colour)
+
+    def getNum(self, x, y, x_len, y_len, full_keyswitches=-1):
+        """Get the keyswitch number of a pad with coordinates (x, y). 
+                Eg: if it is the first keyswitch, return 0
+                or if it is the secons, return 1
+
+        Args:
+            x (int): x coordinate
+            y (int): y coordinate
+            x_len (int): width of each page of articulation
+            y_len (int): height of each page of articulation
+            full_keyswitches (int, optional): whether to use full keyswitches. Defaults to -1.
+
+        Returns:
+            int: keyswitch number
+        """
+        if full_keyswitches == -1: full_keyswitches = config.USE_FULL_KEYSWITCHES
+        
+        if full_keyswitches:
+            # Fancy branchless stuff
+            return (x)*(x < x_len) + (x + x_len)*(x_len <= x < 2*x_len) + x_len*y
+        else:
+            if y == 1:
+                # Use coord_X number for keyswitch number
+                return x
+            
+keyswitches = KeyswitchMgr()
