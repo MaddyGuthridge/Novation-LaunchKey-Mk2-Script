@@ -125,8 +125,7 @@ def processBasic(command):
         if command.type == eventconsts.TYPE_PAD:
             command.handle("Post-note-processor pad catch", True)
         
-        if command.handled:
-            return
+        if command.ignored: return
 
         # For note events quit now
         if command.type == eventconsts.TYPE_NOTE:

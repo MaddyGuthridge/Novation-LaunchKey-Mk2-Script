@@ -49,7 +49,7 @@ def process(command):
     #---------------------------------
 
     # Arms current mixer track when shifted
-    if command.id == eventconsts.TRANSPORT_RECORD and command.is_lift and command.shifted:
+    if command.id == eventconsts.TRANSPORT_RECORD and command.is_lift and internal.shifts["MAIN"].use():
         mixer.armTrack(current_track)
         command.handle("Arm current mixer track")
 

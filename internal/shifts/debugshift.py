@@ -55,15 +55,18 @@ class DebugShift(ShiftState):
                 if command.is_lift:
                     if command.note == eventconsts.Pads[0][0]: 
                         command.handle("Initiate crash")
+                        self.use()
                         raise Exception("Manually initiated crash")
                         
                         
                     elif command.note == eventconsts.Pads[1][0]: 
                         enterDebugMode()
+                        self.use()
                         command.handle("Enable debug mode")
                         
                     elif command.note == eventconsts.Pads[2][0]:
                         triggerIdleLightshow()
+                        self.use()
                         command.handle("Trigger lightshow")
 
                     else:

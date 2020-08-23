@@ -74,14 +74,6 @@ def process(command):
         
         processPopup(command)
 
-    # Note Processor Menu
-    noteprocessors.processNoteModeMenu(command)
-
-    if command.handled:
-        return
-
-    noteprocessors.process(command)
-
     #
     # Extended Mode signals
     #
@@ -113,7 +105,13 @@ def process(command):
     if command.id == eventconsts.SYSTEM_MISC:
         command.handle("Handle misc event", silent=True)
        
-        
+    # Note Processor Menu
+    noteprocessors.processNoteModeMenu(command)
+
+    if command.ignored:
+        return
+
+    noteprocessors.process(command)
 
 def processPopup(command):
     # Always handle all presses
