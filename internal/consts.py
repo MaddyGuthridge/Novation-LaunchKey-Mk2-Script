@@ -112,17 +112,25 @@ FORCE_DEBUG_MODES_LIST = [DEBUG.ERROR, DEBUG.EVENT_DATA, DEBUG.EVENT_ACTIONS, DE
 # Data for internal communication
 #---------------------------------
 
+# Sent when resetting the idle tick
 MESSAGE_RESET_INTERNAL_CONTROLLER = 0x7F00BE
+# Sent when a script restarts to tell the other script to reset its self
+MESSAGE_RESTART_DEVICE = 0x0000BE
 
+# Sent regarding device crashes
 MESSAGE_ERROR_CRASH = 0x7F7FBE
 MESSAGE_ERROR_RECOVER = 0x007FBE
 MESSAGE_ERROR_RECOVER_DEBUG = 0x017FBE
 
+# Sent for main shift menu
 MESSAGE_SHIFT_DOWN = 0x7F01BE
 MESSAGE_SHIFT_UP = 0x0001BE
 MESSAGE_SHIFT_USE = 0x0101BE
 
+# Sent for note processor modes
 MESSAGE_INPUT_MODE_SELECT = 0x02BE # Mode number as velocity
+
+
 
 #---------------------------------
 # Note States

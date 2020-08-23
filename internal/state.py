@@ -129,6 +129,8 @@ def sharedInit():
     PORT = device.getPortNumber()
 
     sendUniversalDeviceEnquiry()
+    
+    sendCompleteInternalMidiMessage(consts.MESSAGE_RESTART_DEVICE)
 
     print(getLineBreak())
 
@@ -378,6 +380,10 @@ class ExtendedMgr:
         
 extendedMode = ExtendedMgr()
 
+def setDefaultExtended():
+    extendedMode.setVal(config.START_IN_INCONTROL_KNOBS, eventconsts.INCONTROL_KNOBS, from_internal=False) 
+    extendedMode.setVal(config.START_IN_INCONTROL_FADERS, eventconsts.INCONTROL_FADERS, from_internal=False) 
+    extendedMode.setVal(config.START_IN_INCONTROL_PADS, eventconsts.INCONTROL_PADS, from_internal=False) 
 
 class ErrorState:
     """Manages state of device (whether it has encountered an error or not)
@@ -386,6 +392,7 @@ class ErrorState:
         e: Any exception triggered by anything
     """
     error = False
+    from_other = False
     error_count = 0
 
     def triggerError(self, e):
@@ -428,6 +435,7 @@ class ErrorState:
         """Sets the device into an error state when an error was encoutered on the other script.
         """
         self.error = True
+        self.from_other = True
 
         noteMode.setState(consts.NOTE_STATE_ERROR)
 
@@ -445,8 +453,6 @@ class ErrorState:
             
         self.printError(True)
 
-        
-
     def getError(self):
         """Gets whether the script is in an error state
 
@@ -454,6 +460,9 @@ class ErrorState:
             bool: error state
         """
         return self.error
+
+    def getFromOther(self):
+        return self.from_other
 
     def redrawError(self, lights):
         """Redraws lights to make them all error colours
@@ -505,6 +514,7 @@ class ErrorState:
             received (bool, optional): Whether the command was recieved from other port. Defaults to False.
         """
         self.error = False
+        self.from_other = False
         
         if enter_debug:
             enterDebugMode()
@@ -536,7 +546,6 @@ class ErrorState:
         if config.DEBUG_HARD_CRASHING or getPortExtended():
             command.handle("Device in error state")
         
-    
 errors = ErrorState()
 
 def enterDebugMode():
@@ -545,9 +554,23 @@ def enterDebugMode():
     config.DEBUG_HARD_CRASHING = True
     config.CONSOLE_DEBUG_MODE = consts.FORCE_DEBUG_MODES_LIST
 
+def restartDevice():
+    """Reset a bunch of components from the script
+    """
+    noteMode.setState(consts.NOTE_STATE_NORMAL)
+    
+    setDefaultExtended()
+    
+    if errors.getError():
+        if not errors.getFromOther():
+            sendCompleteInternalMidiMessage(consts.MESSAGE_ERROR_CRASH)
+        else:
+            errors.recoverError(False, True)
 
 from .messages import sendUniversalDeviceEnquiry, sendCompleteInternalMidiMessage, sendMidiMessage
 
 from .windowstate import window
 
 from .misc import beat
+
+from .notemanager import noteMode

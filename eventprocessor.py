@@ -184,6 +184,10 @@ def processReceived(command):
     elif command.id == internal.consts.MESSAGE_INPUT_MODE_SELECT:
         noteprocessors.setModeByIndex(command.value)
         command.handle("Set note state", True)
+    
+    elif data == internal.consts.MESSAGE_RESTART_DEVICE:
+        internal.state.restartDevice()
+        command.handle("Restart device", True)
         
 
 # Called after a window is activated
