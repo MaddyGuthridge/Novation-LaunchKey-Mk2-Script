@@ -188,6 +188,10 @@ def processReceived(command):
     elif data == internal.consts.MESSAGE_RESTART_DEVICE:
         internal.state.restartDevice()
         command.handle("Restart device", True)
+    
+    elif data == internal.consts.MESSAGE_ENTER_DEBUG_MODE:
+        internal.state.enterDebugMode()
+        command.handle("Enter debug mode", True)
         
 
 # Called after a window is activated

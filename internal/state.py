@@ -551,6 +551,8 @@ errors = ErrorState()
 def enterDebugMode():
     """Put the script into debug mode
     """
+    if not config.DEBUG_HARD_CRASHING:
+        sendCompleteInternalMidiMessage(consts.MESSAGE_ENTER_DEBUG_MODE)
     config.DEBUG_HARD_CRASHING = True
     config.CONSOLE_DEBUG_MODE = consts.FORCE_DEBUG_MODES_LIST
 
