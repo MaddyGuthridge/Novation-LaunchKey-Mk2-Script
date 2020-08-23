@@ -61,22 +61,22 @@ def processExtended(command):
         
         # Process shifts
         internal.shifts.processShift(command)
-        if command.handled: return
+        if command.ignored: return
         
         # Process through shift processors
         internal.shifts.process(command)
-        if command.handled: return
+        if command.ignored: return
         
         # Call primary processor
         processfirst.process(command)
-        if command.handled: return
+        if command.ignored: return
         
         # Process error events
         if internal.errors.getError():
             internal.errors.eventProcessError(command)
             return
 
-        if command.handled: return
+        if command.ignored: return
 
         # Only call plugin and window processors if it is safe to do so | Disabled because of errors
         if command.pme_system_safe or True:
@@ -85,7 +85,7 @@ def processExtended(command):
             # Attempt to process event using custom processors for plugins
             #processplugins.process(command)
 
-            #if command.handled: return
+            #if command.ignored: return
 
             # Process content from windows
             windowprocessors.process(command)
@@ -117,7 +117,7 @@ def processBasic(command):
         # Call primary processor
         processfirst_basic.process(command)
         
-        if command.handled: return
+        if command.ignored: return
 
         # Send to note processors
         noteprocessors.process(command)
@@ -138,7 +138,7 @@ def processBasic(command):
             # Attempt to process event using custom processors for plugins
             pluginprocessors.process(command)
 
-        if command.handled: return
+        if command.ignored: return
 
     except Exception as e:
         internal.errors.triggerError(e)

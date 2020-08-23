@@ -65,7 +65,7 @@ def process(command):
             
             object_to_call.process(command)
         
-            if command.handled: return
+            if command.ignored: return
 
 def redrawNoteModeMenu(lights):
     

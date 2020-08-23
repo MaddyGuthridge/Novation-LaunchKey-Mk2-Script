@@ -20,7 +20,7 @@ NAME = "Omni Mode"
 # The colour used to represent your mode
 DEFAULT_COLOUR = lightingconsts.colours["PURPLE"]
 
-# The colour used to represent your mode while active... 
+# The colour used to represent your mode while active...
 # you can change this while your script is running
 COLOUR = lightingconsts.colours["PURPLE"]
 
@@ -41,7 +41,7 @@ PAD_MAPPINGS = [
     [55, 69],
     [57, 71],
     [59, 72],
-    [60, 74],
+    [60, 74]
 ]
 
 

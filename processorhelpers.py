@@ -203,7 +203,7 @@ class ActionList:
         """
         self.name = name
         self.list = []
-        self.didHandle = False
+        self.handle_type = False
 
     
     def appendAction(self, action, silent, handle):
@@ -212,13 +212,12 @@ class ActionList:
         Args:
             action (str): The action taken
             silent (bool): Whether the action should be set as a hint message
-            handle (bool): Whether this action handled the event
+            handle (int): How this action handled the event (using internal.consts.EVENT_<handle type>)
         """
         self.list.append(Action(action, silent))
 
         # Set flag indicating that this processor handled the event
-        if handle:
-            self.didHandle = True
+        self.handle_type = handle
 
     def getString(self):
         """Returns a string of the actions taken
@@ -240,8 +239,10 @@ class ActionList:
             for i in range(len(self.list)):
                 ret += '\n' + internal.getTab("") + self.list[i].act
 
-        if self.didHandle:
+        if self.handle_type == internal.consts.EVENT_HANDLE:
             ret += '\n' + internal.getTab("") + "[Handled]"
+        elif self.handle_type == internal.consts.EVENT_IGNORE:
+            ret += '\n' + internal.getTab("") + "[Ignored]"
         return ret
 
     # Returns the latest non-silent action to set as the hint message
@@ -276,13 +277,13 @@ class ActionPrinter:
         self.eventProcessors.append(ActionList(name))
 
     
-    def appendAction(self, act, silent=False, handled=False):
+    def appendAction(self, act, silent=False, handle_type=internal.consts.EVENT_NO_HANDLE):
         """Appends an action to the current event processor
 
         Args:
             act (str): The action taken
             silent (bool, optional): Whether the action should be set as a hint message. Defaults to False.
-            handled (bool, optional): Whether the action handled the event. Defaults to False.
+            handled (int, optional): How the action handled/ignored the event. Defaults to internal.consts.EVENT_NO_HANDLE.
         """
 
         # Add some random processor if a processor doesn't exist for some reason
@@ -290,7 +291,7 @@ class ActionPrinter:
             self.addProcessor("NoProcessor")
             internal.debugLog("Added NoProcessor Processor", internal.consts.DEBUG.WARNING_DEPRECIATED_FEATURE)
         # Append the action
-        self.eventProcessors[len(self.eventProcessors) - 1].appendAction(act, silent, handled)
+        self.eventProcessors[len(self.eventProcessors) - 1].appendAction(act, silent, handle_type)
 
     def flush(self):
         """Log all actions taken, and set a hint message if applicable
@@ -349,6 +350,7 @@ class ParsedEvent:
         self.actions = ActionPrinter()
 
         self.handled = False
+        self.ignored = False
 
         self.status = event.status
         
@@ -527,7 +529,12 @@ class ParsedEvent:
             silent (bool, optional): Whether the action should be set as a hint message. Defaults to False.
         """
         self.handled = True
-        self.actions.appendAction(action, silent, True)
+        self.ignored = True
+        self.actions.appendAction(action, silent, internal.consts.EVENT_HANDLE)
+
+    def ignore(self, action, silent=False):
+        self.ignored = True
+        self.actions.appendAction(action, silent, internal.consts.EVENT_IGNORE)
 
     def act(self, action, silent=True):
         """Adds an action to the event without handling it
@@ -535,7 +542,7 @@ class ParsedEvent:
         Args:
             action (str): The action taken
         """
-        self.actions.appendAction(action, silent, False)
+        self.actions.appendAction(action, silent, internal.consts.EVENT_NO_HANDLE)
 
     def addProcessor(self, name):
         """Adds an event processor to the processor list

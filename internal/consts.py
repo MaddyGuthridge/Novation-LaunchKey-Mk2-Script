@@ -53,6 +53,14 @@ INIT_API_OUTDATED = 2
 INIT_PORT_MISMATCH = 3
 
 #---------------------------------
+# Event handling constants
+#---------------------------------
+
+EVENT_NO_HANDLE = 0
+EVENT_HANDLE = 1
+EVENT_IGNORE = 2
+
+#---------------------------------
 # Window constants
 #---------------------------------
 
@@ -65,6 +73,7 @@ WINDOW_BROWSER = midi.widBrowser
 WINDOW_STR_SCRIPT_OUTPUT = "Script output"
 WINDOW_STR_COLOUR_PICKER = "Color selector"
 FL_WINDOW_LIST = ["Mixer", "Channel rack", "Playlist", "Piano roll", "Browser"]
+
 #---------------------------------
 # Snapping constants
 #---------------------------------

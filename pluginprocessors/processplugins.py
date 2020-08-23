@@ -78,7 +78,7 @@ def process(command):
         if canHandle(object_to_call):
             object_to_call.process(command)
         
-        if command.handled: return
+        if command.ignored: return
 
 def canHandle(object_to_call):
     for x in range(len(object_to_call.PLUGINS)):
