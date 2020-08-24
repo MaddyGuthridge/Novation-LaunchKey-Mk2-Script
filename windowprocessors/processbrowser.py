@@ -42,7 +42,7 @@ def redraw(lights):
         if internal.window.getAnimationTick() >= 2:
             lights.setPadColour(5, 1, lightingconsts.colours["GREEN"])    # Play
         if internal.window.getAnimationTick() >= 4:
-            lights.setPadColour(7, 1, lightingconsts.colours["BLUE"], 2)     # Select
+            lights.setPadColour(7, 1, lightingconsts.colours["BLUE"], lightingconsts.MODE_PULSE)     # Select
     return
 
 def process(command):

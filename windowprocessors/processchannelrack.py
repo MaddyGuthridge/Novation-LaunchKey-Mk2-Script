@@ -218,7 +218,7 @@ def redrawMenuMode(lights):
     if internal.window.getAnimationTick() >= 2:
         lights.setPadColour(6, 1, lightingconsts.UI_CHOOSE)
     if internal.window.getAnimationTick() >= 3:
-        lights.setPadColour(7, 1, lightingconsts.UI_ACCEPT, 2)           # To piano roll
+        lights.setPadColour(7, 1, lightingconsts.UI_ACCEPT, lightingconsts.MODE_PULSE)           # To piano roll
 
 # Redraw when in grid bits
 def redrawBitMode(lights):
@@ -320,7 +320,7 @@ def setGridBits(lights):
         if not gridBits.getBit(current_track, light_num_scroll):
             lights.setPadColour(light_num_scroll, 0, lightingconsts.colours["LIGHT LILAC"])
         else:
-            lights.setPadColour(light_num_scroll, 0, lightingconsts.colours["PINK"], 2)
+            lights.setPadColour(light_num_scroll, 0, lightingconsts.colours["PINK"], lightingconsts.MODE_PULSE)
          
     # Set zoom indicator
     light_num_zoom = 7 - int(math.log(gridBits.zoom, 2))
@@ -328,20 +328,20 @@ def setGridBits(lights):
         if not gridBits.getBit(current_track, light_num_zoom):
             lights.setPadColour(light_num_zoom, 0, lightingconsts.colours["LIGHT LIGHT BLUE"])
         else:
-            lights.setPadColour(light_num_zoom, 0, lightingconsts.colours["BLUE"], 2)
+            lights.setPadColour(light_num_zoom, 0, lightingconsts.colours["BLUE"], lightingconsts.MODE_PULSE)
 
     # If zoom and scroll lie on same pad
     if light_num_scroll == light_num_zoom:
         if not gridBits.getBit(current_track, light_num_zoom):
             lights.setPadColour(light_num_zoom, 0, lightingconsts.colours["LIGHT YELLOW"])
         else:
-            lights.setPadColour(light_num_zoom, 0, lightingconsts.colours["PINK"], 2)
+            lights.setPadColour(light_num_zoom, 0, lightingconsts.colours["PINK"], lightingconsts.MODE_PULSE)
 
     # Set remaining grid bits
     for i in range(8):
         if i <= internal.window.getAnimationTick():
             if gridBits.getBit(current_track, i):
-                lights.setPadColour(i, 0, lightingconsts.colours["RED"], 2)
+                lights.setPadColour(i, 0, lightingconsts.colours["RED"], lightingconsts.MODE_PULSE)
             else:
                 lights.setPadColour(i, 0, lightingconsts.colours["DARK GREY"])
 

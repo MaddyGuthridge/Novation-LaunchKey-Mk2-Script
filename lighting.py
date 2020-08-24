@@ -81,19 +81,19 @@ class LightMap:
             ]
 
 
-    def setPadColour(self, x, y, colour, state = 3, override = False):
+    def setPadColour(self, x, y, colour, state = lightingconsts.MODE_DEFAULT, override = False):
         """Sets the colour of a pad
 
         Args:
             x (int): X coordinate
             y (int): Y coordinate
             colour (int): Colour (specified in lightingconsts)
-            state (int, optional): Lighting mode. Defaults to 3.
-                - 0 = off
-                - 1 = on
-                - 2 = pulse
-                - negative = flashing with abs(state)
-                - 3 = automatic
+            state (int, optional): Lighting mode. Defaults to lightingconsts.MODE_DEFAULT. Can be:
+                - lightingconsts.MODE_OFF
+                - lightingconsts.MODE_ON
+                - lightingconsts.MODE_PULSE
+                - ColourL flash with that colour
+                - lightingconsts.MODE_DEFAULT
             override (bool, optional): Whether to override the current pad option. Defaults to False.
 
         Returns:
@@ -108,7 +108,7 @@ class LightMap:
         else: return False
     
     
-    def setFromMatrix(self, map, state=3, override = False):
+    def setFromMatrix(self, map, state = lightingconsts.MODE_DEFAULT, override = False):
         """Set pad lights from a 2x8 matrix
 
         Args:
@@ -219,14 +219,14 @@ class Lights:
         self.__init__()
 
 
-    def setPadColour(self, x, y, colour, state = 3, override = False):
+    def setPadColour(self, x, y, colour, state = lightingconsts.MODE_DEFAULT, override = False):
         """Set the colour of a pad
 
         Args:
             x (int): X coordinate
             y (int): Y coordinate
             colour (int): Colour option
-            state (int, optional): Light mode. Defaults to 3.
+            state (int, optional): Light mode. Defaults to lightingconsts.MODE_DEFAULT.
             override (bool, optional): Whether the event should be sent regardless of the 
                 current state of that pad. Defaults to False.
         """
@@ -237,14 +237,14 @@ class Lights:
             
         
         # Handle light offs
-        if colour == 0 and state == 3:
-            state = 0
+        if colour == 0 and state == lightingconsts.MODE_DEFAULT:
+            state = lightingconsts.MODE_OFF
 
         # Set legacy state
-        elif state == 3:
-            state = 1
+        elif state == lightingconsts.MODE_DEFAULT:
+            state = lightingconsts.MODE_ON
 
-        if state == 0:
+        if state == lightingconsts.MODE_OFF:
             colour = 0
 
         # Check if pad is already in that state - don't bother with event if so
@@ -258,13 +258,13 @@ class Lights:
         status_a = 0x9
         status_b = 0xF
 
-        if state == 0:
+        if state == lightingconsts.MODE_OFF:
             status_a = 0x8
 
-        elif state == 2:
+        elif state == lightingconsts.MODE_PULSE:
             status_b = 0x2
 
-        elif state < 0:
+        elif state > 0:
             status_b = 0xF
 
         # Round pads in basic mode
@@ -282,17 +282,17 @@ class Lights:
             internal.sendMidiMessage(status, processorhelpers.convertPadMapping(eventconsts.Pads[x][y]), colour)
             internal.debugLog("Sent lighting command [" + str(x) + ", " + str(y) + "] (InControl Disabled)", internal.consts.DEBUG.LIGHTING_MESSAGE)
         
-        if state < 0: # Send extra event to trigger flashing
+        if state > 0: # Send extra event to trigger flashing
             status_b = 0x1
             status = (status_a << 4) + status_b
 
             if internal.extendedMode.query(eventconsts.INCONTROL_PADS): 
                 
-                internal.sendMidiMessage(status, eventconsts.Pads[x][y], -state)
+                internal.sendMidiMessage(status, eventconsts.Pads[x][y], state)
                 internal.debugLog("Sent light flash command [" + str(x) + ", " + str(y) + "] (InControl Enabled)", internal.consts.DEBUG.LIGHTING_MESSAGE)
                 
             else: 
-                internal.sendMidiMessage(status, processorhelpers.convertPadMapping(eventconsts.Pads[x][y]), -state)
+                internal.sendMidiMessage(status, processorhelpers.convertPadMapping(eventconsts.Pads[x][y]), state)
                 internal.debugLog("Sent light flash command [" + str(x) + ", " + str(y) + "] (InControl Disabled)", internal.consts.DEBUG.LIGHTING_MESSAGE)
     
     

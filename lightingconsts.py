@@ -9,8 +9,9 @@ Author: Miguel Guthridge
 import math
 
 MODE_OFF = 0
-MODE_ON = 1
-MODE_PULSE = 2
+MODE_ON = -1
+MODE_PULSE = -2
+MODE_DEFAULT = -3 # Guesses based on colour
 
 class ColourContainer:
     """Object that basic colours are stored in. Will have functionality to search by name or RGB value.
