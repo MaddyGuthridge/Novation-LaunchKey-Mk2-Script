@@ -84,7 +84,6 @@ class DebugShift(ShiftState):
         """
         global changed_incontrol
         if window.getAnimationTick() == ENABLE_AFTER and not changed_incontrol and not extendedMode.query(eventconsts.INCONTROL_PADS):
-            print("Here")
             extendedMode.setVal(True, eventconsts.INCONTROL_PADS)
             changed_incontrol = True
 
