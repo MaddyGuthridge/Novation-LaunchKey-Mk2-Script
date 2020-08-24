@@ -510,9 +510,9 @@ class ParsedEvent:
         self.id = (self.status + (self.note << 8))
 
         self.parse()
-
+        newEventStr = "Changed event: " + reason
         if internal.consts.DEBUG.EVENT_DATA in config.CONSOLE_DEBUG_MODE:
-            newEventStr = "Changed event: " + reason + "\n" + self.getInfo()
+            newEventStr += "\n" + self.getInfo()
 
         self.act(newEventStr)
     

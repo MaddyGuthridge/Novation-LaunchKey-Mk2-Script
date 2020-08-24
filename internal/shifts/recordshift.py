@@ -90,17 +90,26 @@ class RecordShift(ShiftState):
         """
         if window.getAnimationTick() > 0:
             # Metronome
-            mode = general.getUseMetronome() + 1
+            if general.getUseMetronome():
+                mode = lightingconsts.MODE_PULSE
+            else:
+                mode = lightingconsts.MODE_ON
             lights.setPadColour(0, 0, lightingconsts.colours["WHITE"], mode)
 
         if window.getAnimationTick() > 1:
             # Wait for input
-            mode = ui.isStartOnInputEnabled() + 1
+            if ui.isStartOnInputEnabled():
+                mode = lightingconsts.MODE_PULSE
+            else:
+                mode = lightingconsts.MODE_ON
             lights.setPadColour(1, 0, lightingconsts.colours["LIGHT BLUE"], mode)
             
         if window.getAnimationTick() > 2:
             # Count down
-            mode = ui.isPrecountEnabled() + 1
+            if ui.isPrecountEnabled():
+                mode = lightingconsts.MODE_PULSE
+            else:
+                mode = lightingconsts.MODE_ON
             lights.setPadColour(2, 0, lightingconsts.colours["GREEN"], mode)
             
             # Step editing
@@ -112,7 +121,10 @@ class RecordShift(ShiftState):
         
         if window.getAnimationTick() > 4:
             # Loop recording
-            mode = ui.isLoopRecEnabled() + 1
+            if ui.isLoopRecEnabled():
+                mode = lightingconsts.MODE_PULSE
+            else:
+                mode = lightingconsts.MODE_ON
             lights.setPadColour(4, 0, lightingconsts.colours["ORANGE"], mode)
             
             
