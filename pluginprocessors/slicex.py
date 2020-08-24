@@ -1,8 +1,8 @@
 """
-pluginprocessors > template_plugin.py
+pluginprocessors > slicex.py
 
-The file acts as a template for plugin handlers. Copy it and edit to add your own plugin handlers.
-To get it to be imported by the event processor, add its filename (without the .py) to processplugins.py
+The file processes events and redraws lights when the Slicex or Fruity Slicer plugin is active.
+It remaps the drum pads to play slices in each of them.
 
 Author: Miguel Guthridge
 """

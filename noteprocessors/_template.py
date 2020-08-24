@@ -1,5 +1,5 @@
 """
-noteprocessors > template.py
+noteprocessors > _template.py
 
 This script is a template note processor.
 

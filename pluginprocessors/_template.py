@@ -1,5 +1,5 @@
 """
-pluginprocessors > template_plugin.py
+pluginprocessors > _template.py
 
 The file acts as a template for plugin handlers. Copy it and edit to add your own plugin handlers.
 To get it to be imported by the event processor, add its filename (without the .py) to processplugins.py

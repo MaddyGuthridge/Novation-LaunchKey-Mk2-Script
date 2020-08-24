@@ -428,11 +428,7 @@ def idleLightshowActive():
     Returns:
         bool: Whether it's active
     """
-    if internal.window.getIdleTick() > config.IDLE_WAIT_TIME and config.IDLE_LIGHTS_ENABLED:
-        return True
-
-    else:
-        return False
+    return internal.window.getIdleTick() > config.IDLE_WAIT_TIME and config.IDLE_LIGHTS_ENABLED
 
 def triggerIdleLightshow():
     """Set idle tick number to tick required for lightshow to begin.
