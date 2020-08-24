@@ -410,7 +410,7 @@ def idleLightshow(lights):
                     animation_speed = IDLE_ANIMATION_SPEED
                 colour = ((tick_num // animation_speed) + x - y) // IDLE_ANIMATION_STRETCH % 128
 
-                light_mode = 1
+                light_mode = lightingconsts.MODE_ON
 
                 # Set off to on
                 if colour == 0:
