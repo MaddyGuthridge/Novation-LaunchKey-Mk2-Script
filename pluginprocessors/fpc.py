@@ -69,7 +69,11 @@ def process(command):
     
     # Change pedals to kick:
     if command.id == eventconsts.PEDAL:
-        command.edit(processorhelpers.RawEvent(0x89, eventconsts.BasicPads[1][1], command.value), "Remap pedal")
+        if command.is_lift:
+            status = 0x89
+        else:
+            status = 0x99
+        command.edit(processorhelpers.RawEvent(status, eventconsts.BasicPads[1][1], command.value), "Remap pedal")
 
     if command.type is eventconsts.TYPE_BASIC_PAD and command.coord_X < 8:
         # Dispatch event to extended mode
