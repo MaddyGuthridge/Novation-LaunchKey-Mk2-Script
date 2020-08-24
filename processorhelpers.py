@@ -321,19 +321,17 @@ class ActionPrinter:
 class RawEvent:
     """Stores event in raw form. A quick way to generate events for editing.
     """
-    def __init__(self, status, data1, data2, shift = False):
+    def __init__(self, status, data1, data2):
         """Create a RawEvent object
 
         Args:
             status (int): Status byte
             data1 (int): First data byte
             data2 (int): 2nd data byte
-            shift (bool, optional): Whether the event is shifted. Defaults to False.
         """
         self.status = status
         self.data1 = data1
         self.data2 = data2
-        self.shift = shift
 
 
 class ParsedEvent:
@@ -507,22 +505,19 @@ class ParsedEvent:
         
         self.status_nibble = event.status >> 4              # Get first half of status byte
         self.channel = event.status & int('00001111', 2)    # Get 2nd half of status byte
-        
-        self.shifted = event.shift
 
         # Bit-shift status and data bytes to get event ID
         self.id = (self.status + (self.note << 8))
 
         self.parse()
 
-        newEventStr = reason
         if internal.consts.DEBUG.EVENT_DATA in config.CONSOLE_DEBUG_MODE:
-            newEventStr += "Changed event: \n" + self.getInfo()
+            newEventStr = "Changed event: " + reason + "\n" + self.getInfo()
 
         self.act(newEventStr)
     
     def handle(self, action, silent=False):
-        """Handles the event
+        """Handles the event and prevents further processing, both in the script and in FL Studio.
 
         Args:
             action (str): The action that handled the event
@@ -533,11 +528,18 @@ class ParsedEvent:
         self.actions.appendAction(action, silent, internal.consts.EVENT_HANDLE)
 
     def ignore(self, action, silent=False):
+        """Prevents further processing in the script but allows processing in FL Studio.
+
+        Args:
+            action (str): The action taken
+            silent (bool, optional): Whether the action should be written to the hint panel. 
+                Defaults to False.
+        """
         self.ignored = True
         self.actions.appendAction(action, silent, internal.consts.EVENT_IGNORE)
 
     def act(self, action, silent=True):
-        """Adds an action to the event without handling it
+        """Adds an action to the event without handling it.
 
         Args:
             action (str): The action taken
@@ -545,7 +547,7 @@ class ParsedEvent:
         self.actions.appendAction(action, silent, internal.consts.EVENT_NO_HANDLE)
 
     def addProcessor(self, name):
-        """Adds an event processor to the processor list
+        """Adds an event processor to the processor list.
 
         Args:
             name (str): Name of processor
