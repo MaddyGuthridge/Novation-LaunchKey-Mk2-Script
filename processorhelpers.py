@@ -46,6 +46,18 @@ class UiModeHandler:
             self.mode = 0
         
         return self.mode
+    
+    def prevMode(self):
+        """Jump to previous menu layer
+        
+        Returns:
+            int: mode number
+        """
+        self.mode -= 1
+        if self.mode == -1:
+            self.mode = self.num_modes - 1
+        
+        return self.mode
 
     def resetMode(self):
         """Resets menu layer to zero
@@ -85,9 +97,7 @@ def didSnap(value, snapTo):
     Returns:
         bool: whether the value would snap
     """
-    if abs(value - snapTo) <= config.SNAP_RANGE and config.ENABLE_SNAPPING:
-        return True
-    else: return False
+    return abs(value - snapTo) <= config.SNAP_RANGE and config.ENABLE_SNAPPING
 
 def toFloat(value, min = 0, max = 1):
     """Converts a MIDI event value (data2) to a float to set parameter values.
