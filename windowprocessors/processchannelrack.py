@@ -58,7 +58,7 @@ def process(command):
     if command.type == eventconsts.TYPE_FADER:
         fader_num = command.coord_X
 
-        if fader_num == 8 and not command.shifted:
+        if fader_num == 8 and not internal.shifts["MAIN"].use():
             channel_num = current_channel
         else:
             channel_num = fader_num
@@ -85,7 +85,7 @@ def process(command):
     if command.type == eventconsts.TYPE_FADER_BUTTON:
         fader_num = command.coord_X
         print(fader_num)
-        if fader_num == 8 and not command.shifted:
+        if fader_num == 8 and not internal.shifts["MAIN"].use():
             channel_num = current_channel
         else:
             channel_num = fader_num
@@ -96,7 +96,7 @@ def process(command):
 
 # Process when in grid bits
 def processBitMode(command):
-    current_track = channels.selectedChannel()
+    current_channel = channels.selectedChannel()
     #---------------------------------
     # Pads
     #---------------------------------
@@ -104,11 +104,11 @@ def processBitMode(command):
         # Grid bits
         if command.coord_Y == 0 and command.coord_X != 8:
             
-            if channels.channelCount() <= current_track:
+            if channels.channelCount() <= current_channel:
                 command.handle("Channel out of range", silent=True)
                 return
             
-            gridBits.toggleBit(current_track, command.coord_X)
+            gridBits.toggleBit(current_channel, command.coord_X)
             command.handle("Grid Bits: Toggle bit")
         
         coord = [command.coord_X, command.coord_Y]

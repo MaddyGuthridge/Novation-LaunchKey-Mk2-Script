@@ -15,9 +15,14 @@ imports = ["fpc", "spitfire_bbcso", "slicex"]
 #
 #
 
+import channels
+import general
+
 import config
 import internal
 import pluginprocessors
+import eventconsts
+import processorhelpers
 
 # Import custom processors specified in list above
 print("Importing Plguin Processors")
@@ -72,7 +77,44 @@ def redraw(lights):
         if canHandle(object_to_call):
             object_to_call.redraw(lights)
 
+mute_toggle_channel = None
+previous_channel_volume = None
+
 def process(command):
+    
+    # REQUIRES SCRIPTING VERSION 8
+    if general.getVersion() >= 8:
+        # Process pitch bend wheel
+        if command.id == eventconsts.PITCH_BEND:
+            current_channel = channels.selectedChannel()
+            channels.setChannelPitch(current_channel, processorhelpers.toFloat(command.value, -1, 1))
+    
+    # Process master fader changing selected channel volume.
+    if command.id == eventconsts.BASIC_FADER_9:
+        current_channel = channels.selectedChannel()
+        volume = processorhelpers.snap(processorhelpers.toFloat(command.value), internal.consts.CHANNEL_VOLUME_SNAP_TO)
+        channels.setChannelVolume(current_channel, volume)
+        action = "Set " + channels.getChannelName(current_channel) + " volume to " + str(round(volume * 100)) + "%"
+        if processorhelpers.didSnap(processorhelpers.toFloat(command.value), internal.consts.CHANNEL_VOLUME_SNAP_TO):
+            action += " [Snapped]"
+        command.handle(action)
+    
+    # Process master fader button to mute/unmute.
+    if command.id == eventconsts.BASIC_FADER_BUTTON_9:
+        global mute_toggle_channel, previous_channel_volume
+        if command.is_lift:
+            if type(mute_toggle_channel) is int and type(previous_channel_volume) is float:
+                if 0 == channels.getChannelVolume(mute_toggle_channel):
+                    channels.setChannelVolume(mute_toggle_channel, previous_channel_volume)
+                    command.handle("Unmuted " + channels.getChannelName(mute_toggle_channel))
+                mute_toggle_channel = None
+                previous_channel_volume = None
+        else:
+            mute_toggle_channel = channels.selectedChannel()
+            previous_channel_volume = channels.getChannelVolume(mute_toggle_channel)
+            channels.setChannelVolume(mute_toggle_channel, 0)
+            command.handle("Muted " + channels.getChannelName(mute_toggle_channel))
+    
     for x in imports:
         object_to_call = getattr(pluginprocessors, x)
         if canHandle(object_to_call):
