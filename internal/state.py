@@ -243,7 +243,7 @@ class ExtendedMgr:
             if len(self.prev_inControl_Pads) == 0:
                 self.prev_inControl_Pads.append(config.START_IN_INCONTROL_PADS)
 
-    def setVal(self, newMode, option = eventconsts.SYSTEM_EXTENDED, force=False, from_internal = True):
+    def setVal(self, new_mode, option = eventconsts.SYSTEM_EXTENDED, force=False, from_internal = True):
         """Set inControl modes on the controller
 
         Args:
@@ -262,43 +262,43 @@ class ExtendedMgr:
         
         # Set all
         if option == eventconsts.SYSTEM_EXTENDED:
-            if newMode is True:
+            if new_mode is True:
                 sendMidiMessage(0x9F, 0x0C, 0x7F)
-            elif newMode is False:
+            elif new_mode is False:
                 sendMidiMessage(0x9F, 0x0C, 0x00)
         
         # On 25-key model, link the fader to the knobs
         elif DEVICE_TYPE == consts.DEVICE_KEYS_25 and (option == eventconsts.INCONTROL_FADERS or option == eventconsts.INCONTROL_KNOBS):
-            if newMode is True:
+            if new_mode is True:
                 sendMidiMessage(0x9F, 0x0D, 0x7F)
-            elif newMode is False:
+            elif new_mode is False:
                 sendMidiMessage(0x9F, 0x0D, 0x00)
         
         # Set knobs
         elif option == eventconsts.INCONTROL_KNOBS:
-            if newMode is True:
+            if new_mode is True:
                 sendMidiMessage(0x9F, 0x0D, 0x7F)
-            elif newMode is False:
+            elif new_mode is False:
                 sendMidiMessage(0x9F, 0x0D, 0x00)
         
         # Set faders
         elif option == eventconsts.INCONTROL_FADERS:
-            if newMode is True:
+            if new_mode is True:
                 sendMidiMessage(0x9F, 0x0E, 0x7F)
-            elif newMode is False:
+            elif new_mode is False:
                 sendMidiMessage(0x9F, 0x0E, 0x00)
         
         # Set pads
         elif option == eventconsts.INCONTROL_PADS:
-            if newMode is True:
+            if new_mode is True:
                 sendMidiMessage(0x9F, 0x0F, 0x7F)
-            elif newMode is False:
+            elif new_mode is False:
                 sendMidiMessage(0x9F, 0x0F, 0x00)
 
         if force:
-            self.recieve(newMode, option)
+            self.recieve(new_mode, option)
 
-    def recieve(self, newMode, option = eventconsts.SYSTEM_EXTENDED):
+    def recieve(self, new_mode, option = eventconsts.SYSTEM_EXTENDED):
         """Processes extended mode switches received from the device
 
         Args:
@@ -315,12 +315,12 @@ class ExtendedMgr:
             self.prev_inControl_Knobs = [config.START_IN_INCONTROL_KNOBS]    # Set to default because otherwise 
             self.prev_inControl_Faders = [config.START_IN_INCONTROL_FADERS]  # they'll revert badly sometimes
             self.prev_inControl_Pads = [config.START_IN_INCONTROL_PADS]      #
-            if newMode is True:
+            if new_mode is True:
                 self.extendedMode = True
                 self.inControl_Knobs = True
                 self.inControl_Faders = True
                 self.inControl_Pads = True
-            elif newMode is False:
+            elif new_mode is False:
                 self.extendedMode = False
                 self.inControl_Knobs = False
                 self.inControl_Faders = False
@@ -331,32 +331,32 @@ class ExtendedMgr:
         # On 25-key model, link the fader to the knobs
         elif DEVICE_TYPE == consts.DEVICE_KEYS_25 and (option == eventconsts.INCONTROL_FADERS or option == eventconsts.INCONTROL_KNOBS):
             self.prev_inControl_Knobs.append(self.inControl_Knobs)
-            if newMode is True:
+            if new_mode is True:
                 self.inControl_Knobs = True
-            elif newMode is False:
+            elif new_mode is False:
                 self.inControl_Knobs = False
                 
             self.prev_inControl_Faders.append(self.inControl_Faders)
-            if newMode is True:
+            if new_mode is True:
                 self.inControl_Faders = True
-            elif newMode is False:
+            elif new_mode is False:
                 self.inControl_Faders = False
 
         # Set knobs
         elif option == eventconsts.INCONTROL_KNOBS:
             self.prev_inControl_Knobs.append(self.inControl_Knobs)
-            if newMode is True:
+            if new_mode is True:
                 self.inControl_Knobs = True
-            elif newMode is False:
+            elif new_mode is False:
                 self.inControl_Knobs = False
             else: debugLog("New mode mode not boolean")
         
         # Set faders
         elif option == eventconsts.INCONTROL_FADERS:
             self.prev_inControl_Faders.append(self.inControl_Faders)
-            if newMode is True:
+            if new_mode is True:
                 self.inControl_Faders = True
-            elif newMode is False:
+            elif new_mode is False:
                 self.inControl_Faders = False
             else: debugLog("New mode mode not boolean")
         
@@ -364,9 +364,9 @@ class ExtendedMgr:
         elif option == eventconsts.INCONTROL_PADS:
             self.prev_inControl_Pads.append(self.inControl_Pads)
             window.resetAnimationTick()
-            if newMode is True:
+            if new_mode is True:
                 self.inControl_Pads = True
-            elif newMode is False:
+            elif new_mode is False:
                 self.inControl_Pads = False
             else: debugLog("New mode mode not boolean")
             lighting.state.reset()

@@ -60,7 +60,7 @@ SNAP_RANGE = 0.05 # Will snap if within this disatnce of snap value
 
 # If a plugin handler uses keyswitches, this controls whether the entire dum pad is used for key switches.
 # This may be used to add a split rows option for the drum pad later.
-USE_FULL_KEYSWITCHES = False
+USE_FULL_KEYSWITCHES = True
 
 #-------------------------------
 # LIGHTING OPTIONS

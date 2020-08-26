@@ -53,6 +53,11 @@ class SnapMgr:
         Args:
             new_mode (int): snap mode (index in snap mode drop down in FL)
         """
+        if new_mode < 2 and self.snap_mode > 2:
+            new_mode += 1
+        if new_mode > 2 and self.snap_mode < 2:
+            new_mode -= 1
+        
         ui.snapMode(new_mode - self.snap_mode)
         
         
