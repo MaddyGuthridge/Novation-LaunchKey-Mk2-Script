@@ -1,7 +1,9 @@
 """
 lighting.py
+
 This file contains functions and constants related to controlling lights on the controller.
 
+Author: Miguel Guthridge
 """
 
 IDLE_ANIMATION_SPEED = 1
@@ -18,18 +20,27 @@ import time
 import internal
 import eventconsts
 import eventprocessor
-import internalconstants
+import processorhelpers
+import internal.consts
 import config
+import lightingconsts
 
-# LightMap is sent around to collect colours on UI redraws
+
 class LightMap:
+    """This object is sent through event processors to gather colours for UI redraws.
+    """
     def __init__(self):
-        # 0 = off, 1-127 = colour
+        """Create instance
+        """
         self.reset()
     
-    # Set all pads to off      
+      
     def reset(self):
-
+        """Resets all lights to transparent
+        """
+        # indicates whether entire map is solidified
+        self.is_solid = False
+        
         # 0 = unfrozen, 1 = frozen
         self.FrozenMap = [
             [0, 0],
@@ -69,8 +80,25 @@ class LightMap:
             [0, 0]
             ]
 
-    # Set the colour of a pad
-    def setPadColour(self, x, y, colour, state = 3, override = False):
+
+    def setPadColour(self, x, y, colour, state = lightingconsts.MODE_DEFAULT, override = False):
+        """Sets the colour of a pad
+
+        Args:
+            x (int): X coordinate
+            y (int): Y coordinate
+            colour (int): Colour (specified in lightingconsts)
+            state (int, optional): Lighting mode. Defaults to lightingconsts.MODE_DEFAULT. Can be:
+                - lightingconsts.MODE_OFF
+                - lightingconsts.MODE_ON
+                - lightingconsts.MODE_PULSE
+                - ColourL flash with that colour
+                - lightingconsts.MODE_DEFAULT
+            override (bool, optional): Whether to override the current pad option. Defaults to False.
+
+        Returns:
+            bool: Whether the assignment was successful.
+        """
         if self.FrozenMap[x][y] == 0 or override: # If pad available to map
             self.PadColours[x][y] = colour
             self.PadStates[x][y] = state
@@ -79,8 +107,20 @@ class LightMap:
             return True
         else: return False
     
-    # Sets colours based on state of LightMap object
-    def setFromMatrix(self, map, state=3, override = False):
+    
+    def setFromMatrix(self, map, state = lightingconsts.MODE_DEFAULT, override = False):
+        """Set pad lights from a 2x8 matrix
+
+        Args:
+            map (matrix): 2D list structure containing light settings
+            state (int, optional): Lighting mode. Defaults to 3.
+                - 0 = off
+                - 1 = on
+                - 2 = pulse
+                - negative = flashing with abs(state)
+                - 3 = automatic
+            override (bool, optional): Whether to override the current pad option. Defaults to False.
+        """
         for x in range(len(self.FrozenMap) - 1): # Don't modify round pads
             for y in range(len(self.FrozenMap[x])):
                 if self.FrozenMap[x][y] == 0 or override:
@@ -88,30 +128,61 @@ class LightMap:
         return
 
 
-    # Prevents pad from being overwritten
     def solidifyPad(self, x, y):
+        """Prevent a pad from being overwritten
+
+        Args:
+            x (int): X coordinate
+            y (int): Y coordinate
+        """
         if self.FrozenMap[x][y] == 0: # If pad available to map
             self.FrozenMap[x][y] = 1
     
-    # Prevents row from being overwritten
+    
     def solidifyRow(self, y):
+        """Prevent a row of lights from being overwritten (not including round pads)
+
+        Args:
+            y (int): Y coordinate
+        """
         for x in range(len(self.FrozenMap) - 1): # Don't solidify round pads
             if self.FrozenMap[x][y] == 0: self.FrozenMap[x][y] = 1
     
-    # Prevents column from being overwritten
+    
     def solidifyColumn(self, x):
+        """Prevents a column from being overwritten
+
+        Args:
+            x (int): X coordinate
+        """
         for y in range(len(self.FrozenMap)):
             if self.FrozenMap[x][y] == 0: self.FrozenMap[x][y] = 1
 
     # Prevents all pads from being overwritten
     def solidifyAll(self):
+        """Prevents all pads from being overwritten (not including round pads). Call this at the end of your redraw functions 
+        if you don't want other processors to possibly draw behind your UI.
+        """
+        self.is_solid = True
         for x in range(len(self.FrozenMap) - 1): # Don't solidify round pads
             for y in range(len(self.FrozenMap[x])):
                 self.solidifyPad(x, y)
 
-# Lights manages state of pad lights
+    def isSolid(self):
+        """Returns whether map has been solidified
+
+        Returns:
+            bool: Answer
+        """
+        return self.is_solid
+
+
 class Lights:
+    """Manages the current state of lights.
+    """
     def __init__(self):
+        """Create instance.
+        """
         # 0 = off, 1-127 = colour
         self.PadColours = [
             [0, 0],
@@ -138,31 +209,42 @@ class Lights:
             [0, 0]
             ]
 
-    # Set all pads to off      
+
     def reset(self):
-        
+        """Reset all lights to off
+        """
         internal.sendMidiMessage(0xBF, 0x00, 0x00)
-        internal.debugLog("Sent lighting reset signal", internalconstants.DEBUG_LIGHTING_RESET)
-        internal.window.reset_animation_tick()
+        internal.debugLog("Sent lighting reset signal", internal.consts.DEBUG.LIGHTING_RESET)
+        internal.window.resetAnimationTick()
         self.__init__()
 
-    # Set the colour of a pad
-    def setPadColour(self, x, y, colour, state = 3, override = False):
-        if internal.window.get_absolute_tick() % config.LIGHTS_FULL_REDRAW_FREQUENCY == 0:
+
+    def setPadColour(self, x, y, colour, state = lightingconsts.MODE_DEFAULT, override = False):
+        """Set the colour of a pad
+
+        Args:
+            x (int): X coordinate
+            y (int): Y coordinate
+            colour (int): Colour option
+            state (int, optional): Light mode. Defaults to lightingconsts.MODE_DEFAULT.
+            override (bool, optional): Whether the event should be sent regardless of the 
+                current state of that pad. Defaults to False.
+        """
+        if internal.window.getAbsoluteTick() % config.LIGHTS_FULL_REDRAW_FREQUENCY == 0:
             full_redraw = True
         else:
             full_redraw = False
             
         
         # Handle light offs
-        if colour == 0 and state == 3:
-            state = 0
+        if colour == 0 and state == lightingconsts.MODE_DEFAULT:
+            state = lightingconsts.MODE_OFF
 
         # Set legacy state
-        elif state == 3:
-            state = 1
+        elif state == lightingconsts.MODE_DEFAULT:
+            state = lightingconsts.MODE_ON
 
-        if state == 0:
+        if state == lightingconsts.MODE_OFF:
             colour = 0
 
         # Check if pad is already in that state - don't bother with event if so
@@ -176,13 +258,13 @@ class Lights:
         status_a = 0x9
         status_b = 0xF
 
-        if state == 0:
+        if state == lightingconsts.MODE_OFF:
             status_a = 0x8
 
-        elif state == 2:
+        elif state == lightingconsts.MODE_PULSE:
             status_b = 0x2
 
-        elif state < 0:
+        elif state > 0:
             status_b = 0xF
 
         # Round pads in basic mode
@@ -194,27 +276,32 @@ class Lights:
 
         if internal.extendedMode.query(eventconsts.INCONTROL_PADS): 
             internal.sendMidiMessage(status, eventconsts.Pads[x][y], colour)
-            internal.debugLog("Sent lighting command [" + str(x) + ", " + str(y) + "] (InControl Enabled)", internalconstants.DEBUG_LIGHTING_MESSAGE)
+            internal.debugLog("Sent lighting command [" + str(x) + ", " + str(y) + "] (InControl Enabled)", internal.consts.DEBUG.LIGHTING_MESSAGE)
             
         else: 
-            internal.sendMidiMessage(status, eventprocessor.convertPadMapping(eventconsts.Pads[x][y]), colour)
-            internal.debugLog("Sent lighting command [" + str(x) + ", " + str(y) + "] (InControl Disabled)", internalconstants.DEBUG_LIGHTING_MESSAGE)
+            internal.sendMidiMessage(status, processorhelpers.convertPadMapping(eventconsts.Pads[x][y]), colour)
+            internal.debugLog("Sent lighting command [" + str(x) + ", " + str(y) + "] (InControl Disabled)", internal.consts.DEBUG.LIGHTING_MESSAGE)
         
-        if state < 0: # Send extra event to trigger flashing
+        if state > 0: # Send extra event to trigger flashing
             status_b = 0x1
             status = (status_a << 4) + status_b
 
             if internal.extendedMode.query(eventconsts.INCONTROL_PADS): 
                 
-                internal.sendMidiMessage(status, eventconsts.Pads[x][y], -state)
-                internal.debugLog("Sent light flash command [" + str(x) + ", " + str(y) + "] (InControl Enabled)", internalconstants.DEBUG_LIGHTING_MESSAGE)
+                internal.sendMidiMessage(status, eventconsts.Pads[x][y], state)
+                internal.debugLog("Sent light flash command [" + str(x) + ", " + str(y) + "] (InControl Enabled)", internal.consts.DEBUG.LIGHTING_MESSAGE)
                 
             else: 
-                internal.sendMidiMessage(status, eventprocessor.convertPadMapping(eventconsts.Pads[x][y]), -state)
-                internal.debugLog("Sent light flash command [" + str(x) + ", " + str(y) + "] (InControl Disabled)", internalconstants.DEBUG_LIGHTING_MESSAGE)
+                internal.sendMidiMessage(status, processorhelpers.convertPadMapping(eventconsts.Pads[x][y]), state)
+                internal.debugLog("Sent light flash command [" + str(x) + ", " + str(y) + "] (InControl Disabled)", internal.consts.DEBUG.LIGHTING_MESSAGE)
     
-    # Sets colours based on state of LightMap object
+    
     def setFromMap(self, map):
+        """Set light colours from LightMap object
+
+        Args:
+            map (LightMap): What to set the lights to
+        """
         map.solidifyAll()
         for x in range(len(self.PadColours)):
             for y in range(len(self.PadColours[x])):
@@ -222,25 +309,32 @@ class Lights:
         return
     
     def redraw(self):
+        """Resends all lighting options from current state.
+        """
         for x in range(len(self.PadColours)):
             for y in range(len(self.PadColours[x])):
                 self.setPadColour(x, y, self.PadColours[x][y], override=True)
 
 state = Lights()
 
-# OoooOooOOOooO PREETTTTTYYYY!!!!!!
-def lightShow():
 
+def lightShow():
+    """OooOOoOOoOOoOOoOoO PREEEETTTTTTTTTTTTTYYYYYYYYYYYYYYYYYY!!!!!!!!!!!
+    
+    This draws the initialisation sequence.
+    """
     state.reset()
 
     sleepTime = 0.05
     x = 0
-    if internal.SHARED_INIT_STATE == internalconstants.INIT_OK:
-        rainbowColours = PALLETE_NORMAL
-    elif  internal.SHARED_INIT_STATE == internalconstants.INIT_API_OUTDATED or internal.SHARED_INIT_STATE == internalconstants.INIT_PORT_MISMATCH:
-        rainbowColours = PALLETE_INIT_FAIL
-    elif internal.SHARED_INIT_STATE == internalconstants.INIT_UPDATE_AVAILABLE:
-        rainbowColours = PALLETE_UPDATE
+    if internal.state.SHARED_INIT_STATE == internal.consts.INIT_OK:
+        rainbowColours = lightingconsts.PALLETE_NORMAL
+    elif  internal.state.SHARED_INIT_STATE == internal.consts.INIT_API_OUTDATED or internal.state.SHARED_INIT_STATE == internal.consts.INIT_PORT_MISMATCH:
+        rainbowColours = lightingconsts.PALLETE_INIT_FAIL
+    elif internal.state.SHARED_INIT_STATE == internal.consts.INIT_UPDATE_AVAILABLE:
+        rainbowColours = lightingconsts.PALLETE_UPDATE
+    else:
+        rainbowColours = lightingconsts.PALLETE_INIT_FAIL
 
 
     while True:
@@ -298,9 +392,14 @@ def lightShow():
 
     state.reset()
 
-def idle_lightshow(lights):
-    if internal.window.get_idle_tick() > config.IDLE_WAIT_TIME and config.IDLE_LIGHTS_ENABLED:
-        tick_num = internal.window.get_idle_tick() - int(config.IDLE_WAIT_TIME) + IDLE_ANIMATION_TRAIL_LENGTH * IDLE_ANIMATION_TRAIL_SPEED
+def idleLightshow(lights):
+    """EVEN PRETTIER!!!!!!!!!!
+
+    Args:
+        lights (LightMap): LightMap object to draw to
+    """
+    if internal.window.getIdleTick() > config.IDLE_WAIT_TIME and config.IDLE_LIGHTS_ENABLED:
+        tick_num = internal.window.getIdleTick() - int(config.IDLE_WAIT_TIME) + IDLE_ANIMATION_TRAIL_LENGTH * IDLE_ANIMATION_TRAIL_SPEED
 
         for x in range(9):
             for y in range(2):
@@ -311,7 +410,7 @@ def idle_lightshow(lights):
                     animation_speed = IDLE_ANIMATION_SPEED
                 colour = ((tick_num // animation_speed) + x - y) // IDLE_ANIMATION_STRETCH % 128
 
-                light_mode = 1
+                light_mode = lightingconsts.MODE_ON
 
                 # Set off to on
                 if colour == 0:
@@ -319,102 +418,21 @@ def idle_lightshow(lights):
 
                 if IDLE_ANIMATION_DO_TRAILS:
                     if not (((tick_num // IDLE_ANIMATION_TRAIL_SPEED) + x + IDLE_ANIMATION_TRAIL_Y_OFFSET*y) % IDLE_ANIMATION_TRAIL_INFREQUENCY < IDLE_ANIMATION_TRAIL_LENGTH):
-                        colour = COLOUR_OFF
+                        colour = lightingconsts.colours["OFF"]
 
                 lights.setPadColour(x, y, colour, light_mode)
 
-def idle_show_active():
-    if internal.window.get_idle_tick() > config.IDLE_WAIT_TIME and config.IDLE_LIGHTS_ENABLED:
-        return True
+def idleLightshowActive():
+    """Whether the idle lightshow is currently active
 
-    else:
-        return False
+    Returns:
+        bool: Whether it's active
+    """
+    return internal.window.getIdleTick() > config.IDLE_WAIT_TIME and config.IDLE_LIGHTS_ENABLED
 
-def trigger_idle_show():
+def triggerIdleLightshow():
+    """Set idle tick number to tick required for lightshow to begin.
+    Call this to get that sweet sweet RGB going.
+    """
     internal.window.idle_tick_number = config.IDLE_WAIT_TIME
 
-# Define colour codes
-COLOUR_TRANSPARENT = -1
-COLOUR_OFF = 0
-COLOUR_WHITE = 3
-COLOUR_RED = 5
-COLOUR_GREEN = 25
-COLOUR_PINK = 53
-COLOUR_BLUE = 46
-COLOUR_YELLOW = 13
-COLOUR_PURPLE = 49
-COLOUR_LILAC = 116
-COLOUR_ORANGE = 84
-
-COLOUR_LIGHT_YELLOW = 109
-COLOUR_LIGHT_BLUE = 37
-COLOUR_LIGHT_LILAC = 116
-COLOUR_LIGHT_LIGHT_BLUE = 40
-
-COLOUR_DARK_GREY = 1
-COLOUR_DARK_PURPLE = 51
-COLOUR_DARK_BLUE = 47
-COLOUR_DARK_RED = 59
-
-# Define colour pallettes used by light show
-PALLETE_NORMAL = [COLOUR_RED, COLOUR_PINK, COLOUR_PURPLE, COLOUR_BLUE, COLOUR_LIGHT_BLUE, COLOUR_GREEN, COLOUR_YELLOW, COLOUR_ORANGE, COLOUR_OFF]
-PALLETE_INIT_FAIL = [COLOUR_YELLOW, COLOUR_ORANGE, COLOUR_ORANGE, COLOUR_RED, COLOUR_RED, COLOUR_ORANGE, COLOUR_ORANGE, COLOUR_YELLOW, COLOUR_OFF] 
-PALLETE_UPDATE = [COLOUR_BLUE, COLOUR_LIGHT_BLUE, COLOUR_LIGHT_BLUE, COLOUR_GREEN, COLOUR_GREEN, COLOUR_LIGHT_BLUE, COLOUR_LIGHT_BLUE, COLOUR_BLUE, COLOUR_OFF] 
-
-# Define UI colours
-UI_NAV_VERTICAL = COLOUR_LIGHT_BLUE
-UI_NAV_HORIZONTAL = COLOUR_PURPLE
-UI_ZOOM = COLOUR_BLUE
-UI_ACCEPT = COLOUR_GREEN
-UI_REJECT = COLOUR_RED
-UI_CHOOSE = COLOUR_PURPLE
-
-UI_UNDO = COLOUR_LIGHT_LIGHT_BLUE
-UI_REDO = COLOUR_LIGHT_BLUE
-
-UI_COPY = COLOUR_BLUE
-UI_CUT = COLOUR_LIGHT_BLUE
-UI_PASTE = COLOUR_GREEN
-
-UI_SAVE = COLOUR_GREEN
-
-# Define tool colours
-TOOL_PENCIL = COLOUR_ORANGE
-TOOL_BRUSH = COLOUR_LIGHT_BLUE
-TOOL_DELETE = COLOUR_RED
-TOOL_MUTE = COLOUR_PINK
-TOOL_SLIP = COLOUR_ORANGE
-TOOL_SLICE = COLOUR_LIGHT_BLUE
-TOOL_SELECT = COLOUR_YELLOW
-TOOL_ZOOM = COLOUR_BLUE
-TOOL_PLAYBACK = COLOUR_GREEN
-
-# Define Window Colours
-WINDOW_PLAYLIST = COLOUR_GREEN
-WINDOW_CHANNEL_RACK = COLOUR_RED
-WINDOW_PIANO_ROLL = COLOUR_PINK
-WINDOW_MIXER = COLOUR_LIGHT_BLUE
-WINDOW_BROWSER = COLOUR_ORANGE
-WINDOW_PLUGIN_PICKER = COLOUR_BLUE
-
-# Define Beat Indicator Colours
-BEAT_PAT_BAR = COLOUR_RED
-BEAT_PAT_BEAT = COLOUR_ORANGE
-BEAT_SONG_BAR = COLOUR_LIGHT_BLUE
-BEAT_SONG_BEAT = COLOUR_GREEN
-
-TEMPO_TAP = COLOUR_PINK
-METRONOME = COLOUR_DARK_GREY
-
-# Colour Matrix for errors
-ERROR_COLOURS = [
-    [COLOUR_RED, COLOUR_RED],
-    [COLOUR_RED, COLOUR_RED],
-    [COLOUR_RED, COLOUR_RED],
-    [COLOUR_RED, COLOUR_RED],
-    [COLOUR_RED, COLOUR_RED],
-    [COLOUR_RED, COLOUR_RED],
-    [COLOUR_RED, COLOUR_RED],
-    [COLOUR_RED, COLOUR_RED],
-    [COLOUR_RED, COLOUR_RED]
-]

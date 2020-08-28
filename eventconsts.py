@@ -1,10 +1,13 @@
-"""eventconsts.py
+"""
+eventconsts.py
 
 This file contains constants for buttons/faders/knobs sent from the controller.
 
 You shouldn't need to adjust these values, 
 but if you are modifying the script for use with a different controller with the same features,
 this is the place to start.
+
+Author: Miguel Guthridge
 """
 
 # Access FL Event consts through here

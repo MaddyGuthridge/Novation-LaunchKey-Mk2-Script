@@ -4,9 +4,11 @@
 
 """
 device_LaunchKey49 port 2.py
+
 This file is the controller file for port 2 of the LaunchKey49 Mk2.
 It handles communication with the device, including colours.
 
+Author: Miguel Guthridge
 """
 
 
@@ -34,9 +36,11 @@ import time
 # Other project files
 import config
 import internal
+import internal.consts
 import lighting
 import eventconsts
 import eventprocessor
+import processorhelpers
 
 
 
@@ -51,20 +55,24 @@ class TGeneric():
 
     def OnInit(self):
 
-        # Run shared init functions
-        internal.sharedInit()
+        try:
+            if internal.state.SHARED_INIT_STATE is internal.consts.INIT_INCOMPLETE:
+                # Run shared init functions
+                internal.sharedInit()
 
-        # Set the device into Extended Mode
-        internal.extendedMode.setVal(True, force=True)
+            # Set the device into Extended Mode
+            internal.extendedMode.setVal(True, force=True)
 
-        # Run light show
-        lighting.lightShow()
+            # Run light show
+            lighting.lightShow()
 
-        # Process inControl preferences | Say it's external since we want the settings to be applied regardless
-        if config.START_IN_INCONTROL_KNOBS == False: internal.extendedMode.setVal(False, eventconsts.INCONTROL_KNOBS, from_internal=False) 
-        if config.START_IN_INCONTROL_FADERS == False: internal.extendedMode.setVal(False, eventconsts.INCONTROL_FADERS, from_internal=False) 
-        if config.START_IN_INCONTROL_PADS == False: internal.extendedMode.setVal(False, eventconsts.INCONTROL_PADS, from_internal=False) 
+            # Process inControl preferences | Say it's external since we want the settings to be applied regardless
+            if config.START_IN_INCONTROL_KNOBS == False: internal.extendedMode.setVal(False, eventconsts.INCONTROL_KNOBS, from_internal=False) 
+            if config.START_IN_INCONTROL_FADERS == False: internal.extendedMode.setVal(False, eventconsts.INCONTROL_FADERS, from_internal=False) 
+            if config.START_IN_INCONTROL_PADS == False: internal.extendedMode.setVal(False, eventconsts.INCONTROL_PADS, from_internal=False) 
         
+        except Exception as e:
+            internal.errors.triggerError(e)
 
         print('Initialisation complete')
         print(internal.getLineBreak())
@@ -73,24 +81,27 @@ class TGeneric():
         print("")
 
     def OnDeInit(self):
-        lighting.lightShow()
-        # Return the device into Basic Mode
-        internal.extendedMode.setVal(False)
-        print('Deinitialisation complete')
-        print(internal.getLineBreak())
-        print(internal.getLineBreak())
-        print("")
-        print("")
+        try:
+            lighting.lightShow()
+            # Return the device into Basic Mode
+            internal.extendedMode.setVal(False)
+            print('Deinitialisation complete')
+            print(internal.getLineBreak())
+            print(internal.getLineBreak())
+            print("")
+            print("")
+        except Exception as e:
+            internal.errors.triggerError(e)
         
 
     def OnMidiIn(self, event):
         event.handled = False
-        internal.eventClock.start()
+        internal.performance.eventClock.start()
         # Update active window (ui.onRefresh() isnt working properly)
         internal.ActiveWindow = ui.getFocusedFormCaption()
 
-        # Process the event into processedEvent format
-        command = eventprocessor.processedEvent(event)
+        # Process the event into ParsedEvent format
+        command = processorhelpers.ParsedEvent(event)
 
         # Print event before processing
         internal.printCommand(command)
@@ -108,6 +119,8 @@ class TGeneric():
             event.status = command.status
             event.data1 = command.note
             event.data2 = command.value
+            
+        internal.performance.eventClock.stop()
 
         # Print output of command
         internal.printCommandOutput(command)
@@ -122,17 +135,17 @@ class TGeneric():
         internal.refreshProcessor()
         
         # Prevent idle lightshow when other parts of FL are being used
-        internal.window.reset_idle_tick()
+        internal.window.resetIdleTick()
         return
     
     def OnUpdateBeatIndicator(self, beat):
-        internal.beat.set_beat(beat)
+        internal.beat.setBeat(beat)
         
         # Prevent idle lightshow from being triggered during playback
-        internal.window.reset_idle_tick()
+        internal.window.resetIdleTick()
         
     def OnSendTempMsg(self, msg, duration):
-        internal.window.reset_idle_tick()
+        internal.window.resetIdleTick()
 
 Generic = TGeneric()
 

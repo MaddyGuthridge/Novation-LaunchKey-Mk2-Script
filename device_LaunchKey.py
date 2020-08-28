@@ -4,9 +4,11 @@
 
 """
 device_LaunchKey49.py
+
 This file is the controller file for port 1 of the LaunchKey49 Mk2.
 It handles most note and controller events.
 
+Author: Miguel Guthridge
 """
 
 
@@ -32,6 +34,8 @@ import utils
 import config
 import internal
 import eventprocessor
+import internal.consts
+import processorhelpers
 
 
 # device.dispatch(2, 0x9F + (0x0C << 8) + (0x00 << 16))
@@ -41,10 +45,14 @@ class TGeneric():
         return
 
     def OnInit(self):
-
-        # Run shared init functions
-        internal.sharedInit()
-
+        
+        try:
+            if internal.state.SHARED_INIT_STATE is internal.consts.INIT_INCOMPLETE:
+                # Run shared init functions
+                internal.sharedInit()
+        except Exception as e:
+            internal.errors.triggerError(e)
+        
         print('Initialisation complete')
         print(internal.getLineBreak())
         print(internal.getLineBreak())
@@ -58,11 +66,11 @@ class TGeneric():
 
     def OnMidiIn(self, event):
         event.handled = False
-
+        internal.performance.eventClock.start()
         
         
-        # Process the event into processedEvent format
-        command = eventprocessor.processedEvent(event)
+        # Process the event into ParsedEvent format
+        command = processorhelpers.ParsedEvent(event)
         
         # Print event before processing
         internal.printCommand(command)
@@ -75,12 +83,20 @@ class TGeneric():
             event.status = command.status
             event.data1 = command.note
             event.data2 = command.value
+        
+        if command.handled:
+            event.handled = True
+        
+        internal.performance.eventClock.stop()
 
         # Print output
         internal.printCommandOutput(command)
     
     def OnIdle(self):
         internal.idleProcessor()
+        
+        if internal.shifts["MAIN"].query():
+            internal.state.idleShift()
         
         
 
