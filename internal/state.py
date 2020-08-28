@@ -80,7 +80,7 @@ def idleShift():
     """Controls pitchbend wheel navigation
     """
     
-    pitch_val = pitchBend.getParsedVal()
+    pitch_val = -pitchBend.getParsedVal()
     
     if pitch_val == 0:
         multiplier = 0

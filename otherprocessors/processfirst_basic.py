@@ -25,8 +25,8 @@ def process(command):
     if command.id == eventconsts.PITCH_BEND:
         internal.state.pitchBend.setVal(command.value)
         if internal.shifts["MAIN"].query():
-            pitch_val = internal.state.pitchBend.getParsedVal()
-            increase = internal.state.pitchBend.getDirection()
+            pitch_val = -internal.state.pitchBend.getParsedVal()
+            increase = -internal.state.pitchBend.getDirection()
             
             if pitch_val > 0 and increase == 1:
                 direction = 1
