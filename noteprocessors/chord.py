@@ -396,13 +396,13 @@ def redraw(lights):
         if pads.getVal(6, 1):
             for i in range(8):
                 colour = JAZZY_COLOURS[i]
-                mode = (chords.getJazziness() == i) + 1
+                mode = -(chords.getJazziness() == i) - 1
                 lights.setPadColour(i, 0, colour, mode)
                 
         else:
             for i in range(min(len(chords.classes), 8)):
                 colour = chords.classes[i].colour
-                mode = (i == chords.active_index) + 1
+                mode = -((i == chords.active_index) + 1)
                 lights.setPadColour(i, 0, colour, mode)
 
 
