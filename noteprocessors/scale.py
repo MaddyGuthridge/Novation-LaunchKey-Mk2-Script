@@ -97,7 +97,7 @@ scales.addScale("Dorian", lightingconsts.colours["PINK"], [0, 2, 3, 5, 7, 9, 10]
 scales.addScale("Phrygian", lightingconsts.colours["LILAC"], [0, 1, 3, 5, 7, 8, 10])
 scales.addScale("Lydian", lightingconsts.colours["GREEN"], [0, 2, 4, 6, 7, 9, 11])
 scales.addScale("Mixolydian", lightingconsts.colours["TEAL"], [0, 2, 4, 5, 7, 9, 10])
-scales.addScale("Aolian", lightingconsts.colours["RED"], [0, 2, 3, 5, 7, 8, 10])
+scales.addScale("Aeolian", lightingconsts.colours["RED"], [0, 2, 3, 5, 7, 8, 10])
 scales.addScale("Locrian", lightingconsts.colours["ORANGE"], [0, 1, 3, 5, 6, 8, 10])
 
 
