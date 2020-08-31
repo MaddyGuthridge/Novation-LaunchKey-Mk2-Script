@@ -44,6 +44,7 @@ class NotesDownMgr:
         """
         # Append note objects to inner list when they are pressed
         self.notes_list = [ [] for _ in range(128)]
+        self.active_notes = [0 for _ in range(128)]
         
     def __del__(self):
         """When the object is deleted, remove all existing notes being played.
@@ -64,7 +65,11 @@ class NotesDownMgr:
         # channels.midiNoteOn(ch_index, ext_note.root.data1, ext_note.root.data2)
         
         for note in ext_note.extended_notes:
+            if self.active_notes[note.data1]:
+                channels.midiNoteOn(ch_index, note.data1, 0)
             channels.midiNoteOn(ch_index, note.data1, note.data2)
+            self.active_notes[note.data1] += 1
+        
         
     def noteOff(self, note):
         """Remove a note from the notes list
@@ -85,7 +90,10 @@ class NotesDownMgr:
         
         # Loop through and turn off any notes that were associated with that note
         for enote in ext_note.extended_notes:
-            channels.midiNoteOn(ch_index, enote.data1, 0)
+            self.active_notes[enote.data1] -= 1
+            if not self.active_notes[enote.data1]:
+                channels.midiNoteOn(ch_index, enote.data1, 0)
+            
         
     def allNotesOff(self):
         """Remove all notes from the list
@@ -93,6 +101,7 @@ class NotesDownMgr:
         ch_index = channels.channelNumber()
         
         self.notes_list = [ [] for _ in range(128)]
+        self.active_notes = [0 for _ in range(128)]
         
         # Send note off to all notes
         for x in range(128):

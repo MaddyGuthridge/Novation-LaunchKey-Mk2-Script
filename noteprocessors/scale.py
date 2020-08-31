@@ -136,27 +136,30 @@ def process(command):
     
     # If command is a note
     elif command.type is eventconsts.TYPE_NOTE:
-        
-        note  = command.note % 12
-        octave = command.note // 12
-                
-        if SNAP_NOTES == None:
-            return
-        
-        closest_distance = 13
-        closest_note = None
-        closest_octave = 0
-        for x in SNAP_NOTES:
-            distance = abs(note - x)
-            if distance < closest_distance:
-                closest_note = x
-                closest_distance = distance
-                if distance == 0:
-                    break
+        if not command.is_lift:
+            note  = command.note % 12
+            octave = command.note // 12
+                    
+            if SNAP_NOTES == None:
+                return
             
-        new_note = closest_note + octave*12 + closest_octave*12
-        command.edit(processorhelpers.RawEvent(command.status, new_note, command.value), "Snap note")
-    
+            closest_distance = 13
+            closest_note = None
+            closest_octave = 0
+            for x in SNAP_NOTES:
+                distance = abs(note - x)
+                if distance < closest_distance:
+                    closest_note = x
+                    closest_distance = distance
+                    if distance == 0:
+                        break
+                
+            new_note = closest_note + octave*12 + closest_octave*12
+            internal.notesDown.noteOn(processorhelpers.ExtensibleNote(command, [processorhelpers.RawEvent(command.status, new_note, command.value)]))
+            command.handle("Snapped note on")
+        else:
+            internal.notesDown.noteOff(command)
+            command.handle("Snapped note off")
     pass
 
 def redraw(lights):
@@ -267,7 +270,7 @@ def processInit(command):
                 CURRENT_SCALE_COLOUR = scales.scale_class_list[SCALE_CLASS].scale_list[x].colour
             else: command.handle("Catch-all", silent=True)
             
-    if command.type == eventconsts.TYPE_NOTE:
+    if command.type == eventconsts.TYPE_NOTE and command.is_lift:
         if CUSTOM_SCALE:
             note = command.note % 12
             if not note in SCALE_TO_USE:
