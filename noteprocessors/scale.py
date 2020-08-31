@@ -258,6 +258,7 @@ def processInit(command):
             elif x < len(scales.scale_class_list):
                 if x == SCALE_CLASS:
                     SCALE_CLASS = -1
+                    SCALE_TO_USE = []
                     command.handle("Remove scale class")
                     return
                 internal.window.resetAnimationTick()
