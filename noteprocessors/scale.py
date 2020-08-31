@@ -108,6 +108,8 @@ CUSTOM_SCALE = False
 
 SCALE_CLASS = -1
 
+PREVENT_NONSCALE = False
+
 ROOT_NOTE = 0
 SCALE_TO_USE = []
 SCALE_TO_USE_INDEX = -1
@@ -155,6 +157,9 @@ def process(command):
                         break
                 
             new_note = closest_note + octave*12 + closest_octave*12
+            if PREVENT_NONSCALE and new_note != command.note:
+                command.handle("Prevent non-scale note", True)
+                return
             internal.notesDown.noteOn(processorhelpers.ExtensibleNote(command, [processorhelpers.RawEvent(command.status, new_note, command.value)]))
             command.handle("Snapped note on")
         else:
@@ -191,6 +196,10 @@ def redraw(lights):
                         else:
                             pulse = lightingconsts.MODE_ON
                         lights.setPadColour(ctr, 1, colour, pulse)
+            else:
+                colour = PREVENT_NONSCALE * lightingconsts.colours["RED"] \
+                    + (not PREVENT_NONSCALE) * lightingconsts.colours["PINK"]
+                lights.setPadColour(0, 1, colour)
         
         lights.setPadColour(7, 0, lightingconsts.colours["GREEN"])
         
@@ -206,7 +215,7 @@ def activeEnd():
     """
     global INIT_COMPLETE, INIT_HAVE_ROOT, INIT_HAVE_SCALE, SCALE_TO_USE, \
         ROOT_NOTE, FORWARD_NOTES, SCALE_CLASS, COLOUR, SCALE_TO_USE_INDEX, \
-            CUSTOM_SCALE
+            CUSTOM_SCALE, PREVENT_NONSCALE
     
     INIT_COMPLETE = False
     INIT_HAVE_ROOT = False
@@ -216,13 +225,14 @@ def activeEnd():
     COLOUR = DEFAULT_COLOUR
     SCALE_TO_USE_INDEX = -1
     CUSTOM_SCALE = False
+    PREVENT_NONSCALE = False
     SCALE_TO_USE = []
 
 
 def processInit(command):
     global INIT_COMPLETE, INIT_HAVE_ROOT, INIT_HAVE_SCALE, SCALE_TO_USE, ROOT_NOTE, \
         FORWARD_NOTES, SCALE_CLASS, COLOUR, CURRENT_SCALE_COLOUR, SCALE_TO_USE_INDEX, \
-            CUSTOM_SCALE
+            CUSTOM_SCALE, PREVENT_NONSCALE
     if command.type == eventconsts.TYPE_PAD and command.is_lift:
         x, y = command.getPadCoord()
         
@@ -246,6 +256,10 @@ def processInit(command):
                         command.handle("Exited custom scale mode")
             
             elif x < len(scales.scale_class_list):
+                if x == SCALE_CLASS:
+                    SCALE_CLASS = -1
+                    command.handle("Remove scale class")
+                    return
                 internal.window.resetAnimationTick()
                 
                 SCALE_CLASS = x
@@ -261,14 +275,20 @@ def processInit(command):
                 
             else: command.handle("Catch-all", silent=True)
         
-        if y == 1 and SCALE_CLASS != -1:
-            if x < len(scales.scale_class_list[SCALE_CLASS].scale_list):
-                INIT_HAVE_SCALE = True
-                SCALE_TO_USE = scales.scale_class_list[SCALE_CLASS].scale_list[x].scale
-                SCALE_TO_USE_INDEX = x
-                command.handle("Set scale to " + scales.scale_class_list[SCALE_CLASS].scale_list[x].name)
-                CURRENT_SCALE_COLOUR = scales.scale_class_list[SCALE_CLASS].scale_list[x].colour
-            else: command.handle("Catch-all", silent=True)
+        if y == 1:
+            if SCALE_CLASS != -1:
+                if x < len(scales.scale_class_list[SCALE_CLASS].scale_list):
+                    INIT_HAVE_SCALE = True
+                    SCALE_TO_USE = scales.scale_class_list[SCALE_CLASS].scale_list[x].scale
+                    SCALE_TO_USE_INDEX = x
+                    command.handle("Set scale to " + scales.scale_class_list[SCALE_CLASS].scale_list[x].name)
+                    CURRENT_SCALE_COLOUR = scales.scale_class_list[SCALE_CLASS].scale_list[x].colour
+                else: command.handle("Catch-all", silent=True)
+            else:
+                if x == 0:
+                    PREVENT_NONSCALE = not PREVENT_NONSCALE
+                    command.handle("Toggle prevention of non-scale notes")
+                else: command.handle("Catch-all", silent=True)
             
     if command.type == eventconsts.TYPE_NOTE and command.is_lift:
         if CUSTOM_SCALE:
