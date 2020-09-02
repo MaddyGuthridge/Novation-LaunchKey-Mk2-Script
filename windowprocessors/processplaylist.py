@@ -37,7 +37,7 @@ def process(command):
     # Process marker jumps
     if command.type == eventconsts.TYPE_TRANSPORT:
         if (command.id == eventconsts.TRANSPORT_BACK or command.id == eventconsts.TRANSPORT_FORWARD):
-            if not command.shifted:
+            if not internal.shifts["MAIN"].use():
                 if command.is_lift:
                     # Check that markers exist
                     if arrangement.getMarkerName(0) is not "":
