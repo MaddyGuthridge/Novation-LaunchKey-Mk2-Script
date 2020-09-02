@@ -58,7 +58,7 @@ def process(command):
         new_status = (command.status_nibble << 4) + internal.consts.OMNI_CHANNEL_STATUS
         command.edit(processorhelpers.RawEvent(new_status, command.note, command.value), "Remap for omni mode")
     
-    elif command.type is eventconsts.TYPE_BASIC_PAD:
+    elif command.type is eventconsts.TYPE_BASIC_PAD or command.type is eventconsts.TYPE_PAD:
         if command.coord_X < 8:
             new_status = (9 << 4) + internal.consts.OMNI_CHANNEL_STATUS
             command.edit(processorhelpers.RawEvent(new_status, PAD_MAPPINGS[command.coord_X][command.coord_Y], command.value), "Remap for omni mode")
@@ -70,21 +70,17 @@ def redraw(lights):
     Args:
         lights (LightMap): The lights to draw to
     """
-    if not internal.extendedMode.query(eventconsts.INCONTROL_PADS):
-        for ctr in range(min(channels.channelCount(1), 16)):
-            x = ctr % 8
-            y = ctr // 8
-            lights.setPadColour(x, y, lightingconsts.colours.getClosestInt(channels.getChannelColor(ctr)))
+    for ctr in range(min(channels.channelCount(1), 16)):
+        x = ctr % 8
+        y = ctr // 8
+        lights.setPadColour(x, y, lightingconsts.colours.getClosestInt(channels.getChannelColor(ctr)))
 
-        lights.solidifyAll()
-    else:
-        internal.extendedMode.setVal(False, eventconsts.INCONTROL_PADS)
+    lights.solidifyAll()
 
 def activeStart():
     """Called when your note mode is made active
     """
     global INIT_COMPLETE
-    internal.extendedMode.setVal(False, eventconsts.INCONTROL_PADS)
     INIT_COMPLETE = True
 
 def activeEnd():
@@ -93,7 +89,6 @@ def activeEnd():
     global COLOUR, INIT_COMPLETE
     # Reset current colour to default
     COLOUR = DEFAULT_COLOUR
-    internal.extendedMode.revert(eventconsts.INCONTROL_PADS)
     INIT_COMPLETE = False
     
 
