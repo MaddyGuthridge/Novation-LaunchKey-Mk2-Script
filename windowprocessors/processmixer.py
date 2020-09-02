@@ -60,7 +60,7 @@ def processFaders(command):
     fader_num = command.coord_X + 1
 
     if fader_num == 9:
-        if command.shifted:
+        if internal.shifts["MAIN"].use():
             track_num = 0
         else:
             track_num = current_track
@@ -76,7 +76,7 @@ def processKnobs(command):
     knob_num = command.coord_X + 1
 
     if knob_num == 8:
-        if command.shifted:
+        if internal.shifts["MAIN"].use():
             track_num = 0
         else:
             track_num = current_track
@@ -92,7 +92,7 @@ def processFaderButtons(command):
     fader_num = command.coord_X + 1
 
     if fader_num == 9:
-        if command.shifted:
+        if internal.shifts["MAIN"].use():
             track_num = 0
         else:
             track_num = current_track
@@ -170,9 +170,10 @@ def processMuteSolo(track, command):
 def setVolume(command, track, value):
     volume = getVolumeSend(value)
     mixer.setTrackVolume(track, volume)
-    command.actions.appendAction("Set " + mixer.getTrackName(track) + " volume to " + getVolumeValue(value))
+    action = "Set " + mixer.getTrackName(track) + " volume to " + getVolumeValue(value)
     if processorhelpers.didSnap(processorhelpers.toFloat(value), internal.consts.MIXER_VOLUME_SNAP_TO):
-        command.actions.appendAction("[Snapped]")
+        action += " [Snapped]"
+    command.handle(action)
 
 # Returns volume value set to send to FL Studio
 def getVolumeSend(inVal):
@@ -188,9 +189,10 @@ def getVolumeValue(inVal):
 def setPan(command, track, value):
     volume = getPanSend(value)
     mixer.setTrackPan(track, volume)
-    command.actions.appendAction("Set " + mixer.getTrackName(track) + " pan to " + getPanValue(value))
+    action = "Set " + mixer.getTrackName(track) + " pan to " + getPanValue(value)
     if processorhelpers.didSnap(processorhelpers.toFloat(value, -1), internal.consts.MIXER_PAN_SNAP_TO):
-        command.actions.appendAction("[Snapped]")
+        action += " [Snapped]"
+    command.handle(action)
 
 # Returns volume value set to send to FL Studio
 def getPanSend(inVal):

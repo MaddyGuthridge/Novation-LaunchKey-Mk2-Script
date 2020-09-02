@@ -71,7 +71,7 @@ def process(command):
     if command.type == eventconsts.TYPE_KNOB:
         knob_num = command.coord_X
 
-        if knob_num == 7 and not command.shifted:
+        if knob_num == 7 and not internal.shifts["MAIN"].use():
             channel_num = current_channel
         else:
             channel_num = knob_num
