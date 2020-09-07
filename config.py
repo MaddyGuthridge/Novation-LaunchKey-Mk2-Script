@@ -85,7 +85,7 @@ LIGHTS_REDUCE_MOTION = False
 CHAOTIC_EVIL_ERROR_NOTE_HANDLER = True
 
 # Controls which console messages are printed. Add things from the DEBUG object
-CONSOLE_DEBUG_MODE = [DEBUG.DISPATCH_EVENT]
+CONSOLE_DEBUG_MODE = [DEBUG.EVENT_DATA]
 
 # Whether script should stop entirely when it encounters an error.
 DEBUG_HARD_CRASHING = False

@@ -82,7 +82,7 @@ class TGeneric():
 
     def OnDeInit(self):
         try:
-            lighting.lightShow()
+            #lighting.lightShow()
             # Return the device into Basic Mode
             internal.extendedMode.setVal(False)
             print('Deinitialisation complete')
