@@ -63,9 +63,6 @@ class TGeneric():
             # Set the device into Extended Mode
             internal.extendedMode.setVal(True, force=True)
 
-            # Run light show
-            # lighting.lightShow()
-
             # Process inControl preferences | Say it's external since we want the settings to be applied regardless
             if config.START_IN_INCONTROL_KNOBS == False: internal.extendedMode.setVal(False, eventconsts.INCONTROL_KNOBS, from_internal=False) 
             if config.START_IN_INCONTROL_FADERS == False: internal.extendedMode.setVal(False, eventconsts.INCONTROL_FADERS, from_internal=False) 
@@ -82,7 +79,6 @@ class TGeneric():
 
     def OnDeInit(self):
         try:
-            #lighting.lightShow()
             # Return the device into Basic Mode
             internal.extendedMode.setVal(False)
             print('Deinitialisation complete')

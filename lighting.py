@@ -317,16 +317,7 @@ class Lights:
 
 state = Lights()
 
-
-def lightShow():
-    """OooOOoOOoOOoOOoOoO PREEEETTTTTTTTTTTTTYYYYYYYYYYYYYYYYYY!!!!!!!!!!!
-    
-    This draws the initialisation sequence.
-    """
-    state.reset()
-
-    sleepTime = 0.05
-    x = 0
+def initLightShow(lights):
     if internal.state.SHARED_INIT_STATE == internal.consts.INIT_OK:
         rainbowColours = lightingconsts.PALLETE_NORMAL
     elif  internal.state.SHARED_INIT_STATE == internal.consts.INIT_API_OUTDATED or internal.state.SHARED_INIT_STATE == internal.consts.INIT_PORT_MISMATCH:
@@ -336,61 +327,55 @@ def lightShow():
     else:
         rainbowColours = lightingconsts.PALLETE_INIT_FAIL
 
+    x = internal.window.getAbsoluteTick()
 
-    while True:
+    if x > len(rainbowColours) + 8: return
 
-        time.sleep(sleepTime)
-
-        # Group 1
-        if (x >= 0) and (x < len(rainbowColours)):
-            state.setPadColour(0, 1, rainbowColours[x])
-        
-         # Group 2
-        if (x >= 1) and (x < len(rainbowColours) + 1):
-            state.setPadColour(1, 1, rainbowColours[x - 1])
-            state.setPadColour(0, 0, rainbowColours[x - 1])
-        
-        # Group 3
-        if (x >= 2) and (x < len(rainbowColours) + 2):
-            state.setPadColour(2, 1, rainbowColours[x - 2])
-            state.setPadColour(1, 0, rainbowColours[x - 2])
-        
-        # Group 4
-        if (x >= 3) and (x < len(rainbowColours) + 3):
-            state.setPadColour(3, 1, rainbowColours[x - 3])
-            state.setPadColour(2, 0, rainbowColours[x - 3])
-        
-        # Group 5
-        if (x >= 4) and (x < len(rainbowColours) + 4):
-            state.setPadColour(4, 1, rainbowColours[x - 4])
-            state.setPadColour(3, 0, rainbowColours[x - 4])
-        
+    # Group 1
+    if (x >= 0) and (x < len(rainbowColours)):
+        lights.setPadColour(0, 1, rainbowColours[x])
     
-        # Group 6
-        if (x >= 5) and (x < len(rainbowColours) + 5):
-            state.setPadColour(5, 1, rainbowColours[x - 5])
-            state.setPadColour(4, 0, rainbowColours[x - 5])
-        
-        # Group 7
-        if (x >= 6) and (x < len(rainbowColours) + 6):
-            state.setPadColour(6, 1, rainbowColours[x - 6])
-            state.setPadColour(5, 0, rainbowColours[x - 6])
-        
-        # Group 8
-        if (x >= 7) and (x < len(rainbowColours) + 7):
-            state.setPadColour(7, 1, rainbowColours[x - 7])
-            state.setPadColour(6, 0, rainbowColours[x - 7])
-        
-        # Group 9
-        if (x >= 8) and (x < len(rainbowColours) + 8):
-            state.setPadColour(7, 0, rainbowColours[x - 8])
-        
-        x += 1
-       
-        
-        if x > len(rainbowColours) + 8: break
+    # Group 2
+    if (x >= 1) and (x < len(rainbowColours) + 1):
+        lights.setPadColour(1, 1, rainbowColours[x - 1])
+        lights.setPadColour(0, 0, rainbowColours[x - 1])
+    
+    # Group 3
+    if (x >= 2) and (x < len(rainbowColours) + 2):
+        lights.setPadColour(2, 1, rainbowColours[x - 2])
+        lights.setPadColour(1, 0, rainbowColours[x - 2])
+    
+    # Group 4
+    if (x >= 3) and (x < len(rainbowColours) + 3):
+        lights.setPadColour(3, 1, rainbowColours[x - 3])
+        lights.setPadColour(2, 0, rainbowColours[x - 3])
+    
+    # Group 5
+    if (x >= 4) and (x < len(rainbowColours) + 4):
+        lights.setPadColour(4, 1, rainbowColours[x - 4])
+        lights.setPadColour(3, 0, rainbowColours[x - 4])
+    
 
-    state.reset()
+    # Group 6
+    if (x >= 5) and (x < len(rainbowColours) + 5):
+        lights.setPadColour(5, 1, rainbowColours[x - 5])
+        lights.setPadColour(4, 0, rainbowColours[x - 5])
+    
+    # Group 7
+    if (x >= 6) and (x < len(rainbowColours) + 6):
+        lights.setPadColour(6, 1, rainbowColours[x - 6])
+        lights.setPadColour(5, 0, rainbowColours[x - 6])
+    
+    # Group 8
+    if (x >= 7) and (x < len(rainbowColours) + 7):
+        lights.setPadColour(7, 1, rainbowColours[x - 7])
+        lights.setPadColour(6, 0, rainbowColours[x - 7])
+    
+    # Group 9
+    if (x >= 8) and (x < len(rainbowColours) + 8):
+        lights.setPadColour(7, 0, rainbowColours[x - 8])
+
+    lights.solidifyAll()
 
 def idleLightshow(lights):
     """EVEN PRETTIER!!!!!!!!!!

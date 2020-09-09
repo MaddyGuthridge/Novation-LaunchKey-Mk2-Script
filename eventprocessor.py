@@ -228,9 +228,12 @@ def redraw():
         lighting.state.setFromMap(lights)
         return
 
-    for i in range(1):
+    for _ in range(1):
         # Error handling: set controller into an error state
         try:
+            
+            # Draw initialisation lightshow
+            lighting.initLightShow(lights)
 
             # Draws idle thing if idle
             lighting.idleLightshow(lights)
