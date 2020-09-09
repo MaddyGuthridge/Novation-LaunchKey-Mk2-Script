@@ -63,18 +63,15 @@ def processExtended(command):
         internal.shifts.processShift(command)
         if command.ignored: return
         
-        # Process through shift processors
-        internal.shifts.process(command)
-        if command.ignored: return
-        
         # Call primary processor
         processfirst.process(command)
         if command.ignored: return
         
-        # Process error events
-        if internal.errors.getError():
-            internal.errors.eventProcessError(command)
-            return
+        # Process through shift processors
+        internal.shifts.process(command)
+        if command.ignored: return
+        
+        
 
         if command.ignored: return
 
@@ -114,9 +111,14 @@ def processBasic(command):
         # Process key mappings
         controllerprocessors.process(command)
         
+        
+        
         # Call primary processor
         processfirst_basic.process(command)
+        if command.ignored: return
         
+        # Process through shift processors
+        internal.shifts.process(command)
         if command.ignored: return
 
         # Send to note processors
@@ -170,11 +172,11 @@ def processReceived(command):
         command.handle("Recover from error state, enable debugging")
         
     elif data == internal.consts.MESSAGE_SHIFT_DOWN:
-        internal.shifts["MAIN"].setDown(True)
+        internal.shifts.setDown("MAIN", True)
         command.handle("Press shift", True)
         
     elif data == internal.consts.MESSAGE_SHIFT_UP:
-        internal.shifts["MAIN"].setDown(False)
+        internal.shifts.setDown("MAIN", False)
         command.handle("Release shift", True)
         
     elif data == internal.consts.MESSAGE_SHIFT_USE:

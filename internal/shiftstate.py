@@ -96,6 +96,7 @@ class ShiftState:
         Returns:
             bool: Whether the button was pressed
         """
+        self.onUse()
         if self.is_down:
             self.is_used = True
             debugLog("Use shift: " + self.name, consts.DEBUG.SHIFT_EVENTS)
@@ -153,6 +154,11 @@ class ShiftState:
         """Called when the shift button is released
         """
         pass
+    
+    def onUse(self):
+        """Called when the shift button is used
+        """
+        pass
         
 class ShiftsMgr:
     """Manages multiple shift menus
@@ -205,6 +211,13 @@ class ShiftsMgr:
                 else:
                     # Ignore it
                     continue
+    
+    def setDown(self, name, value):
+        if name in self.menus:
+            self.current_down = name
+            self.menus[self.current_down].setDown(value)
+        else:
+            raise "Shift menu doesn't exist"
     
     def process(self, command):
         """Call shift menu processor for current shift menu
