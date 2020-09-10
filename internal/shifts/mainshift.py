@@ -104,10 +104,10 @@ class MainShift(ShiftState):
                     self.use()
                     command.handle("Save project")
                 else:
-                    command.handle("Shift menu catch others")
+                    command.handle("Shift menu catch others", True)
 
             else:
-                command.handle("Shift menu catch press")
+                command.handle("Shift menu catch press", True)
         elif command.id == eventconsts.PITCH_BEND:
             self.use()
             pitch_val = -pitchBend.getParsedVal()
@@ -214,15 +214,17 @@ class MainShift(ShiftState):
     def onPress(self):
         """When shift button pressed
         """
-        extendedMode.setVal(True, eventconsts.INCONTROL_PADS)
-        extendedMode.setVal(True, eventconsts.INCONTROL_FADERS)
-        sendCompleteInternalMidiMessage(consts.MESSAGE_SHIFT_DOWN)
+        if getPortExtended():
+            extendedMode.setVal(True, eventconsts.INCONTROL_PADS)
+            extendedMode.setVal(True, eventconsts.INCONTROL_FADERS)
+            sendCompleteInternalMidiMessage(consts.MESSAGE_SHIFT_DOWN)
         
     def onLift(self):
         """When shift button lifted
         """
-        extendedMode.revert(eventconsts.INCONTROL_PADS)
-        extendedMode.revert(eventconsts.INCONTROL_FADERS)
-        sendCompleteInternalMidiMessage(consts.MESSAGE_SHIFT_UP)
-        
+        if getPortExtended():
+            extendedMode.revert(eventconsts.INCONTROL_PADS)
+            extendedMode.revert(eventconsts.INCONTROL_FADERS)
+            sendCompleteInternalMidiMessage(consts.MESSAGE_SHIFT_UP)
+            
             

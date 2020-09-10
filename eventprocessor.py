@@ -111,8 +111,6 @@ def processBasic(command):
         # Process key mappings
         controllerprocessors.process(command)
         
-        
-        
         # Call primary processor
         processfirst_basic.process(command)
         if command.ignored: return
