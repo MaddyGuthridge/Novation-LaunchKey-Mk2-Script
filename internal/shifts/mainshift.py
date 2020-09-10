@@ -9,6 +9,7 @@ Author: Miguel Guthridge
 import general
 import ui
 import transport
+import config
 
 from ..shiftstate import ShiftState
 import eventconsts
@@ -16,8 +17,8 @@ from .. import consts
 import lightingconsts
 from ..snap import snap
 from ..windowstate import window
-from ..state import extendedMode
-from ..messages import sendCompleteInternalMidiMessage
+from ..state import extendedMode, pitchBend, getPortExtended
+from ..messages import sendCompleteInternalMidiMessage, debugLog
 
 
 class MainShift(ShiftState):
@@ -103,11 +104,23 @@ class MainShift(ShiftState):
                     self.use()
                     command.handle("Save project")
                 else:
-                    command.handle("Shift menu catch others")
+                    command.handle("Shift menu catch others", True)
 
             else:
-                command.handle("Shift menu catch press")
-
+                command.handle("Shift menu catch press", True)
+        elif command.id == eventconsts.PITCH_BEND:
+            self.use()
+            pitch_val = -pitchBend.getParsedVal()
+            increase = -pitchBend.getDirection()
+            
+            if pitch_val > 0 and increase == 1:
+                direction = 1
+            elif pitch_val < 0 and increase == -1:
+                direction = -1
+            else:
+                direction = 0
+            ui.jog(direction)
+            command.handle("Pitch bend jog wheel")
         
     def redraw(self, lights):
         """Redraw lights
@@ -115,7 +128,7 @@ class MainShift(ShiftState):
         Args:
             lights (LightMap): Lights to draw on
         """
-
+        
         UNDO_LAST = 1
         UNDO_MIDDLE = 0
         UNDO_FIRST = -1
@@ -191,19 +204,27 @@ class MainShift(ShiftState):
                 
 
         lights.solidifyAll()
+        
+    def onUse(self):
+        """Called when shift button is used
+        """
+        if not getPortExtended():
+            sendCompleteInternalMidiMessage(consts.MESSAGE_SHIFT_USE)
 
     def onPress(self):
         """When shift button pressed
         """
-        extendedMode.setVal(True, eventconsts.INCONTROL_PADS)
-        extendedMode.setVal(True, eventconsts.INCONTROL_FADERS)
-        sendCompleteInternalMidiMessage(consts.MESSAGE_SHIFT_DOWN)
+        if getPortExtended():
+            extendedMode.setVal(True, eventconsts.INCONTROL_PADS)
+            extendedMode.setVal(True, eventconsts.INCONTROL_FADERS)
+            sendCompleteInternalMidiMessage(consts.MESSAGE_SHIFT_DOWN)
         
     def onLift(self):
         """When shift button lifted
         """
-        extendedMode.revert(eventconsts.INCONTROL_PADS)
-        extendedMode.revert(eventconsts.INCONTROL_FADERS)
-        sendCompleteInternalMidiMessage(consts.MESSAGE_SHIFT_UP)
-        
+        if getPortExtended():
+            extendedMode.revert(eventconsts.INCONTROL_PADS)
+            extendedMode.revert(eventconsts.INCONTROL_FADERS)
+            sendCompleteInternalMidiMessage(consts.MESSAGE_SHIFT_UP)
+            
             

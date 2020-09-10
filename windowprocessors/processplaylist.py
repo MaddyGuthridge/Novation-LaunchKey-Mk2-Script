@@ -33,7 +33,7 @@ def redraw(lights):
 
 def process(command):
     command.actions.addProcessor("Playlist Processor")
-
+    
     # Process marker jumps
     if command.type == eventconsts.TYPE_TRANSPORT:
         if (command.id == eventconsts.TRANSPORT_BACK or command.id == eventconsts.TRANSPORT_FORWARD):

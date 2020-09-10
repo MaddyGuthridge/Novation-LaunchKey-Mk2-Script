@@ -107,9 +107,7 @@ def process(command):
        
     # Note Processor Menu
     noteprocessors.processNoteModeMenu(command)
-
-    if command.ignored:
-        return
+    if command.ignored: return
 
     noteprocessors.process(command)
 

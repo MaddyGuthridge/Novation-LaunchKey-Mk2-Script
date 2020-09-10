@@ -83,7 +83,8 @@ def idleShift():
     pitch_val = -pitchBend.getParsedVal()
     
     if pitch_val == 0:
-        multiplier = 0
+        # Return to prevent jogging when the pitch-bend wheel isn't being used
+        return
     elif pitch_val > 0:
         multiplier = 1
     elif pitch_val < 0:
@@ -95,8 +96,8 @@ def idleShift():
         send_val = math.ceil(send_float)
     else:
         send_val = math.floor(send_float)
-    
-    ui.jog(multiplier * send_val)
+    if multiplier * send_val != 0.0:
+        ui.jog(multiplier * send_val)
 
 
 def getPortExtended():
