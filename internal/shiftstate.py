@@ -173,6 +173,7 @@ class ShiftsMgr:
         Args:
             command (ParsedEvent): Command that may or may not trigger shift menus
         """
+        command.addProcessor("Shift Menu Processor")
         # If a shift menu is active
         if self.current_down != "":
             # Process shift in active shift menu
@@ -188,7 +189,7 @@ class ShiftsMgr:
                 return
             
             # If shift menu caused shift menu to press
-            else:
+            elif result == 1:
                 # Ignore it
                 return
         
@@ -207,15 +208,19 @@ class ShiftsMgr:
                     self.current_down = menu_key
                     return
                 
-                # If shift menu caused shift menu to press
-                else:
+                # If event caused shift menu to lift
+                elif result == 0:
                     # Ignore it
                     continue
     
     def setDown(self, name, value):
+        
         if name in self.menus:
-            self.current_down = name
-            self.menus[self.current_down].setDown(value)
+            if value:
+                self.current_down = name
+            else:
+                self.current_down = ""
+            self.menus[name].setDown(value)
         else:
             raise "Shift menu doesn't exist"
     

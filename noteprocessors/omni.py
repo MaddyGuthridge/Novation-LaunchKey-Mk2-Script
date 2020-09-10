@@ -54,15 +54,17 @@ def process(command):
     command.addProcessor("Omni Mode Processor")
     # If command is a note
     if command.type is eventconsts.TYPE_NOTE:
-        # Set status byte to channel 15 (Omni preview channel)
+        # Set status byte to channel 0xD (Omni preview channel)
         new_status = (command.status_nibble << 4) + internal.consts.OMNI_CHANNEL_STATUS
         command.edit(processorhelpers.RawEvent(new_status, command.note, command.value), "Remap for omni mode")
+        command.ignore("Switch to omni channel")
     
     elif command.type is eventconsts.TYPE_BASIC_PAD or command.type is eventconsts.TYPE_PAD:
         if command.coord_X < 8:
             new_status = (9 << 4) + internal.consts.OMNI_CHANNEL_STATUS
             command.edit(processorhelpers.RawEvent(new_status, PAD_MAPPINGS[command.coord_X][command.coord_Y], command.value), "Remap for omni mode")
-
+            command.ignore("Remap to omni mode")
+        
 
 def redraw(lights):
     """Called when a redraw is taking place. Use this to draw menus to allow your users to choose options. Most of the time, you should leave this empty.
