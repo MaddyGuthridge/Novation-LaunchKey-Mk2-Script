@@ -9,7 +9,7 @@ Author: Miguel Guthridge
 #
 # Add custom event processors to this list
 #
-imports = ["default", "error", "scale", "chord", "omni", "unassigned"]
+imports = ["default", "error", "scale", "chord", "omni", "randomiser", "unassigned"]
 #
 #
 #
