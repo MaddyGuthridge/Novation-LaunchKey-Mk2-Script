@@ -47,7 +47,6 @@ current_set = 0
 
 # Autochange set
 bar_progresses_set = False
-last_beat = 0
 last_transport = False
 
 def process(command):
@@ -66,14 +65,23 @@ def process(command):
     
     # If command is a note
     if command.type is eventconsts.TYPE_NOTE:
-        updateBarNum()
         if command.value:
             new_note = chord_sets[current_set][math.floor(abs(rng.random() * len(chord_sets[current_set]) - 0.01))]
             internal.notesDown.noteOn(processorhelpers.ExtensibleNote(command, [processorhelpers.RawEvent(command.status, new_note, command.value)]))
             command.handle("Randomise note")
         else:
             internal.notesDown.noteOff(command)
-            command.handle("Randomise note off")
+            command.handle("Randomise note off", True)
+    
+    elif command.id == eventconsts.PEDAL:
+        if command.is_lift:
+            command.handle("Pedal lift", True)
+        else:
+            toNextSet()
+            if not internal.getPortExtended():
+                # Forward note
+                internal.sendCompleteInternalMidiMessage(command.getDataMIDI())
+            command.handle("Next chord set")
     
     elif command.type is eventconsts.TYPE_PAD:
         if command.coord_Y == 1 and command.coord_X < 8:
@@ -97,6 +105,18 @@ def processInit(command):
     if command.type is eventconsts.TYPE_NOTE and not command.value:
         chord_sets[current_set].append(command.note)
         command.ignore("Add note to list " + str(current_set))
+    
+    elif command.id == eventconsts.PEDAL:
+        if command.is_lift:
+            command.handle("Pedal lift", True)
+        else:
+            current_set += 1
+            if current_set >= 8:
+                current_set = 0
+            if not internal.getPortExtended():
+                # Forward note to other processor
+                internal.sendCompleteInternalMidiMessage(command.getDataMIDI())
+            command.handle("Next chord set")
     
     elif command.type is eventconsts.TYPE_PAD:
         if command.is_lift:
@@ -188,22 +208,24 @@ def activeEnd():
     chord_sets = [[] for _ in range(8)]
     current_set = 0
 
-def updateBarNum():
-    global last_beat, last_transport, current_set
+def updateBeat(beatNum):
+    global last_beat, last_transport
     if bar_progresses_set:
-        beat = transport.getHWBeatLEDState()
         transport_on = transport.isPlaying()
-        if beat != last_beat and beat == 1 and last_transport == transport_on:
-            # Increment bar number
-            next_set = current_set
-            check_set = current_set + 1
-            while(True):
-                if check_set >= 8:
-                    check_set = 0
-                if len(chord_sets[check_set]):
-                    next_set = check_set
-                    break
-                check_set += 1
-            current_set = next_set
-        last_beat = beat
+        if beat == 1 and last_transport == transport_on:
+            toNextSet()
         last_transport = transport_on
+
+def toNextSet():
+    global current_set
+    # Increment bar number
+    next_set = current_set
+    check_set = current_set + 1
+    while(True):
+        if check_set >= 8:
+            check_set = 0
+        if len(chord_sets[check_set]):
+            next_set = check_set
+            break
+        check_set += 1
+    current_set = next_set
