@@ -46,7 +46,25 @@ COLOUR_MAP = [
 
 def redraw(lights):
     if not internal.extendedMode.query(eventconsts.INCONTROL_PADS):
-        lights.setFromMatrix(COLOUR_MAP)
+        light_map = COLOUR_MAP.copy()
+        for x in range(8):
+            light_map[x] = light_map[x].copy()
+        tick = internal.window.getAnimationTick()
+        for x in range(8):
+            for y in range(2):
+                if x >=4 and y == 0:
+                    if tick + 4 < x:
+                        light_map[x][y] = lightingconsts.colours["OFF"]
+                elif x < 4 and y == 0:
+                    if tick - 1 < x:
+                        light_map[x][y] = lightingconsts.colours["OFF"]
+                elif x >= 4 and y == 1:
+                    if tick + 3 < x:
+                        light_map[x][y] = lightingconsts.colours["OFF"]
+                elif x < 4 and y == 1:
+                    if tick - 2 < x:
+                        light_map[x][y] = lightingconsts.colours["OFF"]
+        lights.setFromMatrix(light_map)
 
 
 def topPluginStart():
