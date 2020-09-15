@@ -123,6 +123,9 @@ def topWindowStart():
 def topWindowEnd():
     return
 
+def beatChange(beat):
+    pass
+
 # Internal functions
 
 def processPeak(lights, y, level):

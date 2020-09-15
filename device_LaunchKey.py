@@ -97,7 +97,9 @@ class TGeneric():
         
         if internal.shifts["MAIN"].query():
             internal.state.idleShift()
-        
+    
+    def OnUpdateBeatIndicator(self, beat):
+        eventprocessor.beatChange(beat)
         
 
 
@@ -114,3 +116,6 @@ def OnMidiIn(event):
 
 def OnIdle():
     Generic.OnIdle()
+    
+def OnUpdateBeatIndicator(beat):
+    Generic.OnUpdateBeatIndicator(beat)

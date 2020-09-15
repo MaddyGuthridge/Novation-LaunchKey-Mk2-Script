@@ -146,41 +146,43 @@ def redraw(lights):
     Args:
         lights (LightMap): The lights to draw to
     """
-    # If the note processor isn't initialised, call the initialise function instead
-    if not INIT_COMPLETE:
-        redrawInit(lights)
-        return
-    
-    updateBarNum()
-    
-    # Set controls
-    for x in range(8):
-        if x == current_set:
-            if len(chord_sets[x]):
-                colour = lightingconsts.colours["PINK"]
-            else:
-                colour = lightingconsts.colours["OFF"]
-        else:
-            if len(chord_sets[x]):
-                colour = lightingconsts.colours["DARK GREY"]
-            else:
-                colour = lightingconsts.colours["OFF"]
-        lights.setPadColour(x, 1, colour)
+    if internal.extendedMode.query(eventconsts.INCONTROL_PADS):
+        # If the note processor isn't initialised, call the initialise function instead
+        if not INIT_COMPLETE:
+            redrawInit(lights)
+            return
+        
+        # Set controls
+        for x in range(8):
+            if internal.window.getAnimationTick() > x:
+                if x == current_set:
+                    if len(chord_sets[x]):
+                        colour = lightingconsts.colours["PINK"]
+                    else:
+                        colour = lightingconsts.colours["OFF"]
+                else:
+                    if len(chord_sets[x]):
+                        colour = lightingconsts.colours["DARK GREY"]
+                    else:
+                        colour = lightingconsts.colours["OFF"]
+                lights.setPadColour(x, 1, colour)
+        lights.solidifyAll()
 
 def redrawInit(lights):
     # Set controls
     for x in range(8):
-        if x == current_set:
-            if len(chord_sets[x]):
-                colour = lightingconsts.colours["PURPLE"]
+        if internal.window.getAnimationTick() > x:
+            if x == current_set:
+                if len(chord_sets[x]):
+                    colour = lightingconsts.colours["PURPLE"]
+                else:
+                    colour = lightingconsts.colours["RED"]
             else:
-                colour = lightingconsts.colours["RED"]
-        else:
-            if len(chord_sets[x]):
-                colour = lightingconsts.colours["PINK"]
-            else:
-                colour = lightingconsts.colours["DARK GREY"]
-        lights.setPadColour(x, 1, colour)
+                if len(chord_sets[x]):
+                    colour = lightingconsts.colours["PINK"]
+                else:
+                    colour = lightingconsts.colours["DARK GREY"]
+            lights.setPadColour(x, 1, colour)
     
     # Finish button
     lights.setPadColour(7, 0, lightingconsts.colours["GREEN"])
@@ -208,8 +210,8 @@ def activeEnd():
     chord_sets = [[] for _ in range(8)]
     current_set = 0
 
-def updateBeat(beatNum):
-    global last_beat, last_transport
+def beatChange(beat):
+    global last_transport
     if bar_progresses_set:
         transport_on = transport.isPlaying()
         if beat == 1 and last_transport == transport_on:
@@ -221,6 +223,7 @@ def toNextSet():
     # Increment bar number
     next_set = current_set
     check_set = current_set + 1
+    loop_count = 0
     while(True):
         if check_set >= 8:
             check_set = 0
@@ -228,4 +231,8 @@ def toNextSet():
             next_set = check_set
             break
         check_set += 1
+        
+        if loop_count >= 1000:
+            raise("Loop threshold exceeded")
+        loop_count += 1
     current_set = next_set

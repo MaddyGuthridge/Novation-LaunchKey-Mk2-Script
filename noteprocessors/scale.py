@@ -167,6 +167,9 @@ def process(command):
             command.handle("Snapped note off")
     pass
 
+def beatChange(beat):
+    pass
+
 def redraw(lights):
     """Called when a redraw is taking place. Use this to draw menus to allow your users to choose options. Most of the time, you should leave this empty.
 
