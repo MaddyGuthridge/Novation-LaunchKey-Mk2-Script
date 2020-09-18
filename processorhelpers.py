@@ -19,9 +19,110 @@ import internal
 import internal.consts
 import lightingconsts
 
+class UIMode:
+    def __init__(self, name, colour, process_function, redraw_function):
+        self.name = name
+        self.colour = colour
+        self.process_function = process_function
+        self.redraw_function = redraw_function
+    
+    def process(self, command):
+        self.process_function(command)
+    
+    def redraw(self, lights):
+        self.redraw_function(lights)
 
 class UiModeHandler: 
     """This object is used to manage menu layers, which can be toggled and switched through.
+        It is best used in handler scripts to allow for a plugin or window to have multiple menus.
+    """
+    
+    def __init__(self):
+        """Create instance of UIModeHandler.
+
+        Args:
+            num_modes (int): The number of different menus to be contained in the object
+        """
+        self.is_down = False
+        self.used = False
+        self.modes = []
+        self.current_mode = 0
+
+    # Switch to next mode
+    def nextMode(self):
+        """Jump to the next menu layer
+
+        Returns:
+            int: mode number
+        """
+        self.current_mode += 1
+        if self.current_mode == len(self.modes):
+            self.current_mode = 0
+        
+        return self.current_mode
+    
+    def prevMode(self):
+        """Jump to previous menu layer
+        
+        Returns:
+            int: mode number
+        """
+        self.current_mode -= 1
+        if self.current_mode == -1:
+            self.current_mode = len(self.modes) - 1
+        
+        return self.current_mode
+
+    def resetMode(self):
+        """Resets menu layer to zero
+        """
+        self.current_mode = 0
+
+    # Get current mode number
+    def getMode(self):
+        """Returns mode number
+
+        Returns:
+            int: mode number
+        """
+        return self.current_mode
+
+    def press(self):
+        self.is_down = True
+        self.used = False
+    
+    def lift(self):
+        self.is_down = False
+        if not self.used:
+            self.nextMode()
+
+    def redraw(self, lights):
+        
+        lights.setPadColour(8, 0, self.modes[self.current_mode].colour)
+        
+        self.modes[self.current_mode].redraw(lights)
+        
+    def process(self, command):
+        
+        # For mode toggler
+        if (command.type is eventconsts.TYPE_BASIC_PAD or command.type is eventconsts.TYPE_PAD) and command.coord_Y == 0 and command.coord_X == 8:
+            if command.is_lift:
+                self.lift()
+                command.handle("Lift UI mode button")
+                internal.window.resetAnimationTick()
+            else:
+                self.press()
+                command.handle("Press UI mode button")
+            
+        
+        self.modes[self.current_mode].process(command)
+    
+    def addMode(self, name, colour, process_function, redraw_function):
+        self.modes.append(UIMode(name, colour, process_function, redraw_function))
+
+class UiModeSelector: 
+    """This object is used to manage menu layers, which can be toggled and switched through.
+        Unlike UiModeHandler, it doesn't handle calling functions for processing
         It is best used in handler scripts to allow for a plugin or window to have multiple menus.
     """
     
@@ -31,6 +132,8 @@ class UiModeHandler:
         Args:
             num_modes (int): The number of different menus to be contained in the object
         """
+        self.is_down = False
+        self.used = False
         self.mode = 0
         self.num_modes = num_modes
 
@@ -72,6 +175,22 @@ class UiModeHandler:
             int: mode number
         """
         return self.mode
+
+    def press(self):
+        self.is_down = True
+        self.used = False
+    
+    def lift(self):
+        self.is_down = False
+        if not self.used:
+            self.nextMode()
+
+    def redraw(self, lights):
+        pass
+        
+    def process(self, command):
+        pass
+    
 
 def snap(value, snapTo):
     """Returns a snapped value

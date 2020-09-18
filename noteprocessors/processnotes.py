@@ -41,7 +41,7 @@ print("Note Processor import complete")
 
 
 # Object to hold place in note mode menu
-noteModeMenu = processorhelpers.UiModeHandler(len(customProcessors) // 16 + 1)
+noteModeMenu = processorhelpers.UiModeSelector(len(customProcessors) // 16 + 1)
 
 note_menu_active = False
 
