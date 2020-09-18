@@ -32,28 +32,6 @@ def redraw(lights):
 def process(command):
 
     command.actions.addProcessor("Default Processor")
-
-    #---------------------------------
-    # Tempo button
-    #---------------------------------
-    if (command.type == eventconsts.TYPE_PAD or command.type == eventconsts.TYPE_BASIC_PAD) and command.is_lift:
-        if command.coord_X == 8 and command.coord_Y == 0:
-
-            # Double press: tap tempo
-            if command.is_double_click:
-                internal.beat.toggleMetronome()
-                internal.beat.toggleTempoTap()
-                command.actions.appendAction("Toggled Tempo Tapping")
-
-            if internal.beat.is_tapping_tempo:
-                internal.beat.tapTempo()
-                command.actions.appendAction("Tapped Tempo")
-            else:
-                # Toggle metronome back to original
-                internal.beat.toggleMetronome()
-                command.actions.appendAction("Toggled Metronome")
-            command.handled = True
-    
     
     #---------------------------------
     # Transport functions
