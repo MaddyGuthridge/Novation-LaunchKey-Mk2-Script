@@ -32,6 +32,7 @@ import channels
 import mixer
 import playlist
 import patterns
+import general
 
 def getNewName(name):
     # Trim starts and ends
@@ -59,6 +60,7 @@ def getNewName(name):
                 else:
                     name = name[ : i] + replacement[1]
     
+    # Set to Title Case
     if CAPITALISE_FIRST_LETTERS:
         name = name.title()
     
@@ -75,12 +77,16 @@ def run():
     
     if CHANGE_CHANNELS:
         for i in range(channels.channelCount(1)):
-            channels.setChannelName(i, getNewName(channels.getChannelName(i)))
+            try:
+                channels.setChannelName(i, getNewName(channels.getChannelName(i)))
+            except:
+                print("An index out of range error occurred. Change the Channel Rack's display filter to 'All'.")
     
     if CHANGE_MIXER_TRACKS:
         for i in range(mixer.trackCount()):
             mixer.setTrackName(i, getNewName(mixer.getTrackName(i)))
     
-    
+    # This doesn't do anything for some reason
+    general.saveUndo("Run autorename Script", 0)
     
     
