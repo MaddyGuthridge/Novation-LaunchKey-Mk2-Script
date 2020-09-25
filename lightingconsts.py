@@ -232,3 +232,5 @@ ERROR_COLOURS = [
     [colours["RED"], colours["RED"]],
     [colours["RED"], colours["RED"]]
 ]
+
+RESET = colours["YELLOW"]

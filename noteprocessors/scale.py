@@ -165,6 +165,12 @@ def process(command):
         else:
             internal.notesDown.noteOff(command)
             command.handle("Snapped note off")
+    
+    elif command.type is eventconsts.TYPE_PAD and command.is_lift:
+        if (command.coord_X, command.coord_Y) == (8, 0):
+            resetModule()
+            command.handle("Reset mode")
+    
     pass
 
 def redraw(lights):
@@ -204,15 +210,17 @@ def redraw(lights):
         lights.setPadColour(7, 0, lightingconsts.colours["GREEN"])
         
         lights.solidifyAll()
+    
+    elif INIT_COMPLETE and internal.extendedMode.query(eventconsts.INCONTROL_PADS):
+        lights.setPadColour(8, 0, lightingconsts.RESET)
 
 def activeStart():
     """Called when your note mode is made active
     """
-    internal.extendedMode.setVal(True, eventconsts.INCONTROL_PADS)
+    resetModule()
 
-def activeEnd():
-    """Called wen your note mode is no-longer active
-    """
+def resetModule():
+    internal.extendedMode.setVal(True, eventconsts.INCONTROL_PADS)
     global INIT_COMPLETE, INIT_HAVE_ROOT, INIT_HAVE_SCALE, SCALE_TO_USE, \
         ROOT_NOTE, FORWARD_NOTES, SCALE_CLASS, COLOUR, SCALE_TO_USE_INDEX, \
             CUSTOM_SCALE, PREVENT_NONSCALE
@@ -227,6 +235,11 @@ def activeEnd():
     CUSTOM_SCALE = False
     PREVENT_NONSCALE = False
     SCALE_TO_USE = []
+
+def activeEnd():
+    """Called wen your note mode is no-longer active
+    """
+    pass
 
 
 def processInit(command):
