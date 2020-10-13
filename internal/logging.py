@@ -43,6 +43,11 @@ def debugLog(message, level = 0):
         message (str): what to log
         level (int, optional): the message type. Should be in the form of consts.DEBUG_SOME_MODE. Defaults to 0.
     """
+    
+    # If there is no message, return straight away
+    if len(message) == 0:
+        return
+    
     if level in config.CONSOLE_DEBUG_MODE or level == consts.DEBUG.ERROR:
         print(message)
 

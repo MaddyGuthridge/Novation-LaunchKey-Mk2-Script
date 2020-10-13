@@ -265,11 +265,11 @@ def convertPadMapping(padNumber):
 
 lastPressID = -1
 lastPressTime = -1
-def isDoubleClickPress(id):
+def isDoubleClickPress(id_val):
     """Returns whether a press event was a double click
 
     Args:
-        id (int): Event ID
+        id_val (int): Event ID
 
     Returns:
         bool: whether the event was a double click
@@ -278,20 +278,20 @@ def isDoubleClickPress(id):
     global lastPressTime
     ret = False
     currentTime = time.perf_counter()
-    if id == lastPressID and (currentTime - lastPressTime < config.DOUBLE_PRESS_TIME):
+    if id_val == lastPressID and (currentTime - lastPressTime < config.DOUBLE_PRESS_TIME):
         ret = True
-    lastPressID = id
+    lastPressID = id_val
     lastPressTime = currentTime
     return ret
 
 
 lastLiftID = -1
 lastLiftTime = -1
-def isDoubleClickLift(id):
+def isDoubleClickLift(id_val):
     """Returns whether a lift event was a double click
 
     Args:
-        id (int): Event ID
+        id_val (int): Event ID
 
     Returns:
         bool: whether the event was a double click
@@ -300,12 +300,28 @@ def isDoubleClickLift(id):
     global lastLiftTime
     ret = False
     currentTime = time.perf_counter()
-    if id == lastLiftID and (currentTime - lastLiftTime < config.DOUBLE_PRESS_TIME):
+    if id_val == lastLiftID and (currentTime - lastLiftTime < config.DOUBLE_PRESS_TIME):
         ret = True
-    lastLiftID = id
+    lastLiftID = id_val
     lastLiftTime = currentTime
     return ret
 
+def isLongPressLift(id_val):
+    """Returns whether a lift event was held down for a long time
+    
+    Args:
+        id_val (int): Event ID
+    
+    Returns:
+        bool: whether the event was a long press
+    """
+    global lastPressID, lastPressTime
+    
+    currentTime = time.perf_counter()
+
+    return (id_val == lastPressID) and (currentTime - lastPressTime >= config.LONG_PRESS_TIME)
+    
+    
 
 
 class Action:
@@ -603,18 +619,27 @@ class ParsedEvent:
         else: 
             self.is_lift = False
         
+        # Don't process these for internal events
+        if self.type != eventconsts.TYPE_INTERNAL_EVENT:
+            
         
+            # Process long presses
+            if self.is_lift:
+                self.is_long_press = isLongPressLift(self.id)
+            else:
+                self.is_long_press = False
 
-        # Process long presses: TODO
-        self.is_long_press = False
-
-        # Process double presses (seperate for lifted and pressed buttons)
-        self.is_double_click = False
-        if self.isBinary is True: 
-            if self.is_lift is True:
-                self.is_double_click = isDoubleClickLift(self.id)
-            elif self.is_lift is False and self.isBinary is True: 
-                self.is_double_click = isDoubleClickPress(self.id)
+            # Process double presses (seperate for lifted and pressed buttons)
+            self.is_double_click = False
+            if self.isBinary is True: 
+                if self.is_lift is True:
+                    self.is_double_click = isDoubleClickLift(self.id)
+                elif self.is_lift is False and self.isBinary is True: 
+                    self.is_double_click = isDoubleClickPress(self.id)
+        
+        else:
+            self.is_double_click = False
+            self.is_long_press = False
         
     def edit(self, event, reason):
         """Edit the event to change data
@@ -724,6 +749,12 @@ class ParsedEvent:
             out += "[Shift Key]"
             out = internal.getTab(out)
         """
+        
+        # For internal events, have a different printing  flag
+        if self.type == eventconsts.TYPE_INTERNAL_EVENT:
+            if not internal.consts.DEBUG.PRINT_INTERNAL_EVENTS in config.CONSOLE_DEBUG_MODE:
+                out = ""
+        
         return out
 
     
@@ -736,12 +767,13 @@ class ParsedEvent:
     def printOutput(self):
         """Prints actions taken whilst handling event
         """
-        internal.debugLog("", internal.consts.DEBUG.EVENT_ACTIONS)
-        self.actions.flush()
-        if self.handled:
-            internal.debugLog("[Event was handled]", internal.consts.DEBUG.EVENT_ACTIONS)
-        else: 
-            internal.debugLog("[Event wasn't handled]", internal.consts.DEBUG.EVENT_ACTIONS)
+        if internal.consts.DEBUG.PRINT_INTERNAL_EVENTS in config.CONSOLE_DEBUG_MODE or self.type != eventconsts.TYPE_INTERNAL_EVENT:
+            internal.debugLog("", internal.consts.DEBUG.EVENT_ACTIONS)
+            self.actions.flush()
+            if self.handled:
+                internal.debugLog("[Event was handled]", internal.consts.DEBUG.EVENT_ACTIONS)
+            else: 
+                internal.debugLog("[Event wasn't handled]", internal.consts.DEBUG.EVENT_ACTIONS)
 
     
     def getType(self):

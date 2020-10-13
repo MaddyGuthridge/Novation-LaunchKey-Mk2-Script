@@ -29,7 +29,7 @@ DEVICE_PORT_EXTENDED = 225
 # Interaction options
 #-----------------------
 
-LONG_PRESS_TIME = 0.5 # Change how long a long press needs to be held for
+LONG_PRESS_TIME = 1.0 # Change how long a long press needs to be held for
 DOUBLE_PRESS_TIME = 0.2 # Change how quickly a double press needs to be done to be detected
 
 # If enabled, double pressing shift key keeps the shift button enabled until it is used, or pressed again.

@@ -99,6 +99,7 @@ class DEBUG:
     IDLE_PERFORMANCE = "Idle Performance"
     ANIMATION_IDLE_TIMERS = "Timers"
     EVENT_DATA = "Event data"
+    PRINT_INTERNAL_EVENTS = "Internal Event"
     EVENT_ACTIONS = "Event actions"
     WINDOW_CHANGES = "Window changed"
     WARNING_DEPRECIATED_FEATURE = "Depreciated feature"

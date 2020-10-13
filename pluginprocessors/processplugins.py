@@ -83,11 +83,11 @@ previous_channel_volume = None
 def process(command):
     
     # REQUIRES SCRIPTING VERSION 8
-    if general.getVersion() >= 8:
-        # Process pitch bend wheel
-        if command.id == eventconsts.PITCH_BEND:
-            current_channel = channels.selectedChannel()
-            channels.setChannelPitch(current_channel, processorhelpers.toFloat(command.value, -1, 1))
+    #if general.getVersion() >= 8:
+    # Process pitch bend wheel
+    if command.id == eventconsts.PITCH_BEND:
+        current_channel = channels.selectedChannel()
+        channels.setChannelPitch(current_channel, processorhelpers.toFloat(command.value, -1, 1))
     
     # Process master fader changing selected channel volume.
     if command.id == eventconsts.BASIC_FADER_9:
