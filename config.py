@@ -62,6 +62,9 @@ SNAP_RANGE = 0.05 # Will snap if within this disatnce of snap value
 # This may be used to add a split rows option for the drum pad later.
 USE_FULL_KEYSWITCHES = True
 
+# Whether to force full velocity drum pads in omni-mode and FPC
+DRUM_PADS_FULL_VELOCITY = False
+
 #-------------------------------
 # LIGHTING OPTIONS
 #-------------------------------

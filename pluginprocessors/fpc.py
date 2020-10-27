@@ -100,7 +100,10 @@ def process(command):
         # Map drums to match FPC default layout
         changePads(command)
 
-
+        if config.DRUM_PADS_FULL_VELOCITY and command.value != 0:
+            command.edit(processorhelpers.RawEvent(command.status, command.note, 127), "Full velocity")
+        
+        command.ignore("Remap for FPC", True)
     
     return
 

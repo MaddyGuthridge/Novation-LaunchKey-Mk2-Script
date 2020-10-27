@@ -66,7 +66,7 @@ def process(command):
         else:
             internal.notemanager.pads.lift(command.coord_X, command.coord_Y)
 
-    
+
 
 
     # Right click menu
