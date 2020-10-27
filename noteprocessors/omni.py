@@ -44,6 +44,8 @@ PAD_MAPPINGS = [
     [60, 74]
 ]
 
+full_velocity = False
+
 
 def process(command):
     """Called with an event to be processed by your note processor. Events aren't filtered so you'll want to make sure your processor checks that events are notes.

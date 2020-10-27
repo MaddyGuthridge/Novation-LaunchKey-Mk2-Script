@@ -161,15 +161,10 @@ def process(command):
                 command.handle("Prevent non-scale note", True)
                 return
             internal.notesDown.noteOn(processorhelpers.ExtensibleNote(command, [processorhelpers.RawEvent(command.status, new_note, command.value)]))
-            command.handle("Snapped note on")
+            command.handle("Snapped note on", True)
         else:
             internal.notesDown.noteOff(command)
-            command.handle("Snapped note off")
-    
-    elif command.type is eventconsts.TYPE_PAD and command.is_lift:
-        if (command.coord_X, command.coord_Y) == (8, 0):
-            resetModule()
-            command.handle("Reset mode")
+            command.handle("Snapped note off", True)
     
     pass
 
@@ -211,8 +206,7 @@ def redraw(lights):
         
         lights.solidifyAll()
     
-    elif INIT_COMPLETE and internal.extendedMode.query(eventconsts.INCONTROL_PADS):
-        lights.setPadColour(8, 0, lightingconsts.RESET)
+    
 
 def activeStart():
     """Called when your note mode is made active
@@ -290,6 +284,11 @@ def processInit(command):
             else: command.handle("Catch-all", silent=True)
         
         if y == 1:
+            
+            # Ignore presses of note mode button
+            if x == 8:
+                return
+            
             if SCALE_CLASS != -1:
                 if x < len(scales.scale_class_list[SCALE_CLASS].scale_list):
                     INIT_HAVE_SCALE = True

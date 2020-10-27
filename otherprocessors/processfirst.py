@@ -25,7 +25,7 @@ def redraw(lights):
     if internal.window.getInPopup():
         redrawPopup(lights)
 
-    noteprocessors.redrawNoteModeMenu(lights)
+    
 
     return
 
@@ -105,11 +105,7 @@ def process(command):
     if command.id == eventconsts.SYSTEM_MISC:
         command.handle("Handle misc event", silent=True)
        
-    # Note Processor Menu
-    noteprocessors.processNoteModeMenu(command)
-    if command.ignored: return
-
-    noteprocessors.process(command)
+    
 
 def processPopup(command):
     # Always handle all presses

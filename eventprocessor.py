@@ -53,7 +53,7 @@ def processExtended(command):
         # Reset idle timer
         if not ((command.type is eventconsts.TYPE_BASIC_PAD or command.type is eventconsts.TYPE_PAD or command.type is eventconsts.TYPE_TRANSPORT) and not command.is_lift):
             if lighting.idleLightshowActive():
-                command.handle("End Idle Light Show")
+                command.handle("End Idle Light Show", True)
             internal.window.resetIdleTick()
 
         # Process key mappings
@@ -71,8 +71,8 @@ def processExtended(command):
         internal.shifts.process(command)
         if command.ignored: return
         
-        
-
+        # Note Processors
+        noteprocessors.process(command)
         if command.ignored: return
 
         # Only call plugin and window processors if it is safe to do so | Disabled because of errors
@@ -246,6 +246,8 @@ def redraw():
 
             # Get UI from primary processor
             processfirst.redraw(lights)
+            
+            noteprocessors.redraw(lights)
             
             if lights.isSolid(): break
 
