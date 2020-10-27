@@ -212,7 +212,7 @@ def activeEnd():
 
 def beatChange(beat):
     global last_transport
-    if bar_progresses_set:
+    if bar_progresses_set and INIT_COMPLETE:
         transport_on = transport.isPlaying()
         if beat == 1 and last_transport == transport_on:
             toNextSet()
