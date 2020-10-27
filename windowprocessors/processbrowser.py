@@ -83,3 +83,5 @@ def process(command):
                 # Always handle all pad commands
                 command.handle("Pads catch-all", silent=True)
 
+def beatChange(beat):
+    pass

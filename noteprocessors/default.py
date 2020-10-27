@@ -49,3 +49,5 @@ def activeStart():
 def activeEnd():
     pass
 
+def beatChange(beat):
+    pass

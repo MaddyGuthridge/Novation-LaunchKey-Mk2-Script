@@ -437,4 +437,5 @@ def activeEnd():
     chords.setMode(-1)
     chords.jazziness = 0
     
-
+def beatChange(beat):
+    pass

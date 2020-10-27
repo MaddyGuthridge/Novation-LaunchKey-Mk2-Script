@@ -9,7 +9,7 @@ Author: Miguel Guthridge
 #
 # Add custom event processors to this list
 #
-imports = ["default", "error", "scale", "chord", "omni", "unassigned"]
+imports = ["default", "error", "scale", "chord", "omni", "randomiser", "unassigned"]
 #
 #
 #
@@ -66,6 +66,13 @@ def process(command):
             object_to_call.process(command)
         
             if command.ignored: return
+
+def beatChange(beat):
+    for x in customProcessorsAll:
+        object_to_call = getattr(noteprocessors, x)
+        if object_to_call.NAME == internal.noteMode.getState():
+            object_to_call.beatChange(beat)
+
 
 def redrawNoteModeMenu(lights):
     

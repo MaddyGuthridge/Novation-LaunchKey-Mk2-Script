@@ -104,7 +104,8 @@ def process(command):
     
     return
 
-
+def beatChange(beat):
+    pass
 
 # Change pads to default note layout for FPC
 def changePads(command):
