@@ -1,6 +1,7 @@
 """macros > autorename.py
 
 This script renames all content using some specified parameters.
+It can be run by calling the run() function.
 
 Author: Miguel Guthridge
 """
