@@ -1,5 +1,5 @@
 """
-internalconstants.py
+internal > consts.py
 
 This file contains constants used by the script to allow it to function properly.
 It is not recommended that the user modify these constants, as they may break the script.
@@ -19,7 +19,7 @@ SCRIPT_AUTHOR = "Miguel Guthridge"
 SCRIPT_VERSION_MAJOR = 2
 SCRIPT_VERSION_MINOR = 1
 SCRIPT_VERSION_REVISION = 0
-SCRIPT_VERSION_SUFFIX = "Beta 2"
+SCRIPT_VERSION_SUFFIX = ""
 MIN_FL_SCRIPT_VERSION = 7
 SCRIPT_URL = "https://github.com/MiguelGuthridge/Novation-LaunchKey-Mk2-Script"
 UPDATE_JSON_URL = "https://api.github.com/repos/MiguelGuthridge/Novation-LaunchKey-Mk2-Script/tags"
