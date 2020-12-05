@@ -3,7 +3,7 @@ internal > misc.py
 
 Contains other functions, objects and classes regarding the internal state of the device.
 
-Author: Miguel Guthridge
+Author: Miguel Guthridge [hdsq@outlook.com.au]
 """
 
 import general

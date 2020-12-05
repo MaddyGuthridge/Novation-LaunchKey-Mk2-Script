@@ -4,7 +4,7 @@ pluginprocessors > processplugins.py
 This script forwards events to any plugin processors that can handle the currently active plugin.
 More plugin processors can be added by adding them to the import list.
 
-Author: Miguel Guthridge
+Author: Miguel Guthridge [hdsq@outlook.com.au]
 """
 
 #
@@ -83,11 +83,11 @@ previous_channel_volume = None
 def process(command):
     
     # REQUIRES SCRIPTING VERSION 8
-    if general.getVersion() >= 8:
-        # Process pitch bend wheel
-        if command.id == eventconsts.PITCH_BEND:
-            current_channel = channels.selectedChannel()
-            channels.setChannelPitch(current_channel, processorhelpers.toFloat(command.value, -1, 1))
+    #if general.getVersion() >= 8:
+    # Process pitch bend wheel
+    if command.id == eventconsts.PITCH_BEND:
+        current_channel = channels.selectedChannel()
+        channels.setChannelPitch(current_channel, processorhelpers.toFloat(command.value, -1, 1))
     
     # Process master fader changing selected channel volume.
     if command.id == eventconsts.BASIC_FADER_9:
@@ -121,6 +121,11 @@ def process(command):
             object_to_call.process(command)
         
         if command.ignored: return
+
+def beatChange(beat):
+    for x in imports:
+        object_to_call = getattr(pluginprocessors, x)
+        object_to_call.beatChange(beat)
 
 def canHandle(object_to_call):
     for x in range(len(object_to_call.PLUGINS)):

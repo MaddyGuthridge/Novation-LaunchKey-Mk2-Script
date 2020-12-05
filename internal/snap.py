@@ -3,7 +3,7 @@ internal > snap.py
 
 This file manages the state of FL Studio's snapping.
 
-Author: Miguel Guthridge
+Author: Miguel Guthridge [hdsq@outlook.com.au]
 """
 
 import ui

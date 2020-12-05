@@ -3,7 +3,7 @@ internal > windowstate.py
 
 Contains objects and functions to do with managing active FL windows.
 
-Author: Miguel Guthridge
+Author: Miguel Guthridge [hdsq@outlook.com.au]
 """
 
 import ui

@@ -3,7 +3,7 @@ internal > shifts > mainshift.py
 
 Contains class to manage shift mode for normal shift
 
-Author: Miguel Guthridge
+Author: Miguel Guthridge [hdsq@outlook.com.au]
 """
 
 import general

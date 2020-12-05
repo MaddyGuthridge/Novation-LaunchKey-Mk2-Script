@@ -4,7 +4,7 @@ pluginprocessors > slicex.py
 The file processes events and redraws lights when the Slicex or Fruity Slicer plugin is active.
 It remaps the drum pads to play slices in each of them.
 
-Author: Miguel Guthridge
+Author: Miguel Guthridge [hdsq@outlook.com.au]
 """
 
 # Add names of plugins your script can process to this list
@@ -91,4 +91,5 @@ def process(command):
 
     return
 
-
+def beatChange(beat):
+    pass

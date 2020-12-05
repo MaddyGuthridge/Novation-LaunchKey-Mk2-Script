@@ -8,7 +8,7 @@ device_LaunchKey49 port 2.py
 This file is the controller file for port 2 of the LaunchKey49 Mk2.
 It handles communication with the device, including colours.
 
-Author: Miguel Guthridge
+Author: Miguel Guthridge [hdsq@outlook.com.au]
 """
 
 
@@ -135,7 +135,7 @@ class TGeneric():
         return
     
     def OnUpdateBeatIndicator(self, beat):
-        internal.beat.setBeat(beat)
+        eventprocessor.beatChange(beat)
         
         # Prevent idle lightshow from being triggered during playback
         internal.window.resetIdleTick()
