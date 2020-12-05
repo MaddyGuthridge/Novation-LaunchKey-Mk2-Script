@@ -7,6 +7,8 @@ Author: Miguel Guthridge [hdsq@outlook.com.au]
 """
 
 import ui
+import channels
+import plugins
 
 from . import consts
 import config
@@ -25,6 +27,7 @@ class WindowMgr:
         self.plugin_focused = False
         self.previous_plugin = ""
         self.active_plugin = ""
+        self.active_plugin_index = -1
         self.active_fl_window = -1
         self.animation_tick_number = 0
         self.idle_tick_number = 0
@@ -190,7 +193,7 @@ class WindowMgr:
             if new_plugin == "":
                 return False
 
-            # If window changed
+            # If plugin changed
             if new_plugin != self.active_plugin or self.plugin_focused == False:
 
                 # End active plugin
@@ -204,6 +207,7 @@ class WindowMgr:
                 # Set new plugin
                 self.plugin_focused = True
                 self.active_plugin = new_plugin
+                self.active_plugin_index = channels.channelNumber()
 
                 debugLog("Active Window: " + self.active_plugin, consts.DEBUG.WINDOW_CHANGES)
                 debugLog("[Background: " + getFlWindowString(self.active_fl_window) + "]", consts.DEBUG.WINDOW_CHANGES)
@@ -242,6 +246,25 @@ class WindowMgr:
         """
         self.active_plugin = self.previous_plugin
         self.previous_plugin = ""
+    
+    def getPluginName(self):
+        """Returns the name of the currently active plugin
+        
+        Returns:
+            str: Current plugin name
+        """
+        return self.active_plugin
+
+    def getPluginIndex(self):
+        """Returns the index of the currently selected plugin
+        
+        Returns:
+            int: Index of current plugin
+        """
+        if not plugins.getPluginName(self.active_plugin_index) == self.active_plugin:
+            self.active_plugin_index = -1
+        return self.active_plugin_index
+          
 
 # Create instance of window object
 window = WindowMgr()

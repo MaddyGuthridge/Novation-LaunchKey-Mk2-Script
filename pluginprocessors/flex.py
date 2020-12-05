@@ -8,10 +8,10 @@ Author: Miguel Guthridge [hdsq@outlook.com.au]
 """
 
 # Add names of plugins your script can process to this list
-PLUGINS = []
+PLUGINS = ["FLEX"]
 
 
-# Import any modules you might need\
+# Import any modules you might need
 import plugins
 import config
 import internal
@@ -20,6 +20,7 @@ import eventprocessor
 import lightingconsts
 import processorhelpers
 
+CONTROL_START = 10
 
 def topPluginStart():
     """Called when plugin is top plugin (not neccesarily focused)
@@ -73,6 +74,15 @@ def process(command):
         command (ParsedEvent): contains useful information about the event. 
             Use this to determing what actions your processor will take.
     """
+    if command.type is eventconsts.TYPE_BASIC_FADER:
+        if command.coord_X < 8:
+            plugins.setParamValue(
+                processorhelpers.toFloat(command.value),
+                CONTROL_START + command.coord_X,
+                internal.window.getPluginIndex()
+            )
+            command.handle("Set FLEX Parameter")
+        
     
     # Add event processor to actions list (useful for debugging)
     command.actions.addProcessor("Your Processor Name")

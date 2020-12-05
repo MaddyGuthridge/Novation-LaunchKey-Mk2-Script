@@ -9,6 +9,8 @@ Author: Miguel Guthridge [hdsq@outlook.com.au]
 
 PLUGINS = ["BBC Symphony Orchestra"]
 
+import plugins
+
 import config
 import internal
 import lightingconsts
@@ -16,9 +18,9 @@ import eventconsts
 import processorhelpers
 
 # Constants for event remapping
-EXPRESSION = 11
+EXPRESSION = 0
 DYNAMICS = 1
-REVERB = 19
+REVERB = 2
 
 
 # Called when plugin is top plugin
@@ -66,16 +68,32 @@ def process(command):
 
             command.edit(processorhelpers.RawEvent(0x90, keyswitch_num, command.value), "Remap keyswitches")
 
-    """ Link to parameters - Fix this once API updates
-    if command.id == eventconsts.BASIC_FADER_1:
-        command.edit(eventprocessor.rawEvent(0xB0, EXPRESSION, command.value))
+    if command.type is eventconsts.TYPE_BASIC_FADER:
+        if command.coord_X == 0:
+            plugins.setParamValue(
+                processorhelpers.toFloat(command.value),
+                EXPRESSION,
+                internal.window.getPluginIndex()
+            )
+            command.handle("Set BBCSO Expression")
+        elif command.coord_X == 1:
+            plugins.setParamValue(
+                processorhelpers.toFloat(command.value),
+                DYNAMICS,
+                internal.window.getPluginIndex()
+            )
+            command.handle("Set BBCSO Dynamics")
     
-    if command.id == eventconsts.BASIC_FADER_2:
-        command.edit(eventprocessor.rawEvent(0xB0, DYNAMICS, command.value))
-    
-    if command.id == eventconsts.BASIC_FADER_3:
-        command.edit(eventprocessor.rawEvent(0xB0, REVERB, command.value))
-    """
+    if command.type is eventconsts.TYPE_BASIC_KNOB:
+        if command.coord_X == 0:
+            plugins.setParamValue(
+                processorhelpers.toFloat(command.value),
+                REVERB,
+                internal.window.getPluginIndex()
+            )
+            command.handle("Set BBCSO Reverb")
+
+
 
     return
 

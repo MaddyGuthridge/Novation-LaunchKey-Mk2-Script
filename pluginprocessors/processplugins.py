@@ -10,7 +10,7 @@ Author: Miguel Guthridge [hdsq@outlook.com.au]
 #
 # Add custom event processors to this list
 #
-imports = ["fpc", "spitfire_bbcso", "slicex"]
+imports = ["fpc", "spitfire_bbcso", "slicex", "flex"]
 #
 #
 #
@@ -129,7 +129,7 @@ def beatChange(beat):
 
 def canHandle(object_to_call):
     for x in range(len(object_to_call.PLUGINS)):
-        if object_to_call.PLUGINS[x] == internal.window.active_plugin:
+        if object_to_call.PLUGINS[x] == internal.window.getPluginName():
             return True
 
     return False
