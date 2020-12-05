@@ -8,7 +8,7 @@ device_LaunchKey49.py
 This file is the controller file for port 1 of the LaunchKey49 Mk2.
 It handles most note and controller events.
 
-Author: Miguel Guthridge
+Author: Miguel Guthridge [hdsq@outlook.com.au]
 """
 
 

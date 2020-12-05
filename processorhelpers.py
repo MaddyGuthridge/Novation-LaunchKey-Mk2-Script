@@ -5,7 +5,7 @@ This script includes objects useful for event processors.
 It is worth investigating potential applications of these functions when writing your processors, 
 or adding other frequently-required functions here.
 
-Author: Miguel Guthridge
+Author: Miguel Guthridge [hdsq@outlook.com.au]
 """
 
 import time

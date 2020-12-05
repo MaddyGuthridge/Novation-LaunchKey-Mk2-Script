@@ -3,7 +3,7 @@ internal > messages.py
 
 This module contains functions to help sending messages to the device, and to other running script.
 
-Author: Miguel Guthridge
+Author: Miguel Guthridge [hdsq@outlook.com.au]
 """
 
 import device

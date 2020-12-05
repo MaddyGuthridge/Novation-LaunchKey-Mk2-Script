@@ -3,7 +3,7 @@ lighting.py
 
 This file contains functions and constants related to controlling lights on the controller.
 
-Author: Miguel Guthridge
+Author: Miguel Guthridge [hdsq@outlook.com.au]
 """
 
 IDLE_ANIMATION_SPEED = 1

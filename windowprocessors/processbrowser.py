@@ -4,7 +4,7 @@ windowprocessors > processbrowser.py
 This script processes events when the browser window is active.
 It provides functionality to navigate the browser and load files and plugins.
 
-Author: Miguel Guthridge
+Author: Miguel Guthridge [hdsq@outlook.com.au]
 """
 
 

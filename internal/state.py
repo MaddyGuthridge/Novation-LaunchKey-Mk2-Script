@@ -3,7 +3,7 @@ internal > state.py
 
 Contains variables and objects to manage the state of the script.
 
-Author: Miguel Guthridge
+Author: Miguel Guthridge [hdsq@outlook.com.au]
 """
 
 import math

@@ -5,7 +5,7 @@ This script processes events when the playlist is active.
 It allows you to jump between markers if the exist using the skip button.
 There is planned support for performance mode in the not-too-distant future.
 
-Author: Miguel Guthridge
+Author: Miguel Guthridge [hdsq@outlook.com.au]
 """
 
 import eventconsts

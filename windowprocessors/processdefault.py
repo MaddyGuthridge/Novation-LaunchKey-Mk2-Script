@@ -3,7 +3,7 @@ windowprocessors > processdefault.py
 
 This script can be used as a template for window scripts.
 
-Author: Miguel Guthridge
+Author: Miguel Guthridge [hdsq@outlook.com.au]
 """
 
 

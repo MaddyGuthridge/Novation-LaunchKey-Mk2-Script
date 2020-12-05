@@ -5,7 +5,7 @@ This script is a custom processor module that can process events when the FPC pl
 It maps the pedal to the kick, and rearranges drums to match the FPC default layout, 
 as well as drawing pad colours to match the colours of the default note layout.
 
-Author: Miguel Guthridge
+Author: Miguel Guthridge [hdsq@outlook.com.au]
 """
 
 REMAP_DRUMS = True

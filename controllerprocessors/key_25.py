@@ -3,7 +3,7 @@ controllerprocessors > key_25.py
 
 This script handles initialisation and some event handling specific to the 25-key model
 
-Author: Miguel Guthridge
+Author: Miguel Guthridge [hdsq@outlook.com.au]
 """
 
 import eventconsts

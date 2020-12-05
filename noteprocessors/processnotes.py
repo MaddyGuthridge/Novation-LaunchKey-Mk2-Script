@@ -2,7 +2,7 @@
 noteprocessors > processnotes.py
 This script forwards events to note processors depending on the current mode.
 
-Author: Miguel Guthridge
+Author: Miguel Guthridge [hdsq@outlook.com.au]
 
 """
 

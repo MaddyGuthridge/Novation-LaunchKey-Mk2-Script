@@ -3,7 +3,7 @@ noteprocessors > scale.py
 
 This script snaps notes to the closest note in a scale.
 
-Author: Miguel Guthridge
+Author: Miguel Guthridge [hdsq@outlook.com.au]
 """
 
 import internal.consts

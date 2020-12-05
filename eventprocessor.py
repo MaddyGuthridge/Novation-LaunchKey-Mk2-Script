@@ -3,7 +3,7 @@ eventprocessor.py
 
 This file processes events and lighting redraws.
 
-Author: Miguel Guthridge
+Author: Miguel Guthridge [hdsq@outlook.com.au]
 """
 
 import time

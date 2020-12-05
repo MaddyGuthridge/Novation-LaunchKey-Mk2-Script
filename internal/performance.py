@@ -3,7 +3,7 @@ internal > performance.py
 
 This module contains functions and objects important for checking script performance
 
-Author: Miguel Guthridge
+Author: Miguel Guthridge [hdsq@outlook.com.au]
 """
 
 import time

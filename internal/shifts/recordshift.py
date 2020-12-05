@@ -3,7 +3,7 @@ internal > shifts > recordshift.py
 
 Contains class to manage shift mode for recording options
 
-Author: Miguel Guthridge
+Author: Miguel Guthridge [hdsq@outlook.com.au]
 """
 
 import general

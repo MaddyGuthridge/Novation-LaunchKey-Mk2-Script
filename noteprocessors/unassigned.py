@@ -3,7 +3,7 @@ noteprocessors > template.py
 
 This script is a template note processor.
 
-Author: Miguel Guthridge
+Author: Miguel Guthridge [hdsq@outlook.com.au]
 """
 
 import internal.consts

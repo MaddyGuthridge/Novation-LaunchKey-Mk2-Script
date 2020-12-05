@@ -3,7 +3,7 @@ noteprocessors > chord.py
 
 This script plays individual notes as chords.
 
-Author: Miguel Guthridge
+Author: Miguel Guthridge [hdsq@outlook.com.au]
 """
 
 import _random

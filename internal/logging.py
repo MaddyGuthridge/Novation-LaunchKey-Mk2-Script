@@ -3,7 +3,7 @@ internal > logging.py
 
 This module contains functions for logging information, ans well as some helpers
 
-Author: Miguel Guthridge
+Author: Miguel Guthridge [hdsq@outlook.com.au]
 """
 
 

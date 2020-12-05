@@ -2,7 +2,7 @@
 noteprocessors > default.py
 This script processes notes nomally.
 
-Author: Miguel Guthridge
+Author: Miguel Guthridge [hdsq@outlook.com.au]
 """
 
 import internal.consts

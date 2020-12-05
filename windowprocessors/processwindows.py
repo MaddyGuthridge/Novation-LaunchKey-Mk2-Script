@@ -3,7 +3,7 @@ windowprocessors > processwindows.py
 
 This script forwards events to event processors for FL Studio Windows.
 
-Author: Miguel Guthridge
+Author: Miguel Guthridge [hdsq@outlook.com.au]
 """
 
 

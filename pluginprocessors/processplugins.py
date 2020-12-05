@@ -4,7 +4,7 @@ pluginprocessors > processplugins.py
 This script forwards events to any plugin processors that can handle the currently active plugin.
 More plugin processors can be added by adding them to the import list.
 
-Author: Miguel Guthridge
+Author: Miguel Guthridge [hdsq@outlook.com.au]
 """
 
 #
