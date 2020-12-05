@@ -91,4 +91,5 @@ def process(command):
 
     return
 
-
+def beatChange(beat):
+    pass

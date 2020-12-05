@@ -82,3 +82,5 @@ def activeEnd():
     COLOUR = DEFAULT_COLOUR
     INIT_COMPLETE = False
 
+def beatChange(beat):
+    pass

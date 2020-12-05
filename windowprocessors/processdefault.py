@@ -47,3 +47,6 @@ def process(command):
     #command.actions.addProcessor("[None] Processor")
 
     return
+
+def beatChange(beat):
+    pass

@@ -122,6 +122,11 @@ def process(command):
         
         if command.ignored: return
 
+def beatChange(beat):
+    for x in imports:
+        object_to_call = getattr(pluginprocessors, x)
+        object_to_call.beatChange(beat)
+
 def canHandle(object_to_call):
     for x in range(len(object_to_call.PLUGINS)):
         if object_to_call.PLUGINS[x] == internal.window.active_plugin:

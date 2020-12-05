@@ -9,7 +9,7 @@ Author: Miguel Guthridge
 #
 # Add custom event processors to this list
 #
-imports = ["default", "error", "scale", "chord", "omni", "unassigned"]
+imports = ["default", "error", "scale", "chord", "omni", "randomiser", "unassigned"]
 #
 #
 #
@@ -132,9 +132,14 @@ def processNoteModeMenuOpener(command):
         else:
             internal.extendedMode.setVal(True, eventconsts.INCONTROL_PADS)
         command.handle("Open note mode menu", True)
-            
+
+def beatChange(beat):
+    for x in customProcessorsAll:
+        object_to_call = getattr(noteprocessors, x)
+        if object_to_call.NAME == internal.noteMode.getState():
+            object_to_call.beatChange(beat)
+   
 def redraw(lights):
-    
     # Find current note processor
     current_name = internal.noteMode.getState()
     for ctr in range(len(customProcessorsAll)):

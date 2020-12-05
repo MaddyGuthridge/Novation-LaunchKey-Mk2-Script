@@ -81,3 +81,7 @@ def topWindowEnd():
         current_window.topWindowEnd()
 
     return
+
+def beatChange(beat):
+    current_window = getWindowObject()
+    current_window.beatChange(beat)

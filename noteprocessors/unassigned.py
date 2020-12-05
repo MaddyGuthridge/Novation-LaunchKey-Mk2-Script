@@ -78,3 +78,5 @@ def activeEnd():
     internal.extendedMode.revert(eventconsts.INCONTROL_FADERS)
     internal.extendedMode.revert(eventconsts.INCONTROL_PADS)
 
+def beatChange(beat):
+    pass

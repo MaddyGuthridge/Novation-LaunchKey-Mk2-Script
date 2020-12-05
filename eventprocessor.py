@@ -80,7 +80,7 @@ def processExtended(command):
 
             # Shouldn't be called in extended mode
             # Attempt to process event using custom processors for plugins
-            #processplugins.process(command)
+            #pluginprocessors.process(command)
 
             #if command.ignored: return
 
@@ -273,3 +273,13 @@ def redraw():
 
     # Call pads refresh function
     lighting.state.setFromMap(lights)
+
+def beatChange(beat):
+    pluginprocessors.beatChange(beat)
+    
+    windowprocessors.beatChange(beat)
+    
+    noteprocessors.beatChange(beat)
+    
+    internal.beat.setBeat(beat)
+

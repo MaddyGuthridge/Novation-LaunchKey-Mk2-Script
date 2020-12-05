@@ -231,6 +231,8 @@ def topWindowEnd():
     ui_mode.resetMode()
     return
 
+def beatChange(beat):
+    pass
 
 # Internal functions
 
