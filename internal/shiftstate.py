@@ -4,7 +4,7 @@ internal > shiftstate_new.py
 This module contains classes and objects for managing shift menus.
 it is a remake of shiftstate.py
 
-Author: Miguel Guthridge
+Author: Miguel Guthridge [hdsq@outlook.com.au]
 """
 
 import config

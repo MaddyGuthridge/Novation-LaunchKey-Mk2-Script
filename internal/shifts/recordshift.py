@@ -3,7 +3,7 @@ internal > shifts > recordshift.py
 
 Contains class to manage shift mode for recording options
 
-Author: Miguel Guthridge
+Author: Miguel Guthridge [hdsq@outlook.com.au]
 """
 
 import general
@@ -74,6 +74,11 @@ class RecordShift(ShiftState):
                     transport.globalTransport(eventconsts.midi.FPT_StepEdit, True)
                     command.handle("Toggled step editing")
                     self.use()
+                
+                elif coord == (7, 1):
+                    transport.globalTransport(eventconsts.midi.FPT_TapTempo, True)
+                    command.handle("Tapped Tempo")
+                    self.use()
                     
                 else:
                     command.handle("Shift menu catch others")
@@ -95,6 +100,9 @@ class RecordShift(ShiftState):
             else:
                 mode = lightingconsts.MODE_ON
             lights.setPadColour(0, 0, lightingconsts.colours["WHITE"], mode)
+            
+            # Tempo tapper
+            lights.setPadColour(7, 1, lightingconsts.TEMPO_TAP)
 
         if window.getAnimationTick() > 1:
             # Wait for input

@@ -3,7 +3,7 @@ noteprocessors > error.py
 This script processes notes when the error state is active.
 It includes the "Chaotic Evil Error Note Handler" which changes single note on events to all 128 note-on events.
 
-Author: Miguel Guthridge
+Author: Miguel Guthridge [hdsq@outlook.com.au]
 """
 
 import internal.consts
@@ -65,3 +65,5 @@ def activeStart():
 def activeEnd():
     pass
 
+def beatChange(beat):
+    pass

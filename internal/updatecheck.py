@@ -3,7 +3,7 @@ update_check.py
 
 This module basically checks for script updates and returns true if they are available.
 
-Author: Miguel Guthridge
+Author: Miguel Guthridge [hdsq@outlook.com.au]
 """
 
 import json

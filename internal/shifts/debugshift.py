@@ -3,7 +3,7 @@ internal > shifts > debugshift.py
 
 Contains class to manage shift mode for debugging
 
-Author: Miguel Guthridge
+Author: Miguel Guthridge [hdsq@outlook.com.au]
 """
 
 import general

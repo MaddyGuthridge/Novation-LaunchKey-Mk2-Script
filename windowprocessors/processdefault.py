@@ -3,7 +3,7 @@ windowprocessors > processdefault.py
 
 This script can be used as a template for window scripts.
 
-Author: Miguel Guthridge
+Author: Miguel Guthridge [hdsq@outlook.com.au]
 """
 
 
@@ -47,3 +47,6 @@ def process(command):
     #command.actions.addProcessor("[None] Processor")
 
     return
+
+def beatChange(beat):
+    pass

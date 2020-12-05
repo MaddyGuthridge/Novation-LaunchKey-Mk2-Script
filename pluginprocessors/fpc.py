@@ -5,7 +5,7 @@ This script is a custom processor module that can process events when the FPC pl
 It maps the pedal to the kick, and rearranges drums to match the FPC default layout, 
 as well as drawing pad colours to match the colours of the default note layout.
 
-Author: Miguel Guthridge
+Author: Miguel Guthridge [hdsq@outlook.com.au]
 """
 
 REMAP_DRUMS = True
@@ -46,7 +46,25 @@ COLOUR_MAP = [
 
 def redraw(lights):
     if not internal.extendedMode.query(eventconsts.INCONTROL_PADS):
-        lights.setFromMatrix(COLOUR_MAP)
+        light_map = COLOUR_MAP.copy()
+        for x in range(8):
+            light_map[x] = light_map[x].copy()
+        tick = internal.window.getAnimationTick()
+        for x in range(8):
+            for y in range(2):
+                if x >=4 and y == 0:
+                    if tick + 4 < x:
+                        light_map[x][y] = lightingconsts.colours["OFF"]
+                elif x < 4 and y == 0:
+                    if tick - 1 < x:
+                        light_map[x][y] = lightingconsts.colours["OFF"]
+                elif x >= 4 and y == 1:
+                    if tick + 3 < x:
+                        light_map[x][y] = lightingconsts.colours["OFF"]
+                elif x < 4 and y == 1:
+                    if tick - 2 < x:
+                        light_map[x][y] = lightingconsts.colours["OFF"]
+        lights.setFromMatrix(light_map)
 
 
 def topPluginStart():
@@ -82,11 +100,15 @@ def process(command):
         # Map drums to match FPC default layout
         changePads(command)
 
-
+        if config.DRUM_PADS_FULL_VELOCITY and command.value != 0:
+            command.edit(processorhelpers.RawEvent(command.status, command.note, 127), "Full velocity")
+        
+        command.ignore("Remap for FPC", True)
     
     return
 
-
+def beatChange(beat):
+    pass
 
 # Change pads to default note layout for FPC
 def changePads(command):

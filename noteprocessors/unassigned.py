@@ -3,7 +3,7 @@ noteprocessors > template.py
 
 This script is a template note processor.
 
-Author: Miguel Guthridge
+Author: Miguel Guthridge [hdsq@outlook.com.au]
 """
 
 import internal.consts
@@ -78,3 +78,5 @@ def activeEnd():
     internal.extendedMode.revert(eventconsts.INCONTROL_FADERS)
     internal.extendedMode.revert(eventconsts.INCONTROL_PADS)
 
+def beatChange(beat):
+    pass

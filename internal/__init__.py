@@ -6,7 +6,7 @@ This module contains functions that maintain the internal state of the controlle
  - Extended mode manager
  - etc
 
-Author: Miguel Guthridge
+Author: Miguel Guthridge [hdsq@outlook.com.au]
 """
 
 

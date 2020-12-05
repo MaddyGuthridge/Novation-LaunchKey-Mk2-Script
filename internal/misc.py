@@ -3,7 +3,7 @@ internal > misc.py
 
 Contains other functions, objects and classes regarding the internal state of the device.
 
-Author: Miguel Guthridge
+Author: Miguel Guthridge [hdsq@outlook.com.au]
 """
 
 import general
@@ -24,7 +24,6 @@ import controllerprocessors
 def refreshProcessor():
     """Called on refresh
     """
-    beat.refresh()
     snap.refresh()
     
 
@@ -57,44 +56,6 @@ class BeatMgr:
     """
     beat = 0
 
-    is_tapping_tempo = False
-    
-    metronome_enabled = False
-
-
-    def refresh(self):
-        """Update beat number
-        """
-        self.metronome_enabled = (general.getUseMetronome() == 1)
-
-    
-    def toggleMetronome(self):
-        """Toggle state of metronome
-
-        Returns:
-            bool: Whether the metronome is now enabled
-        """
-        transport.globalTransport(eventconsts.midi.FPT_Metronome, True)
-        self.metronome_enabled = (general.getUseMetronome() == 1)
-        return self.metronome_enabled
-
-
-    def toggleTempoTap(self):
-        """Toggles tempo tapping
-
-        Returns:
-            bool: Whether tempo tapping is now enabled
-        """
-        self.is_tapping_tempo = not self.is_tapping_tempo
-        return self.is_tapping_tempo
-
-
-    def tapTempo(self):
-        """Taps tempo
-        """
-        transport.globalTransport(eventconsts.midi.FPT_TapTempo, True)
-
-    
     def setBeat(self, beat):
         """Sets beat number
 
@@ -110,9 +71,6 @@ class BeatMgr:
         Args:
             lights (LightMap): Lighting object during redraw
         """
-
-        if self.is_tapping_tempo:
-            lights.setPadColour(8, 0, lightingconsts.TEMPO_TAP)
         
         if transport.getLoopMode():
             bar_col = lightingconsts.BEAT_SONG_BAR
@@ -123,9 +81,6 @@ class BeatMgr:
 
         if self.beat is 1: lights.setPadColour(8, 0, bar_col)     # Bar
         elif self.beat is 2: lights.setPadColour(8, 0, beat_col)  # Beat
-
-        if self.metronome_enabled:
-            lights.setPadColour(8, 0, lightingconsts.METRONOME)
 
 beat = BeatMgr()
 

@@ -7,7 +7,7 @@ You shouldn't need to adjust these values,
 but if you are modifying the script for use with a different controller with the same features,
 this is the place to start.
 
-Author: Miguel Guthridge
+Author: Miguel Guthridge [hdsq@outlook.com.au]
 """
 
 # Access FL Event consts through here

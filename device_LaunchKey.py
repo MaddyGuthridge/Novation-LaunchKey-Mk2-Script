@@ -8,7 +8,7 @@ device_LaunchKey49.py
 This file is the controller file for port 1 of the LaunchKey49 Mk2.
 It handles most note and controller events.
 
-Author: Miguel Guthridge
+Author: Miguel Guthridge [hdsq@outlook.com.au]
 """
 
 
@@ -97,7 +97,9 @@ class TGeneric():
         
         if internal.shifts["MAIN"].query():
             internal.state.idleShift()
-        
+    
+    def OnUpdateBeatIndicator(self, beat):
+        eventprocessor.beatChange(beat)
         
 
 
@@ -114,3 +116,6 @@ def OnMidiIn(event):
 
 def OnIdle():
     Generic.OnIdle()
+    
+def OnUpdateBeatIndicator(beat):
+    Generic.OnUpdateBeatIndicator(beat)

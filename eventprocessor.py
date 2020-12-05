@@ -3,7 +3,7 @@ eventprocessor.py
 
 This file processes events and lighting redraws.
 
-Author: Miguel Guthridge
+Author: Miguel Guthridge [hdsq@outlook.com.au]
 """
 
 import time
@@ -53,7 +53,7 @@ def processExtended(command):
         # Reset idle timer
         if not ((command.type is eventconsts.TYPE_BASIC_PAD or command.type is eventconsts.TYPE_PAD or command.type is eventconsts.TYPE_TRANSPORT) and not command.is_lift):
             if lighting.idleLightshowActive():
-                command.handle("End Idle Light Show")
+                command.handle("End Idle Light Show", True)
             internal.window.resetIdleTick()
 
         # Process key mappings
@@ -71,8 +71,8 @@ def processExtended(command):
         internal.shifts.process(command)
         if command.ignored: return
         
-        
-
+        # Note Processors
+        noteprocessors.process(command)
         if command.ignored: return
 
         # Only call plugin and window processors if it is safe to do so | Disabled because of errors
@@ -80,7 +80,7 @@ def processExtended(command):
 
             # Shouldn't be called in extended mode
             # Attempt to process event using custom processors for plugins
-            #processplugins.process(command)
+            #pluginprocessors.process(command)
 
             #if command.ignored: return
 
@@ -226,9 +226,12 @@ def redraw():
         lighting.state.setFromMap(lights)
         return
 
-    for i in range(1):
+    for _ in range(1):
         # Error handling: set controller into an error state
         try:
+            
+            # Draw initialisation lightshow
+            lighting.initLightShow(lights)
 
             # Draws idle thing if idle
             lighting.idleLightshow(lights)
@@ -243,6 +246,8 @@ def redraw():
 
             # Get UI from primary processor
             processfirst.redraw(lights)
+            
+            noteprocessors.redraw(lights)
             
             if lights.isSolid(): break
 
@@ -268,3 +273,13 @@ def redraw():
 
     # Call pads refresh function
     lighting.state.setFromMap(lights)
+
+def beatChange(beat):
+    pluginprocessors.beatChange(beat)
+    
+    windowprocessors.beatChange(beat)
+    
+    noteprocessors.beatChange(beat)
+    
+    internal.beat.setBeat(beat)
+

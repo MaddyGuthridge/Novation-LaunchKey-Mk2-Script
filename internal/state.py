@@ -3,7 +3,7 @@ internal > state.py
 
 Contains variables and objects to manage the state of the script.
 
-Author: Miguel Guthridge
+Author: Miguel Guthridge [hdsq@outlook.com.au]
 """
 
 import math
@@ -168,7 +168,6 @@ def sharedInit():
         print("Advanced debugging is enabled:", config.CONSOLE_DEBUG_MODE)
     print("")
 
-    beat.refresh() # Update beat indicator
 
 
 class ExtendedMgr:

@@ -8,7 +8,7 @@ device_LaunchKey49 port 2.py
 This file is the controller file for port 2 of the LaunchKey49 Mk2.
 It handles communication with the device, including colours.
 
-Author: Miguel Guthridge
+Author: Miguel Guthridge [hdsq@outlook.com.au]
 """
 
 
@@ -63,9 +63,6 @@ class TGeneric():
             # Set the device into Extended Mode
             internal.extendedMode.setVal(True, force=True)
 
-            # Run light show
-            lighting.lightShow()
-
             # Process inControl preferences | Say it's external since we want the settings to be applied regardless
             if config.START_IN_INCONTROL_KNOBS == False: internal.extendedMode.setVal(False, eventconsts.INCONTROL_KNOBS, from_internal=False) 
             if config.START_IN_INCONTROL_FADERS == False: internal.extendedMode.setVal(False, eventconsts.INCONTROL_FADERS, from_internal=False) 
@@ -82,7 +79,6 @@ class TGeneric():
 
     def OnDeInit(self):
         try:
-            lighting.lightShow()
             # Return the device into Basic Mode
             internal.extendedMode.setVal(False)
             print('Deinitialisation complete')
@@ -139,7 +135,7 @@ class TGeneric():
         return
     
     def OnUpdateBeatIndicator(self, beat):
-        internal.beat.setBeat(beat)
+        eventprocessor.beatChange(beat)
         
         # Prevent idle lightshow from being triggered during playback
         internal.window.resetIdleTick()

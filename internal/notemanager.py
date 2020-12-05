@@ -3,7 +3,7 @@ internal > notemanager.py
 
 Contains objects and classes to manage notes and note modes, as well as pad presses.
 
-Author: Miguel Guthridge
+Author: Miguel Guthridge [hdsq@outlook.com.au]
 """
 
 from . import consts

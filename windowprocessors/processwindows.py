@@ -3,7 +3,7 @@ windowprocessors > processwindows.py
 
 This script forwards events to event processors for FL Studio Windows.
 
-Author: Miguel Guthridge
+Author: Miguel Guthridge [hdsq@outlook.com.au]
 """
 
 
@@ -81,3 +81,7 @@ def topWindowEnd():
         current_window.topWindowEnd()
 
     return
+
+def beatChange(beat):
+    current_window = getWindowObject()
+    current_window.beatChange(beat)

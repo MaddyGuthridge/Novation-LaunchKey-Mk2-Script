@@ -4,7 +4,7 @@ pluginprocessors > bbcso.py
 This script processes events when the BBC Symphony Orchesra plugin is active.
 It allows the use of keyswitches, and maps faders to expression, dynamics and reverb.
 
-Author: Miguel Guthridge
+Author: Miguel Guthridge [hdsq@outlook.com.au]
 """
 
 PLUGINS = ["BBC Symphony Orchestra"]
@@ -79,4 +79,5 @@ def process(command):
 
     return
 
-
+def beatChange(beat):
+    pass

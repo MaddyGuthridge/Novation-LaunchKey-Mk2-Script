@@ -3,7 +3,7 @@ lightingconsts.py
 
 This file contains constants regarding lights. It is reorganised into objects so as to allow for colour mapping to match FL Colours.
 
-Author: Miguel Guthridge
+Author: Miguel Guthridge [hdsq@outlook.com.au]
 """
 
 import math
@@ -232,3 +232,5 @@ ERROR_COLOURS = [
     [colours["RED"], colours["RED"]],
     [colours["RED"], colours["RED"]]
 ]
+
+RESET = colours["YELLOW"]
