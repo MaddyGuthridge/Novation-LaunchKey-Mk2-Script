@@ -13,6 +13,7 @@ import eventconsts
 import internal
 import processorhelpers
 import lightingconsts
+import config
 
 # The name of your mode
 NAME = "Omni Mode"
@@ -44,7 +45,6 @@ PAD_MAPPINGS = [
     [60, 74]
 ]
 
-
 def process(command):
     """Called with an event to be processed by your note processor. Events aren't filtered so you'll want to make sure your processor checks that events are notes.
 
@@ -57,13 +57,14 @@ def process(command):
         # Set status byte to channel 0xD (Omni preview channel)
         new_status = (command.status_nibble << 4) + internal.consts.OMNI_CHANNEL_STATUS
         command.edit(processorhelpers.RawEvent(new_status, command.note, command.value), "Remap for omni mode")
-        command.ignore("Switch to omni channel")
+        command.ignore("Switch to omni channel", True)
     
     elif command.type is eventconsts.TYPE_BASIC_PAD or command.type is eventconsts.TYPE_PAD:
         if command.coord_X < 8:
             new_status = (9 << 4) + internal.consts.OMNI_CHANNEL_STATUS
-            command.edit(processorhelpers.RawEvent(new_status, PAD_MAPPINGS[command.coord_X][command.coord_Y], command.value), "Remap for omni mode")
-            command.ignore("Remap to omni mode")
+            new_velocity = (config.DRUM_PADS_FULL_VELOCITY * 127 + (not config.DRUM_PADS_FULL_VELOCITY) * command.value) * (command.value != 0)
+            command.edit(processorhelpers.RawEvent(new_status, PAD_MAPPINGS[command.coord_X][command.coord_Y], new_velocity), "Remap for omni mode")
+            command.ignore("Remap to omni mode", True)
         
 
 def redraw(lights):

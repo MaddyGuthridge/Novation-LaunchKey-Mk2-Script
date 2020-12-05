@@ -19,9 +19,6 @@ import internal
 import eventconsts
 import processorhelpers
 
-ui_mode = processorhelpers.UiModeHandler(2)
-
-
 MENU_MODE_COLOUR = lightingconsts.UI_CHOOSE
 BIT_MODE_COLOUR = lightingconsts.colours["RED"]
 
@@ -35,22 +32,12 @@ def process(command):
     # Pads
     #---------------------------------
     if command.type == eventconsts.TYPE_PAD:
-        if command.is_lift:
-            # UI Mode
-            if command.coord_Y == 1 and command.coord_X == 0:
-                ui_mode.nextMode()
-                internal.window.resetAnimationTick()
-                command.handle("Channel Rack: Next UI mode")
-                if ui_mode.getMode():
-                    gridBits.drawHighlight()
-
-            elif ui_mode.getMode() == 1:
-                processBitMode(command)
-
-            elif ui_mode.getMode() == 0:
-                processMenuMode(command)
-        else:
-            command.handle("Pads press catch-all")
+        
+        # UI Mode
+        ui_mode.process(command)
+        
+        if not command.handled:
+            command.handle("Drum pads catch-all", True)
 
     #---------------------------------
     # Faders
@@ -94,12 +81,17 @@ def process(command):
 
     return
 
+def redraw(lights):
+    if internal.extendedMode.query(eventconsts.INCONTROL_PADS):
+        ui_mode.redraw(lights)
+
+    return
+
+
 # Process when in grid bits
 def processBitMode(command):
     current_channel = channels.selectedChannel()
-    #---------------------------------
-    # Pads
-    #---------------------------------
+    
     if command.type == eventconsts.TYPE_PAD and command.is_lift:
         # Grid bits
         if command.coord_Y == 0 and command.coord_X != 8:
@@ -144,76 +136,59 @@ def processBitMode(command):
 
 # Process when in menu
 def processMenuMode(command):
-    coord = [command.coord_X, command.coord_Y]
+    if command.is_lift:
+        coord = [command.coord_X, command.coord_Y]
+        
+        # Next/prev track
+        if coord == [0, 0]:
+            ui.previous()
+            command.actions.appendAction("Channel Rack: Previous channel")
+            command.handled = True
+        elif coord == [0, 1]:
+            ui.next()
+            command.actions.appendAction("Channel Rack: Next channel")
+            command.handled = True
 
-    # Next/prev track
-    if coord == [1, 0]:
-        ui.previous()
-        command.actions.appendAction("Channel Rack: Previous channel")
-        command.handled = True
-    elif coord == [1, 1]:
-        ui.next()
-        command.actions.appendAction("Channel Rack: Next channel")
-        command.handled = True
+        # Cut, Copy, Paste
+        elif coord == [2, 0]:
+            ui.cut()
+            command.actions.appendAction("UI: Cut")
+            command.handled = True
+        elif coord == [3, 0]:
+            ui.copy()
+            command.actions.appendAction("UI: Copy")
+            command.handled = True
+        elif coord == [4, 0]:
+            ui.paste()
+            command.actions.appendAction("UI: Paste")
+            command.handled = True
 
-    # Cut, Copy, Paste
-    elif coord == [3, 0]:
-        ui.cut()
-        command.actions.appendAction("UI: Cut")
-        command.handled = True
-    elif coord == [4, 0]:
-        ui.copy()
-        command.actions.appendAction("UI: Copy")
-        command.handled = True
-    elif coord == [5, 0]:
-        ui.paste()
-        command.actions.appendAction("UI: Paste")
-        command.handled = True
+        # To piano roll
+        elif coord == [7, 1]:
+            ui.showWindow(internal.consts.WINDOW_PIANO_ROLL)
+            command.actions.appendAction("Sent to pianoroll")
+            command.handled = True
 
-    # To piano roll
-    elif coord == [7, 1]:
-        ui.showWindow(internal.consts.WINDOW_PIANO_ROLL)
-        command.actions.appendAction("Sent to pianoroll")
-        command.handled = True
+        # Plugin window
+        elif coord == [6, 1]:
+            channels.showEditor(channels.channelNumber())
+            command.handle("Opened plugin window")
 
-    # Plugin window
-    elif coord == [6, 1]:
-        channels.showEditor(channels.channelNumber())
-        command.handle("Opened plugin window")
-
-def redraw(lights):
-    if internal.extendedMode.query(eventconsts.INCONTROL_PADS):
-        current_ui_mode = ui_mode.getMode()
-
-        if current_ui_mode == 0:
-            ui_button_colour = MENU_MODE_COLOUR
-        else:
-            ui_button_colour = BIT_MODE_COLOUR
-
-        lights.setPadColour(0, 1, ui_button_colour)    
-
-        if current_ui_mode == 0:
-            redrawMenuMode(lights)
-
-        elif current_ui_mode == 1:
-            redrawBitMode(lights)
-
-    return
 
 # Redraw when in menu
 def redrawMenuMode(lights):
     
     # Set colours for controls
     if internal.window.getAnimationTick() >= 1:
-        lights.setPadColour(1, 1, lightingconsts.UI_NAV_VERTICAL)     # Next track
+        lights.setPadColour(0, 1, lightingconsts.UI_NAV_VERTICAL)     # Next track
 
     if internal.window.getAnimationTick() >= 2:
-        lights.setPadColour(1, 0, lightingconsts.UI_NAV_VERTICAL)     # Prev track
-        lights.setPadColour(3, 0, lightingconsts.UI_COPY)             # Copy
+        lights.setPadColour(0, 0, lightingconsts.UI_NAV_VERTICAL)     # Prev track
+        lights.setPadColour(2, 0, lightingconsts.UI_COPY)             # Copy
     if internal.window.getAnimationTick() >= 3:
-        lights.setPadColour(4, 0, lightingconsts.UI_CUT)              # Cut
+        lights.setPadColour(3, 0, lightingconsts.UI_CUT)              # Cut
     if internal.window.getAnimationTick() >= 4:
-        lights.setPadColour(5, 0, lightingconsts.UI_PASTE)            # Paste
+        lights.setPadColour(4, 0, lightingconsts.UI_PASTE)            # Paste
 
     if internal.window.getAnimationTick() >= 2:
         lights.setPadColour(6, 1, lightingconsts.UI_CHOOSE)
@@ -424,3 +399,12 @@ def getPanValue(inVal):
     elif a > 0: b = str(a) + "% Right"
     else: b = "Centred"
     return b
+
+#
+# UI Mode settings
+#
+
+ui_mode = processorhelpers.UiModeHandler()
+ui_mode.addMode("Menu", lightingconsts.UI_CHOOSE, processMenuMode, redrawMenuMode)
+ui_mode.addMode("Grid Bits", lightingconsts.colours["RED"], processBitMode, redrawBitMode)
+

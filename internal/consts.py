@@ -19,7 +19,7 @@ SCRIPT_AUTHOR = "Miguel Guthridge"
 SCRIPT_VERSION_MAJOR = 2
 SCRIPT_VERSION_MINOR = 1
 SCRIPT_VERSION_REVISION = 0
-SCRIPT_VERSION_SUFFIX = "Beta 1"
+SCRIPT_VERSION_SUFFIX = "Beta 2"
 MIN_FL_SCRIPT_VERSION = 7
 SCRIPT_URL = "https://github.com/MiguelGuthridge/Novation-LaunchKey-Mk2-Script"
 UPDATE_JSON_URL = "https://api.github.com/repos/MiguelGuthridge/Novation-LaunchKey-Mk2-Script/tags"
@@ -99,6 +99,7 @@ class DEBUG:
     IDLE_PERFORMANCE = "Idle Performance"
     ANIMATION_IDLE_TIMERS = "Timers"
     EVENT_DATA = "Event data"
+    PRINT_INTERNAL_EVENTS = "Internal Event"
     EVENT_ACTIONS = "Event actions"
     WINDOW_CHANGES = "Window changed"
     WARNING_DEPRECIATED_FEATURE = "Depreciated feature"

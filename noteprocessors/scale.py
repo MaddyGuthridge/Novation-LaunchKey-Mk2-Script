@@ -161,10 +161,11 @@ def process(command):
                 command.handle("Prevent non-scale note", True)
                 return
             internal.notesDown.noteOn(processorhelpers.ExtensibleNote(command, [processorhelpers.RawEvent(command.status, new_note, command.value)]))
-            command.handle("Snapped note on")
+            command.handle("Snapped note on", True)
         else:
             internal.notesDown.noteOff(command)
-            command.handle("Snapped note off")
+            command.handle("Snapped note off", True)
+    
     pass
 
 def beatChange(beat):
@@ -207,15 +208,16 @@ def redraw(lights):
         lights.setPadColour(7, 0, lightingconsts.colours["GREEN"])
         
         lights.solidifyAll()
+    
+    
 
 def activeStart():
     """Called when your note mode is made active
     """
-    internal.extendedMode.setVal(True, eventconsts.INCONTROL_PADS)
+    resetModule()
 
-def activeEnd():
-    """Called wen your note mode is no-longer active
-    """
+def resetModule():
+    internal.extendedMode.setVal(True, eventconsts.INCONTROL_PADS)
     global INIT_COMPLETE, INIT_HAVE_ROOT, INIT_HAVE_SCALE, SCALE_TO_USE, \
         ROOT_NOTE, FORWARD_NOTES, SCALE_CLASS, COLOUR, SCALE_TO_USE_INDEX, \
             CUSTOM_SCALE, PREVENT_NONSCALE
@@ -230,6 +232,11 @@ def activeEnd():
     CUSTOM_SCALE = False
     PREVENT_NONSCALE = False
     SCALE_TO_USE = []
+
+def activeEnd():
+    """Called wen your note mode is no-longer active
+    """
+    pass
 
 
 def processInit(command):
@@ -280,6 +287,11 @@ def processInit(command):
             else: command.handle("Catch-all", silent=True)
         
         if y == 1:
+            
+            # Ignore presses of note mode button
+            if x == 8:
+                return
+            
             if SCALE_CLASS != -1:
                 if x < len(scales.scale_class_list[SCALE_CLASS].scale_list):
                     INIT_HAVE_SCALE = True

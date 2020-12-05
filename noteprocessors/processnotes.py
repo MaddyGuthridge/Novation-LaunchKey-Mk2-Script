@@ -41,9 +41,10 @@ print("Note Processor import complete")
 
 
 # Object to hold place in note mode menu
-noteModeMenu = processorhelpers.UiModeHandler(len(customProcessors) // 16 + 1)
+noteModeMenu = processorhelpers.UiModeSelector(len(customProcessors) // 16 + 1)
 
 note_menu_active = False
+
 
 def switchNoteModeMenu(newMode, quiet=False):
     global note_menu_active
@@ -55,27 +56,91 @@ def switchNoteModeMenu(newMode, quiet=False):
         else:
             internal.extendedMode.revert(eventconsts.INCONTROL_PADS)
 
+
 def process(command):
-    for x in customProcessorsAll:
-        object_to_call = getattr(noteprocessors, x)
-        if object_to_call.NAME == internal.noteMode.getState():
+    """Processes events to forward them onto note processors
+
+    Args:
+        command (ParsedEvent): command to process
+    """
+    # If in note mode menu, use that processor
+    if note_menu_active:
+        processNoteModeMenu(command)
+    
+    # Otherwise use note processors
+    else:
+        for x in customProcessorsAll:
+            object_to_call = getattr(noteprocessors, x)
+            if object_to_call.NAME == internal.noteMode.getState():
+                
+                if object_to_call.FORWARD_NOTES and command.type == eventconsts.TYPE_NOTE and not internal.getPortExtended():
+                    internal.sendCompleteInternalMidiMessage(command.getDataMIDI())
+                
+                object_to_call.process(command)
             
-            if object_to_call.FORWARD_NOTES and command.type == eventconsts.TYPE_NOTE and not internal.getPortExtended():
-                internal.sendCompleteInternalMidiMessage(command.getDataMIDI())
-            
-            object_to_call.process(command)
+                if command.ignored: return
+    
+    if command.ignored: return
+    
+    # Then check the note mode menu button
+    processNoteModeMenuOpener(command)
+
+def processNoteModeMenu(command):
+    command.addProcessor("Note Menu Processor")
+    if command.type is eventconsts.TYPE_PAD and command.is_lift:
+        note_mode_index = noteModeMenu.getMode()*16 + command.coord_X + 8*command.coord_Y
+                
+        if note_mode_index < len(customProcessors):
+            internal.sendCompleteInternalMidiMessage(internal.consts.MESSAGE_INPUT_MODE_SELECT + (note_mode_index << 16))
+            switchNoteModeMenu(False)
+            setModeByIndex(note_mode_index)
+            command.handle("Set note mode to " + getattr(noteprocessors, customProcessors[note_mode_index]).NAME)
         
-            if command.ignored: return
+        elif command.coord_X < 8:
+            command.handle("Note mode catch-all", silent=True)
+
+def processNoteModeMenuOpener(command):
+    command.addProcessor("Note Menu Opener Processor")
+    if (
+        command.type is eventconsts.TYPE_PAD
+        and command.is_lift 
+        and (command.coord_X, command.coord_Y) == (8, 1)
+    ):
+        
+        if not note_menu_active:
+            switchNoteModeMenu(True)
+            command.handle("Open note mode menu", True)
+        else:
+            # If on last page
+            if noteModeMenu.num_modes - 1 == noteModeMenu.mode:
+                # Exit menu
+                switchNoteModeMenu(False)
+                command.handle("Exit note mode menu", True)
+            
+            else:
+                noteModeMenu.nextMode()
+                command.handle("Next page of note mode menu", True)
+    elif ( # Basic drum pad: forward event
+        command.type is eventconsts.TYPE_BASIC_PAD
+        and command.is_lift 
+        and (command.coord_X, command.coord_Y) == (8, 1)
+        and not note_menu_active
+    ):
+        switchNoteModeMenu(True)
+        if not internal.getPortExtended():
+            internal.sendCompleteInternalMidiMessage(command.getDataMIDI(), "Forward drum for opening note mode menu")
+        else:
+            internal.extendedMode.setVal(True, eventconsts.INCONTROL_PADS)
+        command.handle("Open note mode menu", True)
 
 def beatChange(beat):
     for x in customProcessorsAll:
         object_to_call = getattr(noteprocessors, x)
         if object_to_call.NAME == internal.noteMode.getState():
             object_to_call.beatChange(beat)
-
-
-def redrawNoteModeMenu(lights):
-    
+   
+def redraw(lights):
+    # Find current note processor
     current_name = internal.noteMode.getState()
     for ctr in range(len(customProcessorsAll)):
         if getattr(noteprocessors, customProcessorsAll[ctr]).NAME == current_name:
@@ -84,11 +149,11 @@ def redrawNoteModeMenu(lights):
     
     if note_menu_active:
         colour = lightingconsts.colours["DARK GREY"]
-        light_mode = lightingconsts.MODE_ON
+        light_mode = lightingconsts.MODE_PULSE
     else:
         colour = getattr(noteprocessors, customProcessorsAll[note_mode_index]).COLOUR
     
-        if note_menu_active or not getattr(noteprocessors, customProcessorsAll[ctr]).INIT_COMPLETE:
+        if not getattr(noteprocessors, customProcessorsAll[ctr]).INIT_COMPLETE:
             light_mode = lightingconsts.MODE_PULSE
         else:
             light_mode = lightingconsts.MODE_ON
@@ -99,7 +164,7 @@ def redrawNoteModeMenu(lights):
     if not note_menu_active:
         getattr(noteprocessors, customProcessorsAll[note_mode_index]).redraw(lights)
     
-    if note_menu_active:
+    else:
         redrawTo = min(len(customProcessors) - 16*noteModeMenu.getMode(), 16)
         
         for ctr in range(16*noteModeMenu.getMode(), 16*noteModeMenu.getMode() + redrawTo):
@@ -118,12 +183,37 @@ def redrawNoteModeMenu(lights):
             
         lights.solidifyAll()
 
-def processNoteModeMenu(command):
+# Old code
+"""
+
+
+def process(command):
     
+    # If in note mode menu, use that processor
+    if note_menu_active:
+        processNoteModeMenu(command)
+        return
+    
+    # Otherwise use note processors
+    for x in customProcessorsAll:
+        object_to_call = getattr(noteprocessors, x)
+        if object_to_call.NAME == internal.noteMode.getState():
+            
+            if object_to_call.FORWARD_NOTES and command.type == eventconsts.TYPE_NOTE and not internal.getPortExtended():
+                internal.sendCompleteInternalMidiMessage(command.getDataMIDI())
+            
+            object_to_call.process(command)
+        
+            if command.ignored: return
+    
+    # Then check the note mode menu button
+    processNoteModeMenuOpener(command)
+    
+
+def processNoteModeMenuOpener(command):
     global note_menu_active
     
     if command.type is eventconsts.TYPE_PAD and command.is_lift:
-        
         # Note menu button
         if command.getPadCoord() == (8, 1):
             
@@ -143,9 +233,17 @@ def processNoteModeMenu(command):
                 
                 switchNoteModeMenu(True)
                 command.handle("Open note mode menu")
+
+def processNoteModeMenu(command):
+    
+    global note_menu_active
+    
+    if command.type is eventconsts.TYPE_PAD and command.is_lift:
+        
+        
         
         # Note menu open
-        elif note_menu_active:
+        if note_menu_active:
             note_mode_index = noteModeMenu.getMode()*16 + command.coord_X + 8*command.coord_Y
             
             if note_mode_index < len(customProcessors):
@@ -174,6 +272,9 @@ def processNoteModeMenu(command):
                 switchNoteModeMenu(True)
                 command.handle("Open note mode menu")
 
+
+"""
+
 def setModeByIndex(index):
     current_name = internal.noteMode.getState()
     for ctr in range(len(customProcessorsAll)):
@@ -187,3 +288,5 @@ def setModeByIndex(index):
 
     # Activate new note mode
     getattr(noteprocessors, customProcessors[index]).activeStart()
+    
+    

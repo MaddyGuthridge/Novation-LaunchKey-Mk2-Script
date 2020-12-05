@@ -29,7 +29,7 @@ DEVICE_PORT_EXTENDED = 225
 # Interaction options
 #-----------------------
 
-LONG_PRESS_TIME = 0.5 # Change how long a long press needs to be held for
+LONG_PRESS_TIME = 1.0 # Change how long a long press needs to be held for
 DOUBLE_PRESS_TIME = 0.2 # Change how quickly a double press needs to be done to be detected
 
 # If enabled, double pressing shift key keeps the shift button enabled until it is used, or pressed again.
@@ -61,6 +61,9 @@ SNAP_RANGE = 0.05 # Will snap if within this disatnce of snap value
 # If a plugin handler uses keyswitches, this controls whether the entire dum pad is used for key switches.
 # This may be used to add a split rows option for the drum pad later.
 USE_FULL_KEYSWITCHES = True
+
+# Whether to force full velocity drum pads in omni-mode and FPC
+DRUM_PADS_FULL_VELOCITY = False
 
 #-------------------------------
 # LIGHTING OPTIONS

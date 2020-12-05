@@ -19,9 +19,110 @@ import internal
 import internal.consts
 import lightingconsts
 
+class UIMode:
+    def __init__(self, name, colour, process_function, redraw_function):
+        self.name = name
+        self.colour = colour
+        self.process_function = process_function
+        self.redraw_function = redraw_function
+    
+    def process(self, command):
+        self.process_function(command)
+    
+    def redraw(self, lights):
+        self.redraw_function(lights)
 
 class UiModeHandler: 
     """This object is used to manage menu layers, which can be toggled and switched through.
+        It is best used in handler scripts to allow for a plugin or window to have multiple menus.
+    """
+    
+    def __init__(self):
+        """Create instance of UIModeHandler.
+
+        Args:
+            num_modes (int): The number of different menus to be contained in the object
+        """
+        self.is_down = False
+        self.used = False
+        self.modes = []
+        self.current_mode = 0
+
+    # Switch to next mode
+    def nextMode(self):
+        """Jump to the next menu layer
+
+        Returns:
+            int: mode number
+        """
+        self.current_mode += 1
+        if self.current_mode == len(self.modes):
+            self.current_mode = 0
+        
+        return self.current_mode
+    
+    def prevMode(self):
+        """Jump to previous menu layer
+        
+        Returns:
+            int: mode number
+        """
+        self.current_mode -= 1
+        if self.current_mode == -1:
+            self.current_mode = len(self.modes) - 1
+        
+        return self.current_mode
+
+    def resetMode(self):
+        """Resets menu layer to zero
+        """
+        self.current_mode = 0
+
+    # Get current mode number
+    def getMode(self):
+        """Returns mode number
+
+        Returns:
+            int: mode number
+        """
+        return self.current_mode
+
+    def press(self):
+        self.is_down = True
+        self.used = False
+    
+    def lift(self):
+        self.is_down = False
+        if not self.used:
+            self.nextMode()
+
+    def redraw(self, lights):
+        
+        lights.setPadColour(8, 0, self.modes[self.current_mode].colour)
+        
+        self.modes[self.current_mode].redraw(lights)
+        
+    def process(self, command):
+        
+        # For mode toggler
+        if (command.type is eventconsts.TYPE_BASIC_PAD or command.type is eventconsts.TYPE_PAD) and command.coord_Y == 0 and command.coord_X == 8:
+            if command.is_lift:
+                self.lift()
+                command.handle("Lift UI mode button")
+                internal.window.resetAnimationTick()
+            else:
+                self.press()
+                command.handle("Press UI mode button")
+            
+        
+        self.modes[self.current_mode].process(command)
+    
+    def addMode(self, name, colour, process_function, redraw_function):
+        self.modes.append(UIMode(name, colour, process_function, redraw_function))
+
+class UiModeSelector: 
+    """This object is used to manage menu layers, which can be toggled and switched through.
+        Unlike UiModeHandler, it doesn't handle calling functions for processing
         It is best used in handler scripts to allow for a plugin or window to have multiple menus.
     """
     
@@ -31,6 +132,8 @@ class UiModeHandler:
         Args:
             num_modes (int): The number of different menus to be contained in the object
         """
+        self.is_down = False
+        self.used = False
         self.mode = 0
         self.num_modes = num_modes
 
@@ -72,6 +175,22 @@ class UiModeHandler:
             int: mode number
         """
         return self.mode
+
+    def press(self):
+        self.is_down = True
+        self.used = False
+    
+    def lift(self):
+        self.is_down = False
+        if not self.used:
+            self.nextMode()
+
+    def redraw(self, lights):
+        pass
+        
+    def process(self, command):
+        pass
+    
 
 def snap(value, snapTo):
     """Returns a snapped value
@@ -146,11 +265,11 @@ def convertPadMapping(padNumber):
 
 lastPressID = -1
 lastPressTime = -1
-def isDoubleClickPress(id):
+def isDoubleClickPress(id_val):
     """Returns whether a press event was a double click
 
     Args:
-        id (int): Event ID
+        id_val (int): Event ID
 
     Returns:
         bool: whether the event was a double click
@@ -159,20 +278,20 @@ def isDoubleClickPress(id):
     global lastPressTime
     ret = False
     currentTime = time.perf_counter()
-    if id == lastPressID and (currentTime - lastPressTime < config.DOUBLE_PRESS_TIME):
+    if id_val == lastPressID and (currentTime - lastPressTime < config.DOUBLE_PRESS_TIME):
         ret = True
-    lastPressID = id
+    lastPressID = id_val
     lastPressTime = currentTime
     return ret
 
 
 lastLiftID = -1
 lastLiftTime = -1
-def isDoubleClickLift(id):
+def isDoubleClickLift(id_val):
     """Returns whether a lift event was a double click
 
     Args:
-        id (int): Event ID
+        id_val (int): Event ID
 
     Returns:
         bool: whether the event was a double click
@@ -181,12 +300,28 @@ def isDoubleClickLift(id):
     global lastLiftTime
     ret = False
     currentTime = time.perf_counter()
-    if id == lastLiftID and (currentTime - lastLiftTime < config.DOUBLE_PRESS_TIME):
+    if id_val == lastLiftID and (currentTime - lastLiftTime < config.DOUBLE_PRESS_TIME):
         ret = True
-    lastLiftID = id
+    lastLiftID = id_val
     lastLiftTime = currentTime
     return ret
 
+def isLongPressLift(id_val):
+    """Returns whether a lift event was held down for a long time
+    
+    Args:
+        id_val (int): Event ID
+    
+    Returns:
+        bool: whether the event was a long press
+    """
+    global lastPressID, lastPressTime
+    
+    currentTime = time.perf_counter()
+
+    return (id_val == lastPressID) and (currentTime - lastPressTime >= config.LONG_PRESS_TIME)
+    
+    
 
 
 class Action:
@@ -484,18 +619,27 @@ class ParsedEvent:
         else: 
             self.is_lift = False
         
+        # Don't process these for internal events
+        if self.type != eventconsts.TYPE_INTERNAL_EVENT:
+            
         
+            # Process long presses
+            if self.is_lift:
+                self.is_long_press = isLongPressLift(self.id)
+            else:
+                self.is_long_press = False
 
-        # Process long presses: TODO
-        self.is_long_press = False
-
-        # Process double presses (seperate for lifted and pressed buttons)
-        self.is_double_click = False
-        if self.isBinary is True: 
-            if self.is_lift is True:
-                self.is_double_click = isDoubleClickLift(self.id)
-            elif self.is_lift is False and self.isBinary is True: 
-                self.is_double_click = isDoubleClickPress(self.id)
+            # Process double presses (seperate for lifted and pressed buttons)
+            self.is_double_click = False
+            if self.isBinary is True: 
+                if self.is_lift is True:
+                    self.is_double_click = isDoubleClickLift(self.id)
+                elif self.is_lift is False and self.isBinary is True: 
+                    self.is_double_click = isDoubleClickPress(self.id)
+        
+        else:
+            self.is_double_click = False
+            self.is_long_press = False
         
     def edit(self, event, reason):
         """Edit the event to change data
@@ -605,6 +749,12 @@ class ParsedEvent:
             out += "[Shift Key]"
             out = internal.getTab(out)
         """
+        
+        # For internal events, have a different printing  flag
+        if self.type == eventconsts.TYPE_INTERNAL_EVENT:
+            if not internal.consts.DEBUG.PRINT_INTERNAL_EVENTS in config.CONSOLE_DEBUG_MODE:
+                out = ""
+        
         return out
 
     
@@ -617,12 +767,13 @@ class ParsedEvent:
     def printOutput(self):
         """Prints actions taken whilst handling event
         """
-        internal.debugLog("", internal.consts.DEBUG.EVENT_ACTIONS)
-        self.actions.flush()
-        if self.handled:
-            internal.debugLog("[Event was handled]", internal.consts.DEBUG.EVENT_ACTIONS)
-        else: 
-            internal.debugLog("[Event wasn't handled]", internal.consts.DEBUG.EVENT_ACTIONS)
+        if internal.consts.DEBUG.PRINT_INTERNAL_EVENTS in config.CONSOLE_DEBUG_MODE or self.type != eventconsts.TYPE_INTERNAL_EVENT:
+            internal.debugLog("", internal.consts.DEBUG.EVENT_ACTIONS)
+            self.actions.flush()
+            if self.handled:
+                internal.debugLog("[Event was handled]", internal.consts.DEBUG.EVENT_ACTIONS)
+            else: 
+                internal.debugLog("[Event wasn't handled]", internal.consts.DEBUG.EVENT_ACTIONS)
 
     
     def getType(self):
