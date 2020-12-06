@@ -1,17 +1,16 @@
 """
-pluginprocessors > _template.py
+pluginprocessors > vital.py
 
-The file acts as a template for plugin handlers. Copy it and edit to add your own plugin handlers.
-To get it to be imported by the event processor, add its filename (without the .py) to processplugins.py
+This processor adds integration with the wavetable synthesizer Vital by Matt Tytel
 
 Author: Miguel Guthridge [hdsq@outlook.com.au]
 """
 
 # Add names of plugins your script can process to this list
-PLUGINS = ["FLEX"]
+PLUGINS = ["Vital"]
 
 
-# Import any modules you might need
+# Import any modules you might need\
 import plugins
 import config
 import internal
@@ -19,8 +18,6 @@ import eventconsts
 import eventprocessor
 import lightingconsts
 import processorhelpers
-
-CONTROL_START = 10
 
 def topPluginStart():
     """Called when plugin is top plugin (not neccesarily focused)
@@ -76,22 +73,10 @@ def process(command):
     """
     
     # Add event processor to actions list (useful for debugging)
-    command.actions.addProcessor("FLEX Processor")
-    
-    value = processorhelpers.toFloat(command.value)
-    
-    if command.type is eventconsts.TYPE_BASIC_FADER:
-        if command.coord_X < 8:
-            plugins.setParamValue(
-                value,
-                CONTROL_START + command.coord_X,
-                internal.window.getPluginIndex()
-            )
-            command.handle("Set FLEX "
-                           + plugins.getParamName(CONTROL_START + command.coord_X, 
-                                                  internal.window.getPluginIndex())
-                           + " to " + str(round(value, 2)) + "%")
-        
+    command.actions.addProcessor("Vital Processor")
+
+    # When you handle your events, use command.handle("Some action") to handle events.
+
     return
 
 

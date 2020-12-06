@@ -20,7 +20,15 @@ import processorhelpers
 # Constants for event remapping
 EXPRESSION = 0
 DYNAMICS = 1
+
+NEAR_FAR = 6
+
 REVERB = 2
+RELEASE = 3
+TIGHTNESS = 4
+VARIATION = 14
+VIBRATO = 5
+
 
 
 # Called when plugin is top plugin
@@ -68,21 +76,35 @@ def process(command):
 
             command.edit(processorhelpers.RawEvent(0x90, keyswitch_num, command.value), "Remap keyswitches")
 
+    #
+    # Map parameters
+    #
+    
+    value = processorhelpers.toFloat(command.value)
+
     if command.type is eventconsts.TYPE_BASIC_FADER:
         if command.coord_X == 0:
             plugins.setParamValue(
-                processorhelpers.toFloat(command.value),
+                value,
                 EXPRESSION,
                 internal.window.getPluginIndex()
             )
-            command.handle("Set BBCSO Expression")
+            command.handle("Set BBCSO Expression to " + str(round(value, 2)) + "%")
         elif command.coord_X == 1:
             plugins.setParamValue(
-                processorhelpers.toFloat(command.value),
+                value,
                 DYNAMICS,
                 internal.window.getPluginIndex()
             )
-            command.handle("Set BBCSO Dynamics")
+            command.handle("Set BBCSO Dynamics to " + str(round(value, 2)) + "%")
+        
+        elif command.coord_X == 7:
+            plugins.setParamValue(
+                value,
+                NEAR_FAR,
+                internal.window.getPluginIndex()
+            )
+            command.handle("Set BBCSO Near-far to " + str(round(value, 2)) + "%")
     
     if command.type is eventconsts.TYPE_BASIC_KNOB:
         if command.coord_X == 0:
@@ -91,7 +113,39 @@ def process(command):
                 REVERB,
                 internal.window.getPluginIndex()
             )
-            command.handle("Set BBCSO Reverb")
+            command.handle("Set BBCSO Reverb to " + str(round(value, 2)) + "%")
+            
+        if command.coord_X == 1:
+            plugins.setParamValue(
+                processorhelpers.toFloat(command.value),
+                RELEASE,
+                internal.window.getPluginIndex()
+            )
+            command.handle("Set BBCSO Release to " + str(round(value, 2)) + "%")
+        
+        if command.coord_X == 2:
+            plugins.setParamValue(
+                processorhelpers.toFloat(command.value),
+                TIGHTNESS,
+                internal.window.getPluginIndex()
+            )
+            command.handle("Set BBCSO Tightness to " + str(round(value, 2)) + "%")
+        
+        if command.coord_X == 3:
+            plugins.setParamValue(
+                processorhelpers.toFloat(command.value),
+                VARIATION,
+                internal.window.getPluginIndex()
+            )
+            command.handle("Set BBCSO Variation to " + str(round(value, 2)) + "%")
+        
+        if command.coord_X == 4:
+            plugins.setParamValue(
+                processorhelpers.toFloat(command.value),
+                VIBRATO,
+                internal.window.getPluginIndex()
+            )
+            command.handle("Set BBCSO Vibrato to " + str(round(value, 2)) + "%")
 
 
 
