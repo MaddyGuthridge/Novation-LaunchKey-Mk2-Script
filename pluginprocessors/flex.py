@@ -12,7 +12,7 @@ PLUGINS = ["FLEX"]
 
 
 # Import any modules you might need
-import plugins
+import pluginswrapper
 import config
 import internal
 import eventconsts
@@ -28,8 +28,8 @@ def topPluginStart():
     
     # Only in extended mode: uncomment lines to set inControl mode
     if internal.getPortExtended():
-        # internal.extendedMode.setVal(False, eventconsts.INCONTROL_FADERS) # Faders
-        # internal.extendedMode.setVal(False, eventconsts.INCONTROL_KNOBS) # Knobs
+        internal.extendedMode.setVal(False, eventconsts.INCONTROL_FADERS) # Faders
+        internal.extendedMode.setVal(False, eventconsts.INCONTROL_KNOBS) # Knobs
         # internal.extendedMode.setVal(False, eventconsts.INCONTROL_PADS) # Pads
         pass
     return
@@ -40,8 +40,8 @@ def topPluginEnd():
     
     # Only in extended mode: uncomment lines to revert to previous inControl modes
     if internal.getPortExtended():
-        # internal.extendedMode.revert(eventconsts.INCONTROL_FADERS) # Faders
-        # internal.extendedMode.revert(eventconsts.INCONTROL_KNOBS) # Knobs
+        internal.extendedMode.revert(eventconsts.INCONTROL_FADERS) # Faders
+        internal.extendedMode.revert(eventconsts.INCONTROL_KNOBS) # Knobs
         # internal.extendedMode.revert(eventconsts.INCONTROL_PADS) # Pads
         pass
     return
@@ -82,16 +82,10 @@ def process(command):
     
     if command.type is eventconsts.TYPE_BASIC_FADER:
         if command.coord_X < 8:
-            plugins.setParamValue(
-                value,
-                CONTROL_START + command.coord_X,
-                internal.window.getPluginIndex()
-            )
-            command.handle("Set FLEX "
-                           + plugins.getParamName(CONTROL_START + command.coord_X, 
-                                                  internal.window.getPluginIndex())
-                           + " to " + str(round(value, 2)) + "%")
+            pluginswrapper.setParamByIndex(command.coord_X + CONTROL_START, command.value)
+            command.handle("Set FLEX param slider", 1)
         
     return
 
-
+def beatChange(beat):
+    return

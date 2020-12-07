@@ -10,7 +10,7 @@ Author: Miguel Guthridge [hdsq@outlook.com.au]
 #
 # Add custom event processors to this list
 #
-imports = ["fpc", "spitfire_bbcso", "slicex", "flex"]
+imports = ["fpc", "spitfire_bbcso", "slicex", "flex", "spitfire_labs"]
 #
 #
 #

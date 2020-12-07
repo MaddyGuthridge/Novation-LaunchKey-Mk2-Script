@@ -12,7 +12,7 @@ PLUGINS = []
 
 
 # Import any modules you might need\
-import plugins
+import pluginswrapper
 import config
 import internal
 import eventconsts
@@ -81,4 +81,10 @@ def process(command):
 
     return
 
+def beatChange(beat):
+    """Called when the beat updates
 
+    Args:
+        beat (int): Beat type (refer to FL Studio docs)
+    """
+    return

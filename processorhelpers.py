@@ -12,6 +12,7 @@ import time
 
 import utils
 import ui
+import plugins
 
 import config
 import eventconsts
@@ -1125,3 +1126,4 @@ class KeyswitchMgr:
                 return x
             
 keyswitches = KeyswitchMgr()
+
