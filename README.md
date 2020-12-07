@@ -1,8 +1,8 @@
-# Novation-LaunchKey49-Mk2-Script
+# Novation Launchkey Mk2 Script
 
-A WIP Python script for linking the Novation LaunchKey49 Mk2 controller to FL Studio.
+A Python script for linking Novation LaunchKey Mk2 series controllers to FL Studio, allowing for advanced integration with your music-making workflow.
 
-Author: [Miguel Guthridge](https://www.youtube.com/channel/UCPB_zkvsJKuIkCgEzoXtN3g)
+Author: [Miguel Guthridge](mailto:hdsq@outlook.com.au)
 
 Project Page: [GitHub](https://github.com/MiguelGuthridge/Novation-LaunchKey49-Mk2-Script)
 
@@ -24,7 +24,7 @@ Use the knobs and faders to adjust the panning and volume of tracks, and mute or
 
 ## Advanced Event Handling
 
-Events are processed in the context of the active window and plugin, allowing for deep integration with FL Studio and plugins ([see note](https://github.com/MiguelGuthridge/Novation-LaunchKey-Mk2-Script/wiki/Plugin-Specific-Event-Handlers#important-note)). The modular system makes writing event handlers simple, meaning that new features can be added easily over time.
+Events are processed in the context of the active window and plugin, allowing for deep integration with FL Studio and plugins. The modular system makes writing event handlers, including plugin and note processor modules, simple and streamlined. The script has the capacity to integrate with almost any plugin, and if it isn't compatible yet, you can code it yourself! The possibilities are endless!
 
 # Helpful Links:
 
@@ -33,4 +33,4 @@ Events are processed in the context of the active window and plugin, allowing fo
 | [-> Latest Release](https://github.com/MiguelGuthridge/Novation-LaunchKey-Mk2-Script/releases) | Download the script |
 | [-> Script Manual](https://github.com/MiguelGuthridge/Novation-LaunchKey-Mk2-Script/wiki) | Lean to use the script |
 | [-> Installation and Set-up](https://github.com/MiguelGuthridge/Novation-LaunchKey-Mk2-Script/wiki/Installation-and-Set-up) | Instructions for installing the script |
-| [-> MIDI Scripting (FL Studio Manual)](https://www.image-line.com/support/flstudio_online_manual/html/midi_scripting.htm) | A page detailing FL Studio's Scripting API |
+| [-> MIDI Scripting (FL Studio Manual)](https://www.image-line.com/fl-studio-learning/fl-studio-beta-online-manual/html/midi_scripting.htm) | A page detailing FL Studio's Scripting API |
