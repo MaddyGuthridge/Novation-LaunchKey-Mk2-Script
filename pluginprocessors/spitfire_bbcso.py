@@ -79,7 +79,7 @@ def process(command):
         if command.coord_X == 0:
             spitfire_generic.setExpression(command)
         elif command.coord_X == 1:
-            spitfire_generic.setExpression(command)
+            spitfire_generic.setDynamics(command)
         
         elif command.coord_X == 7:
             pluginswrapper.setParamByName("Variation", command.value, -1, VARIATION)

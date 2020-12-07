@@ -43,6 +43,6 @@ def setTightness(command):
 
 def setVibrato(command):
     global EXPECTED_VIBRATO
-    EXPECTED_VIBRATO = pluginswrapper.setParamByName("Release", command.value, -1, EXPECTED_VIBRATO)
+    EXPECTED_VIBRATO = pluginswrapper.setParamByName("Vibrato", command.value, -1, EXPECTED_VIBRATO)
 
 
