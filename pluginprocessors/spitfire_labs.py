@@ -11,7 +11,7 @@ PLUGINS = ["LABS"]
 
 
 # Import any modules you might need\
-import plugins
+import pluginswrapper
 import config
 import internal
 import eventconsts
@@ -19,9 +19,10 @@ import eventprocessor
 import lightingconsts
 import processorhelpers
 
+from . import spitfire_generic
+
 # Constants for event remapping
-EXPRESSION = 0
-DYNAMICS = 1
+ASDR_START = 8
 
 
 def topPluginStart():
@@ -30,8 +31,8 @@ def topPluginStart():
     
     # Only in extended mode: uncomment lines to set inControl mode
     if internal.getPortExtended():
-        # internal.extendedMode.setVal(False, eventconsts.INCONTROL_FADERS) # Faders
-        # internal.extendedMode.setVal(False, eventconsts.INCONTROL_KNOBS) # Knobs
+        internal.extendedMode.setVal(False, eventconsts.INCONTROL_FADERS) # Faders
+        internal.extendedMode.setVal(False, eventconsts.INCONTROL_KNOBS) # Knobs
         # internal.extendedMode.setVal(False, eventconsts.INCONTROL_PADS) # Pads
         pass
     return
@@ -42,8 +43,8 @@ def topPluginEnd():
     
     # Only in extended mode: uncomment lines to revert to previous inControl modes
     if internal.getPortExtended():
-        # internal.extendedMode.revert(eventconsts.INCONTROL_FADERS) # Faders
-        # internal.extendedMode.revert(eventconsts.INCONTROL_KNOBS) # Knobs
+        internal.extendedMode.revert(eventconsts.INCONTROL_FADERS) # Faders
+        internal.extendedMode.revert(eventconsts.INCONTROL_KNOBS) # Knobs
         # internal.extendedMode.revert(eventconsts.INCONTROL_PADS) # Pads
         pass
     return
@@ -82,6 +83,18 @@ def process(command):
 
     # When you handle your events, use command.handle("Some action") to handle events.
 
+    if command.type is eventconsts.TYPE_BASIC_KNOB:
+        if command.coord_X < 4:
+            pluginswrapper.setParamByIndex(ASDR_START + command.coord_X, command.value)
+            command.handle("Set LABS ASDR", 1)
+    
+    elif command.type is eventconsts.TYPE_BASIC_FADER:
+        if command.coord_X == 0:
+            spitfire_generic.setExpression(command)
+        if command.coord_X == 1:
+            spitfire_generic.setDynamics(command)
+
     return
 
-
+def beatChange(beat):
+    return
