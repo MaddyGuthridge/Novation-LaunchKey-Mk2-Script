@@ -116,4 +116,6 @@ def setParamByIndex(param_index, value,  plugin_index=-1):
     plugin_index = _getPluginIndexTuple(plugin_index)
     
     plugins.setParamValue(value, param_index, plugin_index[1], plugin_index[0])
-    
+
+def setCCParam(ccNum, value, plugin_index=-1):
+    setParamByIndex(ccNum + 4096, value, plugin_index)

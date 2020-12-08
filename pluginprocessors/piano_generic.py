@@ -1,13 +1,14 @@
 """
-pluginprocessors > spitfire_labs.py
+pluginprocessors > _template.py
 
-This processor links parameters for the Spitfire Labs plugin
+The file acts as a template for plugin handlers. Copy it and edit to add your own plugin handlers.
+To get it to be imported by the event processor, add its filename (without the .py) to processplugins.py
 
 Author: Miguel Guthridge [hdsq@outlook.com.au]
 """
 
 # Add names of plugins your script can process to this list
-PLUGINS = ["LABS"]
+PLUGINS = ["Kontakt", "Originals - Firewood Piano", "Originals - Cinematic Soft Piano"]
 
 
 # Import any modules you might need\
@@ -19,11 +20,6 @@ import eventprocessor
 import lightingconsts
 import processorhelpers
 
-from . import spitfire_generic
-
-# Constants for event remapping
-ASDR_START = 8
-
 
 def topPluginStart():
     """Called when plugin is top plugin (not neccesarily focused)
@@ -31,8 +27,8 @@ def topPluginStart():
     
     # Only in extended mode: uncomment lines to set inControl mode
     if internal.getPortExtended():
-        internal.extendedMode.setVal(False, eventconsts.INCONTROL_FADERS) # Faders
-        internal.extendedMode.setVal(False, eventconsts.INCONTROL_KNOBS) # Knobs
+        # internal.extendedMode.setVal(False, eventconsts.INCONTROL_FADERS) # Faders
+        # internal.extendedMode.setVal(False, eventconsts.INCONTROL_KNOBS) # Knobs
         # internal.extendedMode.setVal(False, eventconsts.INCONTROL_PADS) # Pads
         pass
     return
@@ -43,8 +39,8 @@ def topPluginEnd():
     
     # Only in extended mode: uncomment lines to revert to previous inControl modes
     if internal.getPortExtended():
-        internal.extendedMode.revert(eventconsts.INCONTROL_FADERS) # Faders
-        internal.extendedMode.revert(eventconsts.INCONTROL_KNOBS) # Knobs
+        # internal.extendedMode.revert(eventconsts.INCONTROL_FADERS) # Faders
+        # internal.extendedMode.revert(eventconsts.INCONTROL_KNOBS) # Knobs
         # internal.extendedMode.revert(eventconsts.INCONTROL_PADS) # Pads
         pass
     return
@@ -52,7 +48,6 @@ def topPluginEnd():
 def activeStart():
     """Called when plugin brought to foreground (focused)
     """
-    
     return
 
 def activeEnd():
@@ -79,21 +74,9 @@ def process(command):
     """
     
     # Add event processor to actions list (useful for debugging)
-    command.actions.addProcessor("Labs Processor")
+    command.actions.addProcessor("Your Processor Name")
 
     # When you handle your events, use command.handle("Some action") to handle events.
-
-    if command.type is eventconsts.TYPE_BASIC_KNOB:
-        if command.coord_X < 4:
-            pluginswrapper.setParamByIndex(ASDR_START + command.coord_X, command.value)
-            command.handle("Set LABS ASDR", 1)
-    
-    elif command.type is eventconsts.TYPE_BASIC_FADER:
-        if command.coord_X == 0:
-            spitfire_generic.setExpression(command)
-        if command.coord_X == 1:
-            spitfire_generic.setDynamics(command)
-    
     if command.id == eventconsts.PEDAL:
         pluginswrapper.setCCParam(command.note, command.value)
         command.handle("Pedal", 1)
@@ -101,4 +84,9 @@ def process(command):
     return
 
 def beatChange(beat):
+    """Called when the beat updates
+
+    Args:
+        beat (int): Beat type (refer to FL Studio docs)
+    """
     return
