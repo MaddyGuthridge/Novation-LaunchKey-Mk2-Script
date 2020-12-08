@@ -87,6 +87,10 @@ def setParamByName(name, value,  plugin_index=-1, expected_param_index=-1):
     if type(value) is int:
         value = processorhelpers.toFloat(value)
     
+    # No plugin selected
+    if plugin_index[1] == -1:
+        return expected_param_index
+    
     plugins.setParamValue(value, param_index, plugin_index[1], plugin_index[0])
     
     return param_index
@@ -114,6 +118,10 @@ def setParamByIndex(param_index, value,  plugin_index=-1):
         value = processorhelpers.toFloat(value)
     
     plugin_index = _getPluginIndexTuple(plugin_index)
+    
+    # No plugin selected
+    if plugin_index[1] == -1:
+        return
     
     plugins.setParamValue(value, param_index, plugin_index[1], plugin_index[0])
 

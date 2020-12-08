@@ -120,11 +120,9 @@ def process(command):
     
     # Mod-wheel
     if command.id == eventconsts.MOD_WHEEL:
-        try:
-            pluginswrapper.setCCParam(command.note, command.value)
-            command.handle("Mod-wheel", 1)
-        except:
-            pass
+        pluginswrapper.setCCParam(command.note, command.value)
+        command.handle("Mod-wheel", 1)
+        
     
     # Pitch-bend wheel
     if command.id == eventconsts.PITCH_BEND:

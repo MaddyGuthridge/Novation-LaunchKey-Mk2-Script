@@ -261,10 +261,13 @@ class WindowMgr:
         Returns:
             int: Index of current plugin
         """
-        if not plugins.getPluginName(self.active_plugin_index) == self.active_plugin:
-            self.active_plugin_index = -1
-        return self.active_plugin_index
-          
+        try:
+            if not plugins.getPluginName(self.active_plugin_index) == self.active_plugin:
+                self.active_plugin_index = -1
+            return self.active_plugin_index
+        except:
+            # No plugin selected
+            return -1
 
 # Create instance of window object
 window = WindowMgr()
