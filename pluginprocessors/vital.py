@@ -11,7 +11,7 @@ PLUGINS = ["Vital"]
 
 
 # Import any modules you might need\
-import plugins
+import pluginswrapper
 import config
 import internal
 import eventconsts
@@ -19,15 +19,80 @@ import eventprocessor
 import lightingconsts
 import processorhelpers
 
+# Previous param index: should speed things up
+prev_param_index = -1
+
+#
+# Oscillator
+#
+
+# Params
+
+OSCILLATOR = "Oscillator"
+
+WAVE_FRAME = "Wave Frame"
+UNISON = "Unison Voices"
+DETUNE = "Unison Detune"
+FREQUENCY_MORPH = "Frequency Morph Amount"
+DISTORTION = "Distortion Amount"
+
+
+NUM_OSCS = 3
+
+selected_osc = 1
+
+def processOsc(command):
+    global prev_param_index
+    
+    param_str =  OSCILLATOR + " " + str(selected_osc) + " "
+    
+    # When you handle your events, use command.handle("Some action") to handle events.
+    if command.type is eventconsts.TYPE_BASIC_FADER:
+        if command.coord_X == 0:
+            prev_param_index = pluginswrapper.setParamByName(
+                                    param_str + WAVE_FRAME, 
+                                    command.value, -1, prev_param_index)
+            command.handle("Wave frame", 1)
+            
+        elif command.coord_X == 1:
+            prev_param_index = pluginswrapper.setParamByName(
+                                    param_str + UNISON, 
+                                    command.value, -1, prev_param_index)
+            command.handle("Unison voices", 1)
+            
+        elif command.coord_X == 2:
+            prev_param_index = pluginswrapper.setParamByName(
+                                    param_str + DETUNE, 
+                                    command.value, -1, prev_param_index)
+            command.handle("Detune", 1)
+            
+    elif command.type is eventconsts.TYPE_BASIC_KNOB:
+        if command.coord_X == 0:
+            prev_param_index = pluginswrapper.setParamByName(
+                                    param_str + FREQUENCY_MORPH, 
+                                    command.value, -1, prev_param_index)
+            command.handle("Frequency Morph", 1)
+        elif command.coord_X == 1:
+            pluginswrapper.setParamByName(
+                                    param_str + DISTORTION, 
+                                    command.value, -1, prev_param_index)
+            command.handle("Distortion", 1)
+            
+
+
+#
+# Redirect functions
+#
+
 def topPluginStart():
     """Called when plugin is top plugin (not neccesarily focused)
     """
     
     # Only in extended mode: uncomment lines to set inControl mode
     if internal.getPortExtended():
-        # internal.extendedMode.setVal(False, eventconsts.INCONTROL_FADERS) # Faders
-        # internal.extendedMode.setVal(False, eventconsts.INCONTROL_KNOBS) # Knobs
-        # internal.extendedMode.setVal(False, eventconsts.INCONTROL_PADS) # Pads
+        internal.extendedMode.setVal(False, eventconsts.INCONTROL_FADERS) # Faders
+        internal.extendedMode.setVal(False, eventconsts.INCONTROL_KNOBS) # Knobs
+        internal.extendedMode.setVal(False, eventconsts.INCONTROL_PADS) # Pads
         pass
     return
 
@@ -37,9 +102,9 @@ def topPluginEnd():
     
     # Only in extended mode: uncomment lines to revert to previous inControl modes
     if internal.getPortExtended():
-        # internal.extendedMode.revert(eventconsts.INCONTROL_FADERS) # Faders
-        # internal.extendedMode.revert(eventconsts.INCONTROL_KNOBS) # Knobs
-        # internal.extendedMode.revert(eventconsts.INCONTROL_PADS) # Pads
+        internal.extendedMode.revert(eventconsts.INCONTROL_FADERS) # Faders
+        internal.extendedMode.revert(eventconsts.INCONTROL_KNOBS) # Knobs
+        internal.extendedMode.revert(eventconsts.INCONTROL_PADS) # Pads
         pass
     return
 
@@ -72,11 +137,14 @@ def process(command):
             Use this to determing what actions your processor will take.
     """
     
+    
     # Add event processor to actions list (useful for debugging)
     command.actions.addProcessor("Vital Processor")
 
-    # When you handle your events, use command.handle("Some action") to handle events.
+    processOsc(command)
+
 
     return
 
-
+def beatChange(beat):
+    pass

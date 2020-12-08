@@ -10,7 +10,7 @@ Author: Miguel Guthridge [hdsq@outlook.com.au]
 #
 # Add custom event processors to this list
 #
-imports = ["fpc", "spitfire_bbcso", "slicex", "flex", "spitfire_labs", "piano_generic"]
+imports = ["fpc", "spitfire_bbcso", "slicex", "flex", "spitfire_labs", "piano_generic", "vital"]
 #
 #
 #
@@ -126,8 +126,10 @@ def process(command):
     
     # Pitch-bend wheel
     if command.id == eventconsts.PITCH_BEND:
+        #pluginswrapper.setCCParam(command.note, command.value)
         current_channel = channels.selectedChannel()
         channels.setChannelPitch(current_channel, processorhelpers.toFloat(command.value, -1, 1))
+        command.handle("Pitch Bend", 1)
 
 def beatChange(beat):
     for x in imports:
