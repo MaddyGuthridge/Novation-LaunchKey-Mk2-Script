@@ -21,6 +21,7 @@ import general
 import config
 import internal
 import pluginprocessors
+import pluginswrapper
 import eventconsts
 import processorhelpers
 
@@ -82,13 +83,6 @@ previous_channel_volume = None
 
 def process(command):
     
-    # REQUIRES SCRIPTING VERSION 8
-    #if general.getVersion() >= 8:
-    # Process pitch bend wheel
-    if command.id == eventconsts.PITCH_BEND:
-        current_channel = channels.selectedChannel()
-        channels.setChannelPitch(current_channel, processorhelpers.toFloat(command.value, -1, 1))
-    
     # Process master fader changing selected channel volume.
     if command.id == eventconsts.BASIC_FADER_9:
         current_channel = channels.selectedChannel()
@@ -121,6 +115,21 @@ def process(command):
             object_to_call.process(command)
         
         if command.ignored: return
+    
+    # Only process mod-wheel and pitch-bend if they weren't already handled by plugin processors
+    
+    # Mod-wheel
+    if command.id == eventconsts.MOD_WHEEL:
+        try:
+            pluginswrapper.setCCParam(command.note, command.value)
+            command.handle("Mod-wheel", 1)
+        except:
+            pass
+    
+    # Pitch-bend wheel
+    if command.id == eventconsts.PITCH_BEND:
+        current_channel = channels.selectedChannel()
+        channels.setChannelPitch(current_channel, processorhelpers.toFloat(command.value, -1, 1))
 
 def beatChange(beat):
     for x in imports:
