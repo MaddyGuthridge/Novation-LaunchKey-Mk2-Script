@@ -80,7 +80,7 @@ def processExtended(command):
 
             # Shouldn't be called in extended mode
             # Attempt to process event using custom processors for plugins
-            #pluginprocessors.process(command)
+            pluginprocessors.process(command)
 
             #if command.ignored: return
 

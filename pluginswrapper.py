@@ -27,7 +27,7 @@ def _getPluginIndexTuple(plugin_index):
     
     return (track_index, plugin_index)
 
-def getParamByName(name, plugin_index=-1, expected_param_index=-1):
+def getParamIndexByName(name, plugin_index=-1, expected_param_index=-1):
     """Returns the index of a parameter in a plugin given the name of the parameter.
 
     Args:
@@ -82,7 +82,7 @@ def setParamByName(name, value,  plugin_index=-1, expected_param_index=-1):
     
     plugin_index = _getPluginIndexTuple(plugin_index)
     
-    param_index = getParamByName(name, plugin_index, expected_param_index)
+    param_index = getParamIndexByName(name, plugin_index, expected_param_index)
     
     if type(value) is int:
         value = processorhelpers.toFloat(value)
@@ -127,3 +127,62 @@ def setParamByIndex(param_index, value,  plugin_index=-1):
 
 def setCCParam(ccNum, value, plugin_index=-1):
     setParamByIndex(ccNum + 4096, value, plugin_index)
+
+#
+# Getters
+#
+
+def getParamByName(name,  plugin_index=-1, expected_param_index=-1):
+    """Sets a parameter in a plugin given the name of the parameter.
+
+    Args:
+        name (str): Name of the parameter to find.
+        
+        plugin_index (optional)
+         *  (int):              Plugin index to search. Use -1 for currently-selected
+                                    plugin's index.
+         *  (tuple: 2 ints):    Respectively, mixer track and plugin index to search.
+        
+        expected_param_index (optional, int): index where the parameter is expected to be.
+            it is searched first to increase efficiency
+    
+    Returns:
+        int: parameter index changed
+    """
+    
+    plugin_index = _getPluginIndexTuple(plugin_index)
+    
+    param_index = getParamIndexByName(name, plugin_index, expected_param_index)
+    
+    # No plugin selected
+    if plugin_index[1] == -1:
+        return expected_param_index
+    
+    return plugins.getParamValue(param_index, plugin_index[1], plugin_index[0])
+
+def getParamByIndex(param_index,  plugin_index=-1):
+    """Sets a parameter in a plugin given the name of the parameter.
+
+    Args:
+        param_index (int): index where the parameter is.
+            
+        name (str): Name of the parameter to find.
+        
+        plugin_index (optional)
+         *  (int):              Plugin index to search. Use -1 for currently-selected
+                                    plugin's index.
+         *  (tuple: 2 ints):    Respectively, mixer track and plugin index to search.        
+    """
+    
+    plugin_index = _getPluginIndexTuple(plugin_index)
+    
+    # No plugin selected
+    if plugin_index[1] == -1:
+        return
+    
+    return plugins.getParamValue(param_index, plugin_index[1], plugin_index[0])
+
+
+def getCCParam(ccNum, plugin_index=-1):
+    return getParamByIndex(ccNum + 4096, plugin_index)
+
