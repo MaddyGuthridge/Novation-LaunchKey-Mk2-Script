@@ -22,6 +22,21 @@ import processorhelpers
 # Previous param index: should speed things up
 prev_param_index = -1
 
+#
+# Macros
+#
+
+MACRO = "Macro"
+NUM_MACROS = 4
+
+def processMacros(command):
+    global prev_param_index
+    if command.type == eventconsts.TYPE_BASIC_FADER and command.coord_X < NUM_MACROS:
+        param_str = MACRO + " " + str(command.coord_X + 1)
+        prev_param_index = pluginswrapper.setParamByName(
+                                param_str, 
+                                command.value, -1, prev_param_index)
+        command.handle("Set macro", 1)
 
 #
 # Oscillator
@@ -163,13 +178,122 @@ selected_filter = 1
 
 FILTER_ENABLED = "Switch"
 
+FILTER_BLEND = "Blend"
+FILTER_CUT = "Cutoff"
+FILTER_RESONANCE = "Resonance"
+
+FILTER_DRIVE = "Drive"
+FILTER_MIX = "Mix"
+FILTER_KEY = "Key Track"
+
+def processFilter(command):
+    global prev_param_index, selected_filter
+    
+    param_str =  FILTER + " " + str(selected_filter) + " "
+    
+    if not pluginswrapper.getParamByName(param_str + FILTER_ENABLED):
+        selected_filter = 0
+        
+    if command.type is eventconsts.TYPE_BASIC_PAD and command.coord_Y == 1:
+        if command.is_lift:
+            # Change oscillators
+            if command.coord_X < NUM_FILTERS:
+                filter_num = command.coord_X + 1
+                param_str = FILTER + " " + str(filter_num) + " "
+                
+                # Acting on selected oscillator
+                if filter_num == selected_filter:
+                    # If disabled
+                    if not pluginswrapper.getParamByName(param_str + FILTER_ENABLED):
+                        pluginswrapper.setParamByName(param_str + FILTER_ENABLED, 1.0)
+                        command.handle("Vital: Enable filter " + str(filter_num))
+                    else:
+                        pluginswrapper.setParamByName(param_str + FILTER_ENABLED, 0.0)
+                        selected_osc = 0
+                        command.handle("Vital: Disable filter " + str(filter_num))
+                
+                else:
+                    # If disabled
+                    if not pluginswrapper.getParamByName(param_str + FILTER_ENABLED):
+                        pluginswrapper.setParamByName(param_str + FILTER_ENABLED, 1.0)
+                        selected_filter = filter_num
+                        command.handle("Vital: Enable filter " + str(filter_num))
+                    else:
+                        selected_filter = filter_num
+                        command.handle("Vital: Select filter " + str(filter_num))
+            
+            else:
+                command.handle("Pads catch-all", 1)
+        else:
+            command.handle("Handle presses", 1)
+        
+    # No oscilator selected
+    if selected_filter == 0:
+        return
+
+    if command.type == eventconsts.TYPE_BASIC_FADER:
+        if command.coord_X == 0:
+            prev_param_index = pluginswrapper.setParamByName(param_str + FILTER_BLEND, command.value, -1, prev_param_index)
+            command.handle("Set filter blend", 1)
+        elif command.coord_X == 1:
+            prev_param_index = pluginswrapper.setParamByName(param_str + FILTER_CUT, command.value, -1, prev_param_index)
+            command.handle("Set filter cut", 1)
+        elif command.coord_X == 2:
+            prev_param_index = pluginswrapper.setParamByName(param_str + FILTER_RESONANCE, command.value, -1, prev_param_index)
+            command.handle("Set filter resonance", 1)
+    
+    elif command.type ==  eventconsts.TYPE_BASIC_KNOB:
+        if command.coord_X == 0:
+            prev_param_index = pluginswrapper.setParamByName(param_str + FILTER_DRIVE, command.value, -1, prev_param_index)
+            command.handle("Set filter drive", 1)
+        elif command.coord_X == 1:
+            prev_param_index = pluginswrapper.setParamByName(param_str + FILTER_MIX, command.value, -1, prev_param_index)
+            command.handle("Set filter mix", 1)
+        elif command.coord_X == 2:
+            prev_param_index = pluginswrapper.setParamByName(param_str + FILTER_KEY, command.value, -1, prev_param_index)
+            command.handle("Set filter key tracking", 1)
+    
+
+def redrawFilter(lights):
+    global selected_filter
+    
+    for i in range(0, NUM_FILTERS):
+        param_str =  FILTER + " " + str(i + 1) + " " + FILTER_ENABLED
+        if pluginswrapper.getParamByName(param_str):
+            if i + 1 == selected_filter:
+                lights.setPadColour(i, 1, lightingconsts.colours["RED"])
+            else:
+                lights.setPadColour(i, 1, lightingconsts.colours["TEAL"])
+        else:
+            if i == selected_filter:
+                selected_filter = 0
+            
+            lights.setPadColour(i, 1, lightingconsts.colours["DARK GREY"])
+
+#
+# Envelopes
+#
+
+ENVELOPE = "Envelope"
+NUM_ENVELOPES = 6
+
+selected_envelope = 1
+
+def processEnv(command):
+    pass
+
+def redrawEnv(lights):
+    pass
+
 #
 # Overall functions
 #
 
-current_selection = ""
+# Default selection is macros
+current_selection = MACRO
 
-SELECTIONS = [OSCILLATOR, FILTER]
+SELECTIONS = [MACRO, OSCILLATOR, FILTER]
+SELECTION_COLOURS = [lightingconsts.colours["LIGHT BLUE"], lightingconsts.colours["PURPLE"], lightingconsts.colours["ORANGE"]]
 
 def topPluginStart():
     """Called when plugin is top plugin (not neccesarily focused)
@@ -182,9 +306,6 @@ def topPluginStart():
         internal.extendedMode.setVal(False, eventconsts.INCONTROL_KNOBS) # Knobs
         internal.extendedMode.setVal(False, eventconsts.INCONTROL_PADS) # Pads
         pass
-    
-    if current_selection ==  "":
-        current_selection = OSCILLATOR
     
     return
 
@@ -220,7 +341,19 @@ def redraw(lights):
             Modify the object using it's methods to set light colours.
     """
     
-    redrawOsc(lights)
+    for i in range(len(SELECTIONS)):
+        if SELECTIONS[i] == current_selection:
+            lights.setPadColour(i, 0, lightingconsts.colours["DARK GREY"])
+        else:
+            lights.setPadColour(i, 0, SELECTION_COLOURS[i])
+    
+    
+    if current_selection == OSCILLATOR:
+        redrawOsc(lights)
+    elif current_selection == FILTER:
+        redrawFilter(lights)
+    
+    lights.solidifyAll()
     
     return
 
@@ -248,10 +381,12 @@ def process(command):
 
     if command.handled: return
 
-    if current_selection == OSCILLATOR:
+    if current_selection == MACRO:
+        processMacros(command)
+    elif current_selection == OSCILLATOR:
         processOsc(command)
     elif current_selection == FILTER:
-        pass
+        processFilter(command)
 
     return
 
