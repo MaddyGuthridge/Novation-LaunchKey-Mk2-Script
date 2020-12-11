@@ -85,8 +85,7 @@ def process(command):
 
     if command.type is eventconsts.TYPE_BASIC_KNOB:
         if command.coord_X < 4:
-            pluginswrapper.setParamByIndex(ASDR_START + command.coord_X, command.value)
-            command.handle("Set LABS ASDR", 1)
+            pluginswrapper.setParamByIndex(ASDR_START + command.coord_X, command.value, -1, command)
     
     elif command.type is eventconsts.TYPE_BASIC_FADER:
         if command.coord_X == 0:

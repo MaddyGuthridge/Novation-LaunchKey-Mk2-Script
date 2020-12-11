@@ -57,7 +57,7 @@ def getParamIndexByName(name, plugin_index=-1, expected_param_index=-1):
     
     return -1
 
-def setParamByName(name, value,  plugin_index=-1, expected_param_index=-1):
+def setParamByName(name, value,  plugin_index=-1, expected_param_index=-1, command=None):
     """Sets a parameter in a plugin given the name of the parameter.
 
     Args:
@@ -75,6 +75,8 @@ def setParamByName(name, value,  plugin_index=-1, expected_param_index=-1):
         
         expected_param_index (optional, int): index where the parameter is expected to be.
             it is searched first to increase efficiency
+        
+        command (ParsedEvent, optional): Command to add handling message to
     
     Returns:
         int: parameter index changed
@@ -84,18 +86,11 @@ def setParamByName(name, value,  plugin_index=-1, expected_param_index=-1):
     
     param_index = getParamIndexByName(name, plugin_index, expected_param_index)
     
-    if type(value) is int:
-        value = processorhelpers.toFloat(value)
-    
-    # No plugin selected
-    if plugin_index[1] == -1:
-        return expected_param_index
-    
-    plugins.setParamValue(value, param_index, plugin_index[1], plugin_index[0])
+    setParamByIndex(param_index, value, plugin_index, command)
     
     return param_index
 
-def setParamByIndex(param_index, value,  plugin_index=-1):
+def setParamByIndex(param_index, value,  plugin_index=-1, command=None):
     """Sets a parameter in a plugin given the name of the parameter.
 
     Args:
@@ -111,7 +106,9 @@ def setParamByIndex(param_index, value,  plugin_index=-1):
         plugin_index (optional)
          *  (int):              Plugin index to search. Use -1 for currently-selected
                                     plugin's index.
-         *  (tuple: 2 ints):    Respectively, mixer track and plugin index to search.        
+         *  (tuple: 2 ints):    Respectively, mixer track and plugin index to search.
+        
+        command (ParsedEvent, optional): Command to add handling message to        
     """
     
     if type(value) is int:
@@ -124,9 +121,16 @@ def setParamByIndex(param_index, value,  plugin_index=-1):
         return
     
     plugins.setParamValue(value, param_index, plugin_index[1], plugin_index[0])
+    
+    if command is not None:
+        command.handle(plugins.getPluginName(plugin_index[1], plugin_index[0])
+                       + ": Set "
+                       + plugins.getParamName(param_index, plugin_index[1], plugin_index[0])
+                       + " to " + str(round(value * 100)) + "%"
+                    )
 
-def setCCParam(ccNum, value, plugin_index=-1):
-    setParamByIndex(ccNum + 4096, value, plugin_index)
+def setCCParam(ccNum, value, plugin_index=-1, command=None):
+    setParamByIndex(ccNum + 4096, value, plugin_index, command)
 
 #
 # Getters

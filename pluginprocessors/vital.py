@@ -35,8 +35,7 @@ def processMacros(command):
         param_str = MACRO + " " + str(command.coord_X + 1)
         prev_param_index = pluginswrapper.setParamByName(
                                 param_str, 
-                                command.value, -1, prev_param_index)
-        command.handle("Set macro", 1)
+                                command.value, -1, prev_param_index, command)
 
 #
 # Oscillator
@@ -110,13 +109,12 @@ def processOsc(command):
 
     if command.type == eventconsts.TYPE_BASIC_FADER:
         if command.coord_X < len(OSC_FADERS):
-            prev_param_index = pluginswrapper.setParamByName(param_str + OSC_FADERS[command.coord_X], command.value, -1, prev_param_index)
-            command.handle("Set osc fader", 1)
+            prev_param_index = pluginswrapper.setParamByName(param_str + OSC_FADERS[command.coord_X], command.value, -1, prev_param_index, command)
     
     elif command.type ==  eventconsts.TYPE_BASIC_KNOB:
         if command.coord_X < len(OSC_KNOBS):
-            prev_param_index = pluginswrapper.setParamByName(param_str + OSC_KNOBS[command.coord_X], command.value, -1, prev_param_index)
-            command.handle("Set osc knob", 1)
+            prev_param_index = pluginswrapper.setParamByName(param_str + OSC_KNOBS[command.coord_X], command.value, -1, prev_param_index, command)
+    
     
 def redrawOsc(lights):
     global selected_osc
@@ -201,13 +199,11 @@ def processFilter(command):
 
     if command.type == eventconsts.TYPE_BASIC_FADER:
         if command.coord_X < len(FILTER_FADERS):
-            prev_param_index = pluginswrapper.setParamByName(param_str + FILTER_FADERS[command.coord_X], command.value, -1, prev_param_index)
-            command.handle("Set filter fader", 1)
+            prev_param_index = pluginswrapper.setParamByName(param_str + FILTER_FADERS[command.coord_X], command.value, -1, prev_param_index, command)
     
     elif command.type ==  eventconsts.TYPE_BASIC_KNOB:
         if command.coord_X < len(FILTER_KNOBS):
-            prev_param_index = pluginswrapper.setParamByName(param_str + FILTER_KNOBS[command.coord_X], command.value, -1, prev_param_index)
-            command.handle("Set filter knob", 1)
+            prev_param_index = pluginswrapper.setParamByName(param_str + FILTER_KNOBS[command.coord_X], command.value, -1, prev_param_index, command)
     
 
 def redrawFilter(lights):
@@ -262,8 +258,7 @@ def processEnv(command):
 
     if command.type == eventconsts.TYPE_BASIC_KNOB:
         if command.coord_X < len(ENV_KNOBS):
-            prev_param_index = pluginswrapper.setParamByName(param_str + ENV_KNOBS[command.coord_X], command.value, -1, prev_param_index)
-            command.handle("Set envelope " + ENV_KNOBS[command.coord_X], 1)
+            prev_param_index = pluginswrapper.setParamByName(param_str + ENV_KNOBS[command.coord_X], command.value, -1, prev_param_index, command)
         
 
 def redrawEnv(lights):

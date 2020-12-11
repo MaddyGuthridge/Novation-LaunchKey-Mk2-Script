@@ -82,8 +82,7 @@ def process(command):
     
     if command.type is eventconsts.TYPE_BASIC_FADER:
         if command.coord_X < 8:
-            pluginswrapper.setParamByIndex(command.coord_X + CONTROL_START, command.value)
-            command.handle("Set FLEX param slider", 1)
+            pluginswrapper.setParamByIndex(command.coord_X + CONTROL_START, command.value, -1, command)
         
     return
 

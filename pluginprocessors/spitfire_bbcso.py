@@ -82,8 +82,7 @@ def process(command):
             spitfire_generic.setDynamics(command)
         
         elif command.coord_X == 7:
-            pluginswrapper.setParamByName("Variation", command.value, -1, VARIATION)
-            command.handle("Set BBCSO Near-far", 1)
+            pluginswrapper.setParamByName("Variation", command.value, -1, VARIATION, command)
     
     if command.type is eventconsts.TYPE_BASIC_KNOB:
         if command.coord_X == 0:
@@ -94,8 +93,7 @@ def process(command):
             spitfire_generic.setTightness(command)
             
         elif command.coord_X == 3:
-            pluginswrapper.setParamByName("Variation", command.value, -1, VARIATION)
-            command.handle("Set BBCSO Variation", 1)
+            pluginswrapper.setParamByName("Variation", command.value, -1, VARIATION, command)
         
         elif command.coord_X == 4:
             spitfire_generic.setVibrato(command)
