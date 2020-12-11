@@ -74,37 +74,35 @@ def processOsc(command):
         selected_osc = 0
     
     if command.type is eventconsts.TYPE_BASIC_PAD and command.coord_Y == 1:
-        if command.is_lift:
-            # Change oscillators
-            if command.coord_X < NUM_OSCS:
-                osc_num = command.coord_X + 1
-                param_str = OSCILLATOR + " " + str(osc_num) + " "
-                
-                # Acting on selected oscillator
-                if osc_num == selected_osc:
-                    # If disabled
-                    if not pluginswrapper.getParamByName(param_str + OSC_ENABLED):
-                        pluginswrapper.setParamByName(param_str + OSC_ENABLED, 1.0)
-                        command.handle("Vital: Enable oscillator " + str(osc_num))
-                    else:
-                        pluginswrapper.setParamByName(param_str + OSC_ENABLED, 0.0)
-                        selected_osc = 0
-                        command.handle("Vital: Disable oscillator " + str(osc_num))
-                
+        # Change oscillators
+        if command.coord_X < NUM_OSCS:
+            osc_num = command.coord_X + 1
+            param_str = OSCILLATOR + " " + str(osc_num) + " "
+            
+            # Acting on selected oscillator
+            if osc_num == selected_osc:
+                # If disabled
+                if not pluginswrapper.getParamByName(param_str + OSC_ENABLED):
+                    pluginswrapper.setParamByName(param_str + OSC_ENABLED, 1.0)
+                    command.handle("Vital: Enable oscillator " + str(osc_num))
                 else:
-                    # If disabled
-                    if not pluginswrapper.getParamByName(param_str + OSC_ENABLED):
-                        pluginswrapper.setParamByName(param_str + OSC_ENABLED, 1.0)
-                        selected_osc = osc_num
-                        command.handle("Vital: Enable oscillator " + str(osc_num))
-                    else:
-                        selected_osc = osc_num
-                        command.handle("Vital: Select oscillator " + str(osc_num))
+                    pluginswrapper.setParamByName(param_str + OSC_ENABLED, 0.0)
+                    selected_osc = 0
+                    command.handle("Vital: Disable oscillator " + str(osc_num))
             
             else:
-                command.handle("Pads catch-all", 1)
+                # If disabled
+                if not pluginswrapper.getParamByName(param_str + OSC_ENABLED):
+                    pluginswrapper.setParamByName(param_str + OSC_ENABLED, 1.0)
+                    selected_osc = osc_num
+                    command.handle("Vital: Enable oscillator " + str(osc_num))
+                else:
+                    selected_osc = osc_num
+                    command.handle("Vital: Select oscillator " + str(osc_num))
+        
         else:
-            command.handle("Handle presses", 1)
+            command.handle("Pads catch-all", 1)
+            
     # No oscilator selected
     if selected_osc == 0:
         return
@@ -195,39 +193,36 @@ def processFilter(command):
         selected_filter = 0
         
     if command.type is eventconsts.TYPE_BASIC_PAD and command.coord_Y == 1:
-        if command.is_lift:
-            # Change oscillators
-            if command.coord_X < NUM_FILTERS:
-                filter_num = command.coord_X + 1
-                param_str = FILTER + " " + str(filter_num) + " "
-                
-                # Acting on selected oscillator
-                if filter_num == selected_filter:
-                    # If disabled
-                    if not pluginswrapper.getParamByName(param_str + FILTER_ENABLED):
-                        pluginswrapper.setParamByName(param_str + FILTER_ENABLED, 1.0)
-                        command.handle("Vital: Enable filter " + str(filter_num))
-                    else:
-                        pluginswrapper.setParamByName(param_str + FILTER_ENABLED, 0.0)
-                        selected_osc = 0
-                        command.handle("Vital: Disable filter " + str(filter_num))
-                
+        # Change filters
+        if command.coord_X < NUM_FILTERS:
+            filter_num = command.coord_X + 1
+            param_str = FILTER + " " + str(filter_num) + " "
+            
+            # Acting on selected filter
+            if filter_num == selected_filter:
+                # If disabled
+                if not pluginswrapper.getParamByName(param_str + FILTER_ENABLED):
+                    pluginswrapper.setParamByName(param_str + FILTER_ENABLED, 1.0)
+                    command.handle("Vital: Enable filter " + str(filter_num))
                 else:
-                    # If disabled
-                    if not pluginswrapper.getParamByName(param_str + FILTER_ENABLED):
-                        pluginswrapper.setParamByName(param_str + FILTER_ENABLED, 1.0)
-                        selected_filter = filter_num
-                        command.handle("Vital: Enable filter " + str(filter_num))
-                    else:
-                        selected_filter = filter_num
-                        command.handle("Vital: Select filter " + str(filter_num))
+                    pluginswrapper.setParamByName(param_str + FILTER_ENABLED, 0.0)
+                    selected_osc = 0
+                    command.handle("Vital: Disable filter " + str(filter_num))
             
             else:
-                command.handle("Pads catch-all", 1)
-        else:
-            command.handle("Handle presses", 1)
+                # If disabled
+                if not pluginswrapper.getParamByName(param_str + FILTER_ENABLED):
+                    pluginswrapper.setParamByName(param_str + FILTER_ENABLED, 1.0)
+                    selected_filter = filter_num
+                    command.handle("Vital: Enable filter " + str(filter_num))
+                else:
+                    selected_filter = filter_num
+                    command.handle("Vital: Select filter " + str(filter_num))
         
-    # No oscilator selected
+        else:
+            command.handle("Pads catch-all", 1)
+        
+    # No filter selected
     if selected_filter == 0:
         return
 
@@ -263,7 +258,7 @@ def redrawFilter(lights):
             if i + 1 == selected_filter:
                 lights.setPadColour(i, 1, lightingconsts.colours["RED"])
             else:
-                lights.setPadColour(i, 1, lightingconsts.colours["TEAL"])
+                lights.setPadColour(i, 1, lightingconsts.colours["ORANGE"])
         else:
             if i == selected_filter:
                 selected_filter = 0
@@ -279,11 +274,45 @@ NUM_ENVELOPES = 6
 
 selected_envelope = 1
 
+ENVELOPE_ENABLED = "Switch"
+
+ENV_DELAY = "Delay"
+ENV_ATTACK = "Attack"
+ENV_HOLD = "Hold"
+ENV_DECAY = "Decay"
+ENV_SUSTAIN = "Sustain"
+ENV_RELEASE = "Release"
+
+ENV_KNOBS = [ENV_DELAY, ENV_ATTACK, ENV_HOLD, ENV_DECAY, ENV_SUSTAIN, ENV_RELEASE]
+
 def processEnv(command):
-    pass
+    global prev_param_index, selected_envelope
+    
+    param_str =  ENVELOPE + " " + str(selected_envelope) + " "
+        
+    if command.type is eventconsts.TYPE_BASIC_PAD and command.coord_Y == 1:
+        # Change envelopes
+        if command.coord_X < NUM_ENVELOPES:
+            selected_envelope = command.coord_X + 1
+            command.handle("Select envelope")
+        
+        else:
+            command.handle("Pads catch-all", 1)
+
+    if command.type == eventconsts.TYPE_BASIC_KNOB:
+        if command.coord_X < len(ENV_KNOBS):
+            prev_param_index = pluginswrapper.setParamByName(param_str + ENV_KNOBS[command.coord_X], command.value, -1, prev_param_index)
+            command.handle("Set envelope " + ENV_KNOBS[command.coord_X], 1)
+        
 
 def redrawEnv(lights):
-    pass
+    global selected_envelope
+    
+    for i in range(0, NUM_ENVELOPES):
+        if i + 1 == selected_envelope:
+            lights.setPadColour(i, 1, lightingconsts.colours["TEAL"])
+        else:
+            lights.setPadColour(i, 1, lightingconsts.colours["DARK GREY"])
 
 #
 # Overall functions
@@ -292,8 +321,8 @@ def redrawEnv(lights):
 # Default selection is macros
 current_selection = MACRO
 
-SELECTIONS = [MACRO, OSCILLATOR, FILTER]
-SELECTION_COLOURS = [lightingconsts.colours["LIGHT BLUE"], lightingconsts.colours["PURPLE"], lightingconsts.colours["ORANGE"]]
+SELECTIONS = [MACRO, OSCILLATOR, FILTER, ENVELOPE]
+SELECTION_COLOURS = [lightingconsts.colours["LIGHT BLUE"], lightingconsts.colours["PURPLE"], lightingconsts.colours["ORANGE"], lightingconsts.colours["TEAL"]]
 
 def topPluginStart():
     """Called when plugin is top plugin (not neccesarily focused)
@@ -341,6 +370,9 @@ def redraw(lights):
             Modify the object using it's methods to set light colours.
     """
     
+    if internal.extendedMode.query(eventconsts.INCONTROL_PADS):
+        return
+    
     for i in range(len(SELECTIONS)):
         if SELECTIONS[i] == current_selection:
             lights.setPadColour(i, 0, lightingconsts.colours["DARK GREY"])
@@ -352,6 +384,8 @@ def redraw(lights):
         redrawOsc(lights)
     elif current_selection == FILTER:
         redrawFilter(lights)
+    elif current_selection == ENVELOPE:
+        redrawEnv(lights)
     
     lights.solidifyAll()
     
@@ -371,13 +405,16 @@ def process(command):
     command.actions.addProcessor("Vital Processor")
 
     if command.type == eventconsts.TYPE_BASIC_PAD:
+        if command.is_lift:
+            command.handle("Handle presses")
+        
         if command.coord_Y == 0:
             if command.coord_X < len(SELECTIONS):
                 current_selection = SELECTIONS[command.coord_X]
                 command.handle("Select: " + SELECTIONS[command.coord_X])
 
             else:
-                command.handle("Lower pads catch-all")
+                command.handle("Upper pads catch-all")
 
     if command.handled: return
 
@@ -387,6 +424,11 @@ def process(command):
         processOsc(command)
     elif current_selection == FILTER:
         processFilter(command)
+    elif current_selection == ENVELOPE:
+        processEnv(command)
+
+    if command.type == eventconsts.TYPE_BASIC_PAD:
+        command.handle("Pads catch-all", 1)
 
     return
 
