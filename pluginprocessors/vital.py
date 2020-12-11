@@ -62,7 +62,8 @@ OSC_PAN = "Pan"
 OSC_FREQUENCY_MORPH = "Frequency Morph Amount"
 OSC_DISTORTION = "Distortion Amount"
 
-
+OSC_FADERS = [OSC_WAVE_FRAME, OSC_UNISON, OSC_DETUNE, OSC_PHASE, OSC_PHASE_RAND]
+OSC_KNOBS = [OSC_LEVEL, OSC_PAN, OSC_FREQUENCY_MORPH, OSC_DISTORTION]
 
 
 def processOsc(command):
@@ -107,46 +108,15 @@ def processOsc(command):
     if selected_osc == 0:
         return
 
-    if command.type is eventconsts.TYPE_BASIC_FADER:
-        if command.coord_X == 0:
-            prev_param_index = pluginswrapper.setParamByName(
-                                    param_str + OSC_WAVE_FRAME, 
-                                    command.value, -1, prev_param_index)
-            command.handle("Wave frame", 1)
-            
-        elif command.coord_X == 1:
-            prev_param_index = pluginswrapper.setParamByName(
-                                    param_str + OSC_UNISON, 
-                                    command.value, -1, prev_param_index)
-            command.handle("Unison voices", 1)
-            
-        elif command.coord_X == 2:
-            prev_param_index = pluginswrapper.setParamByName(
-                                    param_str + OSC_DETUNE, 
-                                    command.value, -1, prev_param_index)
-            command.handle("Detune", 1)
-            
-    elif command.type is eventconsts.TYPE_BASIC_KNOB:
-        if command.coord_X == 0:
-            prev_param_index = pluginswrapper.setParamByName(
-                                    param_str + OSC_LEVEL, 
-                                    command.value, -1, prev_param_index)
-            command.handle("Level", 1)
-        elif command.coord_X == 1:
-            pluginswrapper.setParamByName(
-                                    param_str + OSC_PAN, 
-                                    command.value, -1, prev_param_index)
-            command.handle("Pan", 1)
-        elif command.coord_X == 2:
-            prev_param_index = pluginswrapper.setParamByName(
-                                    param_str + OSC_FREQUENCY_MORPH, 
-                                    command.value, -1, prev_param_index)
-            command.handle("Frequency Morph", 1)
-        elif command.coord_X == 3:
-            pluginswrapper.setParamByName(
-                                    param_str + OSC_DISTORTION, 
-                                    command.value, -1, prev_param_index)
-            command.handle("Distortion", 1)
+    if command.type == eventconsts.TYPE_BASIC_FADER:
+        if command.coord_X < len(OSC_FADERS):
+            prev_param_index = pluginswrapper.setParamByName(param_str + OSC_FADERS[command.coord_X], command.value, -1, prev_param_index)
+            command.handle("Set osc fader", 1)
+    
+    elif command.type ==  eventconsts.TYPE_BASIC_KNOB:
+        if command.coord_X < len(OSC_KNOBS):
+            prev_param_index = pluginswrapper.setParamByName(param_str + OSC_KNOBS[command.coord_X], command.value, -1, prev_param_index)
+            command.handle("Set osc knob", 1)
     
 def redrawOsc(lights):
     global selected_osc
@@ -183,6 +153,9 @@ FILTER_RESONANCE = "Resonance"
 FILTER_DRIVE = "Drive"
 FILTER_MIX = "Mix"
 FILTER_KEY = "Key Track"
+
+FILTER_FADERS = [FILTER_BLEND, FILTER_CUT, FILTER_RESONANCE]
+FILTER_KNOBS = [FILTER_DRIVE, FILTER_MIX, FILTER_KEY]
 
 def processFilter(command):
     global prev_param_index, selected_filter
@@ -227,26 +200,14 @@ def processFilter(command):
         return
 
     if command.type == eventconsts.TYPE_BASIC_FADER:
-        if command.coord_X == 0:
-            prev_param_index = pluginswrapper.setParamByName(param_str + FILTER_BLEND, command.value, -1, prev_param_index)
-            command.handle("Set filter blend", 1)
-        elif command.coord_X == 1:
-            prev_param_index = pluginswrapper.setParamByName(param_str + FILTER_CUT, command.value, -1, prev_param_index)
-            command.handle("Set filter cut", 1)
-        elif command.coord_X == 2:
-            prev_param_index = pluginswrapper.setParamByName(param_str + FILTER_RESONANCE, command.value, -1, prev_param_index)
-            command.handle("Set filter resonance", 1)
+        if command.coord_X < len(FILTER_FADERS):
+            prev_param_index = pluginswrapper.setParamByName(param_str + FILTER_FADERS[command.coord_X], command.value, -1, prev_param_index)
+            command.handle("Set filter fader", 1)
     
     elif command.type ==  eventconsts.TYPE_BASIC_KNOB:
-        if command.coord_X == 0:
-            prev_param_index = pluginswrapper.setParamByName(param_str + FILTER_DRIVE, command.value, -1, prev_param_index)
-            command.handle("Set filter drive", 1)
-        elif command.coord_X == 1:
-            prev_param_index = pluginswrapper.setParamByName(param_str + FILTER_MIX, command.value, -1, prev_param_index)
-            command.handle("Set filter mix", 1)
-        elif command.coord_X == 2:
-            prev_param_index = pluginswrapper.setParamByName(param_str + FILTER_KEY, command.value, -1, prev_param_index)
-            command.handle("Set filter key tracking", 1)
+        if command.coord_X < len(FILTER_KNOBS):
+            prev_param_index = pluginswrapper.setParamByName(param_str + FILTER_KNOBS[command.coord_X], command.value, -1, prev_param_index)
+            command.handle("Set filter knob", 1)
     
 
 def redrawFilter(lights):
