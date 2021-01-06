@@ -207,7 +207,7 @@ class WindowMgr:
                 # Set new plugin
                 self.plugin_focused = True
                 self.active_plugin = new_plugin
-                self.active_plugin_index = channels.channelNumber()
+                self.active_plugin_index = channels.selectedChannel()
 
                 debugLog("Active Window: " + self.active_plugin, consts.DEBUG.WINDOW_CHANGES)
                 debugLog("[Background: " + getFlWindowString(self.active_fl_window) + "]", consts.DEBUG.WINDOW_CHANGES)
