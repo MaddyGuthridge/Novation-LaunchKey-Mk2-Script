@@ -6,6 +6,7 @@ Author: Miguel Guthridge [hdsq@outlook.com.au]
 """
 
 import plugins
+import channels
 
 import internal
 import processorhelpers
@@ -123,7 +124,12 @@ def setParamByIndex(param_index, value,  plugin_index=-1, command=None):
     plugins.setParamValue(value, param_index, plugin_index[1], plugin_index[0])
     
     if command is not None:
-        command.handle(plugins.getPluginName(plugin_index[1], plugin_index[0])
+        # For generators, use name on channel rack
+        if plugin_index[0] == -1:
+            plug_name = channels.getChannelName(plugin_index[1])
+        else:
+            plug_name = plugins.getPluginName(plugin_index[1], plugin_index[0])
+        command.handle(plug_name
                        + ": Set "
                        + plugins.getParamName(param_index, plugin_index[1], plugin_index[0])
                        + " to " + str(round(value * 100)) + "%"
