@@ -1,14 +1,14 @@
 """
-pluginprocessors > _template.py
+pluginprocessors > midi_cc.py
 
-The file acts as a template for plugin handlers. Copy it and edit to add your own plugin handlers.
-To get it to be imported by the event processor, add its filename (without the .py) to processplugins.py
+This file processes knob, fader, pedal and mod-wheel events by sending raw MIDI CC data to plugins, allowing them 
+to use their own MIDI capabilities, such as MIDI learning or custom CC mappings.
 
 Author: Miguel Guthridge [hdsq@outlook.com.au]
 """
 
 # Add names of plugins your script can process to this list
-PLUGINS = ["Originals - Firewood Piano", "Originals - Cinematic Soft Piano", "Addictive Keys"]
+PLUGINS = ["Kontakt"]
 
 
 # Import any modules you might need\
@@ -27,8 +27,8 @@ def topPluginStart():
     
     # Only in extended mode: uncomment lines to set inControl mode
     if internal.getPortExtended():
-        # internal.extendedMode.setVal(False, eventconsts.INCONTROL_FADERS) # Faders
-        # internal.extendedMode.setVal(False, eventconsts.INCONTROL_KNOBS) # Knobs
+        internal.extendedMode.setVal(False, eventconsts.INCONTROL_FADERS) # Faders
+        internal.extendedMode.setVal(False, eventconsts.INCONTROL_KNOBS) # Knobs
         # internal.extendedMode.setVal(False, eventconsts.INCONTROL_PADS) # Pads
         pass
     return
@@ -39,8 +39,8 @@ def topPluginEnd():
     
     # Only in extended mode: uncomment lines to revert to previous inControl modes
     if internal.getPortExtended():
-        # internal.extendedMode.revert(eventconsts.INCONTROL_FADERS) # Faders
-        # internal.extendedMode.revert(eventconsts.INCONTROL_KNOBS) # Knobs
+        internal.extendedMode.revert(eventconsts.INCONTROL_FADERS) # Faders
+        internal.extendedMode.revert(eventconsts.INCONTROL_KNOBS) # Knobs
         # internal.extendedMode.revert(eventconsts.INCONTROL_PADS) # Pads
         pass
     return
@@ -48,6 +48,7 @@ def topPluginEnd():
 def activeStart():
     """Called when plugin brought to foreground (focused)
     """
+    
     return
 
 def activeEnd():
@@ -74,12 +75,14 @@ def process(command):
     """
     
     # Add event processor to actions list (useful for debugging)
-    command.actions.addProcessor("Your Processor Name")
+    command.actions.addProcessor("MIDI-CC Processor")
 
     # When you handle your events, use command.handle("Some action") to handle events.
-    if command.id == eventconsts.PEDAL:
-        pluginswrapper.setCCParam(command.note, command.value)
-        command.handle("Pedal", 1)
+    if command.type is eventconsts.TYPE_BASIC_FADER \
+        or command.type is eventconsts.TYPE_BASIC_KNOB \
+        or command.id is eventconsts.MOD_WHEEL\
+        or command.id is eventconsts.PEDAL:
+            pluginswrapper.setCCParam(command.note, command.value, command=command)
 
     return
 
