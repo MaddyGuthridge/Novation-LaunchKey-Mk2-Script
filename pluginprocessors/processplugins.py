@@ -129,7 +129,7 @@ def process(command):
     if command.id == eventconsts.PITCH_BEND:
         #pluginswrapper.setCCParam(command.note, command.value)
         current_channel = channels.selectedChannel()
-        channels.setChannelPitch(current_channel, processorhelpers.toFloat(command.value, -1, 1))
+        channels.setChannelPitch(current_channel, processorhelpers.snap(processorhelpers.toFloat(command.value, -1, 1), 0.0))
         command.handle("Pitch Bend", 1)
 
 def beatChange(beat):

@@ -198,13 +198,21 @@ def snap(value, snapTo):
 
     Args:
         value (float): value being snapped
-        snapTo (float): value to snap to
+        snapTo (float or list of floats): value(s) to snap to
 
     Returns:
         float: value after snapping
     """
-    if abs(value - snapTo) <= config.SNAP_RANGE and config.ENABLE_SNAPPING:
-        return snapTo
+    if not config.ENABLE_SNAPPING:
+        return value
+    
+    # Change to list
+    if type(snapTo) is float or type(snapTo) is int:
+        snapTo = [snapTo]
+    
+    for i in range(len(snapTo)):
+        if abs(value - snapTo[i]) <= config.SNAP_RANGE:
+            return snapTo[i]
     else: return value
 
 def didSnap(value, snapTo):
@@ -212,7 +220,7 @@ def didSnap(value, snapTo):
 
     Args:
         value (float): value being snapped
-        snapTo (float): value to snap to
+        snapTo (float or list of floats): value(s) to snap to
 
     Returns:
         bool: whether the value would snap
