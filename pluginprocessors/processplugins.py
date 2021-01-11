@@ -27,15 +27,22 @@ import eventconsts
 import processorhelpers
 
 # Import custom processors specified in list above
-print("Importing Plguin Processors")
+print("Importing Plguin Processors...")
 customProcessors = []
+success = 0
+total_plugins = 0
 for x in range(len(imports)):
     try:
         customProcessors.append( __import__("pluginprocessors." + imports[x]) )
-        print (" - Successfully imported:", getattr(pluginprocessors, imports[x]).PLUGINS)
-    except ImportError:
-        print (" - Error importing: " + imports[x])
-print("Plugin Processor import complete")
+        plugin_count = len(getattr(pluginprocessors, imports[x]).PLUGINS)
+        success += 1
+        total_plugins += plugin_count
+    except ImportError as e:
+        print ("\tError importing: " + imports[x])
+        print("\t" + e)
+        if config.DEBUG_HARD_CRASHING:
+            raise e
+print("Successfully imported " + str(success) + "/" + str(len(imports)) + " modules (" + str(total_plugins) + " plugins)")
 
 # Called when plugin is top plugin
 def topPluginStart():
