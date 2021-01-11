@@ -255,13 +255,12 @@ def redraw():
             
             if lights.isSolid(): break
 
-            # Get UI drawn from plugins
-            pluginprocessors.redraw(lights)
-            
-            if lights.isSolid(): break
-
-            # Get UI drawn from windows
-            windowprocessors.redraw(lights)
+            if not internal.extendedMode.query(eventconsts.INCONTROL_PADS):
+                # Get UI drawn from plugins
+                pluginprocessors.redraw(lights)
+            else:
+                # Get UI drawn from windows
+                windowprocessors.redraw(lights)
             
             if lights.isSolid(): break
 

@@ -30,7 +30,7 @@ def topPluginStart():
     if internal.getPortExtended():
         # internal.extendedMode.setVal(False, eventconsts.INCONTROL_FADERS) # Faders
         # internal.extendedMode.setVal(False, eventconsts.INCONTROL_KNOBS) # Knobs
-        # internal.extendedMode.setVal(False, eventconsts.INCONTROL_PADS) # Pads
+        internal.extendedMode.setVal(False, eventconsts.INCONTROL_PADS) # Pads
         pass
     return
 
@@ -42,7 +42,7 @@ def topPluginEnd():
     if internal.getPortExtended():
         # internal.extendedMode.revert(eventconsts.INCONTROL_FADERS) # Faders
         # internal.extendedMode.revert(eventconsts.INCONTROL_KNOBS) # Knobs
-        # internal.extendedMode.revert(eventconsts.INCONTROL_PADS) # Pads
+        internal.extendedMode.revert(eventconsts.INCONTROL_PADS) # Pads
         pass
     return
 
