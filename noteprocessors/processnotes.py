@@ -23,7 +23,7 @@ import eventconsts
 import lightingconsts
 
 # Import custom processors specified in list above
-print("Importing Note Processors")
+print("Importing Note Processors...")
 customProcessors = []       # Not including hidden ones
 customProcessorsAll = []    # Includes hidden ones
 success = 0

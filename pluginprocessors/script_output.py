@@ -25,7 +25,16 @@ import lighting
 def topPluginStart():
     """Called when plugin is top plugin (not neccesarily focused)
     """
-    
+    return
+
+def topPluginEnd():
+    """Called when plugin is no longer top plugin (not neccesarily focused)
+    """
+    return
+
+def activeStart():
+    """Called when plugin brought to foreground (focused)
+    """
     # Only in extended mode: uncomment lines to set inControl mode
     if internal.getPortExtended():
         # internal.extendedMode.setVal(False, eventconsts.INCONTROL_FADERS) # Faders
@@ -34,28 +43,15 @@ def topPluginStart():
         pass
     return
 
-def topPluginEnd():
-    """Called when plugin is no longer top plugin (not neccesarily focused)
+def activeEnd():
+    """Called when plugin no longer in foreground (end of focused)
     """
-    
     # Only in extended mode: uncomment lines to revert to previous inControl modes
     if internal.getPortExtended():
         # internal.extendedMode.revert(eventconsts.INCONTROL_FADERS) # Faders
         # internal.extendedMode.revert(eventconsts.INCONTROL_KNOBS) # Knobs
         internal.extendedMode.revert(eventconsts.INCONTROL_PADS) # Pads
         pass
-    return
-
-def activeStart():
-    """Called when plugin brought to foreground (focused)
-    """
-    
-    return
-
-def activeEnd():
-    """Called when plugin no longer in foreground (end of focused)
-    """
-    
     return
 
 def redraw(lights):
