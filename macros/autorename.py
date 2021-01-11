@@ -35,6 +35,9 @@ import playlist
 import patterns
 import general
 
+import lightingconsts
+from . import helpers
+
 def getNewName(name):
     # Trim starts and ends
     if len(name) > (TRIM_FIRST + TRIM_END):
@@ -68,24 +71,38 @@ def getNewName(name):
     return name
 
 def run():
+    major_colour = lightingconsts.colours["TEAL"]
     if CHANGE_PATTERNS:
-        for i in range(1, patterns.patternCount() + 1):
+        minor_colour = lightingconsts.colours["RED"]
+        pats = patterns.patternCount()
+        for i in range(1, pats + 1):
             patterns.setPatternName(i, getNewName(patterns.getPatternName(i)))
+            p = (i - 1)/pats
+            helpers.setProgress(p * 0.25, p, major_colour, minor_colour)
     
     if CHANGE_PLAYLIST_TRACKS:
+        minor_colour = lightingconsts.colours["ORANGE"]
         for i in range(playlist.trackCount()):
             playlist.setTrackName(i, getNewName(playlist.getTrackName(i)))
+            p = i/playlist.trackCount()
+            helpers.setProgress(0.25 + p * 0.25, p, major_colour, minor_colour)
     
     if CHANGE_CHANNELS:
+        minor_colour = lightingconsts.colours["YELLOW"]
         for i in range(channels.channelCount(1)):
             try:
                 channels.setChannelName(i, getNewName(channels.getChannelName(i)))
             except:
                 print("An index out of range error occurred. Change the Channel Rack's display filter to 'All'.")
+            p = i/channels.channelCount(1)
+            helpers.setProgress(0.5 + 0.25 * p, p, major_colour, minor_colour)
     
     if CHANGE_MIXER_TRACKS:
+        minor_colour = lightingconsts.colours["LIME"]
         for i in range(mixer.trackCount()):
             mixer.setTrackName(i, getNewName(mixer.getTrackName(i)))
+            p = i/mixer.trackCount()
+            helpers.setProgress(0.75 + 0.25 * p, p, major_colour, minor_colour)
     
     # This doesn't do anything for some reason
     general.saveUndo("Run autorename Script", 0)
