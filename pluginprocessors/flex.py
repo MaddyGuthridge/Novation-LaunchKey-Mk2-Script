@@ -22,6 +22,16 @@ import processorhelpers
 
 CONTROL_START = 10
 
+KNOB_MAPPINGS = [
+    ([ 5,  6,  7,  8,  9, -1, -1, -1], "Filter AHDSR", lightingconsts.colours["RED"]),
+    ([ 0,  1,  2,  3,  4, -1, -1, -1], "Volume AHDSR", lightingconsts.colours["ORANGE"]),
+    ([21, 22, -1, -1, -1, -1, -1, -1], "Master Filter", lightingconsts.colours["PINK"]),
+    ([25, 26, 27, 29, 28, -1, -1, -1], "Delay", lightingconsts.colours["PURPLE"]),
+    ([30, 31, 32, 34, 33, 44, -1, -1], "Reverb", lightingconsts.colours["BLUE"])
+]
+
+selected_mapping = 0
+
 def topPluginStart():
     """Called when plugin is top plugin (not neccesarily focused)
     """
@@ -30,7 +40,7 @@ def topPluginStart():
     if internal.getPortExtended():
         internal.extendedMode.setVal(False, eventconsts.INCONTROL_FADERS) # Faders
         internal.extendedMode.setVal(False, eventconsts.INCONTROL_KNOBS) # Knobs
-        # internal.extendedMode.setVal(False, eventconsts.INCONTROL_PADS) # Pads
+        internal.extendedMode.setVal(False, eventconsts.INCONTROL_PADS) # Pads
         pass
     return
 
@@ -42,7 +52,7 @@ def topPluginEnd():
     if internal.getPortExtended():
         internal.extendedMode.revert(eventconsts.INCONTROL_FADERS) # Faders
         internal.extendedMode.revert(eventconsts.INCONTROL_KNOBS) # Knobs
-        # internal.extendedMode.revert(eventconsts.INCONTROL_PADS) # Pads
+        internal.extendedMode.revert(eventconsts.INCONTROL_PADS) # Pads
         pass
     return
 
@@ -65,6 +75,15 @@ def redraw(lights):
         lights (LightMap): object containing state of lights for next redraw. 
             Modify the object using it's methods to set light colours.
     """
+    if internal.extendedMode.query(eventconsts.INCONTROL_PADS):
+        return
+    
+    for i in range(len(KNOB_MAPPINGS)):
+        if i < internal.window.getAnimationTick():
+            if i == selected_mapping:
+                lights.setPadColour(i, 0, lightingconsts.colours["DARK GREY"])
+            else:
+                lights.setPadColour(i, 0, KNOB_MAPPINGS[i][2])
     return
 
 def process(command):
@@ -74,6 +93,7 @@ def process(command):
         command (ParsedEvent): contains useful information about the event. 
             Use this to determing what actions your processor will take.
     """
+    global selected_mapping
     
     # Add event processor to actions list (useful for debugging)
     command.actions.addProcessor("FLEX Processor")
@@ -83,7 +103,16 @@ def process(command):
     if command.type is eventconsts.TYPE_BASIC_FADER:
         if command.coord_X < 8:
             pluginswrapper.setParamByIndex(command.coord_X + CONTROL_START, command.value, -1, command)
-        
+    
+    if command.type is eventconsts.TYPE_BASIC_KNOB:
+        if KNOB_MAPPINGS[selected_mapping][0][command.coord_X] != -1:
+            pluginswrapper.setParamByIndex(KNOB_MAPPINGS[selected_mapping][0][command.coord_X], command.value, -1, command)
+    
+    if command.type is eventconsts.TYPE_BASIC_PAD:
+        if command.coord_X < len(KNOB_MAPPINGS) and command.coord_Y == 0:
+            selected_mapping = command.coord_X
+            command.handle("Mapped knobs to " + KNOB_MAPPINGS[selected_mapping][1])
+     
     return
 
 def beatChange(beat):
