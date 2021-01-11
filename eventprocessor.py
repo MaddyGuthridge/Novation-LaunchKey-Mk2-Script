@@ -17,6 +17,7 @@ import internal
 import internal.consts
 import config
 import lighting
+import lightingconsts
 
 import otherprocessors.processdefault as processdefault
 import otherprocessors.processfirst as processfirst
@@ -231,7 +232,10 @@ def redraw():
         try:
             
             # Draw initialisation lightshow
-            lighting.initLightShow(lights)
+            if internal.window.getAbsoluteTick() < len(lightingconsts.PALLETE_NORMAL) + 8:
+                lighting.initLightShow(lights)
+            elif internal.window.getAbsoluteTick() == len(lightingconsts.PALLETE_NORMAL) + 8:
+                internal.window.resetAnimationTick()
 
             # Draws idle thing if idle
             lighting.idleLightshow(lights)
