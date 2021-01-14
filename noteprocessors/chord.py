@@ -86,9 +86,10 @@ DIM_MAJOR_SIXTH_CHORD = [0, 3, 6, 8]
 
 class Chord:
     
-    def __init__(self, notes, jazziness, can_change):
+    def __init__(self, notes, jazziness, name, can_change):
         self.notes = notes
         self.jazziness = jazziness
+        self.name = name
         self.can_change = can_change
         
     def getNotes(self, offset=0):
@@ -102,8 +103,8 @@ class ChordStack:
         self.stack = []
         self.recent_index = -1
     
-    def addChord(self, notes, jazziness, can_change):
-        self.stack.append(Chord(notes, jazziness, can_change))
+    def addChord(self, notes, jazziness, name, can_change):
+        self.stack.append(Chord(notes, jazziness, name, can_change))
     
     def getNotes(self, offset, random, was_previous):
         if len(self.stack) == 0:
@@ -122,6 +123,11 @@ class ChordStack:
             self.recent_index = access_index
             return self.stack[access_index].getNotes(offset)
 
+    def getRecentName(self):
+        """Get the name of the most recent chord played
+        """ 
+        return self.stack[self.recent_index].name
+
 class ChordSet:
     
     def __init__(self, name, colour):
@@ -130,13 +136,16 @@ class ChordSet:
         self.recent_root = -1
         self.chords = [ChordStack() for i in range(12)]
     
-    def addChord(self, root, notes, jazziness, can_change):
-        self.chords[root].addChord(notes, jazziness, can_change)
+    def addChord(self, root, notes, jazziness, name, can_change):
+        self.chords[root].addChord(notes, jazziness, name, can_change)
         
     def getChord(self, root):
         is_recent = (root == self.recent_root)
         self.recent_root = root
         return self.chords[root % 12].getNotes(root, ENABLE_RANDOMNESS, is_recent)
+
+    def getRecentName(self):
+        return processorhelpers.getRelNoteName(self.recent_root, ROOT_NOTE) + " " + self.chords[self.recent_root % 12].getRecentName()
 
 class ChordMgr:
     def __init__(self):
@@ -149,12 +158,16 @@ class ChordMgr:
         self.classes.append(ChordSet(name, colour))
         self.recent = name
     
-    def addChord(self, root, notes, jazziness, can_change=True):
-        self.classes[-1].addChord(root, notes, jazziness, can_change)
+    def addChord(self, root, notes, jazziness, name, can_change=True):
+        assert(type(jazziness) is int)
+        self.classes[-1].addChord(root, notes, jazziness, name, can_change)
         
     def getChord(self, root):
         return self.classes[self.active_index].getChord(root)
-        
+    
+    def getRecentName(self):
+        return self.classes[self.active_index].getRecentName()
+     
     def setMode(self, index):
         if index >= 0:
             self.active = self.classes[index].name
@@ -182,50 +195,50 @@ chords.addChordClass("Major", lightingconsts.colours["YELLOW"])
 
 # Primary notes
 #--------------
-chords.addChord(0, MAJOR_CHORD, 0, False)
-chords.addChord(0, SUS2_CHORD, 2)
-chords.addChord(0, MAJOR_MAJOR_SEVENTH_CHORD, 5, False)
+chords.addChord(0, MAJOR_CHORD, 0, "", False)
+chords.addChord(0, SUS2_CHORD, 2, "Sus2")
+chords.addChord(0, MAJOR_MAJOR_SEVENTH_CHORD, 5, "M7", False)
 
-chords.addChord(2, MINOR_CHORD, 0, False)
-chords.addChord(2, MAJOR_CHORD, 1, False)
-chords.addChord(2, MAJOR_MINOR_SEVENTH_CHORD, 4, False)
+chords.addChord(2, MINOR_CHORD, 0, "m", False)
+chords.addChord(2, MAJOR_CHORD, 1, "", False)
+chords.addChord(2, MAJOR_MINOR_SEVENTH_CHORD, 4, "7", False)
 
-chords.addChord(4, MINOR_CHORD, 0)
-chords.addChord(4, MINOR_MINOR_SEVENTH_CHORD, 3, False)
+chords.addChord(4, MINOR_CHORD, 0, "m")
+chords.addChord(4, MINOR_MINOR_SEVENTH_CHORD, 3, "m7", False)
 
-chords.addChord(5, MAJOR_CHORD, 0, False)
-chords.addChord(5, SUS4_CHORD, 2)
-chords.addChord(5, MAJOR_MINOR_SEVENTH_CHORD, 4, False)
-chords.addChord(5, MAJOR_MAJOR_SEVENTH_CHORD, 5, False)
-chords.addChord(5, MAJOR_MAJOR_SIXTH_CHORD, 5, False)
-chords.addChord(5, MINOR_MAJOR_SIXTH_CHORD, 6, False)
+chords.addChord(5, MAJOR_CHORD, 0, "", False)
+chords.addChord(5, SUS4_CHORD, 2, "Sus4")
+chords.addChord(5, MAJOR_MINOR_SEVENTH_CHORD, 4, "7", False)
+chords.addChord(5, MAJOR_MAJOR_SEVENTH_CHORD, 5, "M7", False)
+chords.addChord(5, MAJOR_MAJOR_SIXTH_CHORD, 5, "M6", False)
+chords.addChord(5, MINOR_MAJOR_SIXTH_CHORD, 6, "mM6", False)
 
-chords.addChord(7, MAJOR_CHORD, 0, False)
-chords.addChord(7, SUS4_CHORD, 1)
-chords.addChord(7, MAJOR_MINOR_SEVENTH_CHORD, 2, False)
+chords.addChord(7, MAJOR_CHORD, 0, "", False)
+chords.addChord(7, SUS4_CHORD, 1, "Sus4")
+chords.addChord(7, MAJOR_MINOR_SEVENTH_CHORD, 2, "7", False)
 
-chords.addChord(9, MINOR_CHORD, 0, False)
-chords.addChord(9, MINOR_MINOR_SEVENTH_CHORD, 2)
-chords.addChord(9, SUS4_CHORD, 3)
+chords.addChord(9, MINOR_CHORD, 0, "m", False)
+chords.addChord(9, MINOR_MINOR_SEVENTH_CHORD, 2, "m7")
+chords.addChord(9, SUS4_CHORD, 3, "Sus4")
 
-chords.addChord(11, DIM_CHORD, 0)
+chords.addChord(11, DIM_CHORD, 0, "Dim")
 
 # Non-scale notes
 #----------------
-chords.addChord(1, MAJOR_CHORD, 0)
+chords.addChord(1, MAJOR_CHORD, 0, "")
 
-chords.addChord(3, MAJOR_CHORD, 0)
-chords.addChord(3, MAJOR_MAJOR_SIXTH_CHORD, 5, False)
+chords.addChord(3, MAJOR_CHORD, 0, "")
+chords.addChord(3, MAJOR_MAJOR_SIXTH_CHORD, 5, "M6", False)
 
-chords.addChord(6, DIM_MAJOR_SEVENTH_CHORD, 0)
+chords.addChord(6, DIM_MAJOR_SEVENTH_CHORD, 0, "Dim M7")
 
-chords.addChord(8, MAJOR_CHORD, 0, False)
-chords.addChord(8, SUS2_CHORD, 2)
-chords.addChord(8, MAJOR_MAJOR_SIXTH_CHORD, 4, False)
+chords.addChord(8, MAJOR_CHORD, 0, "", False)
+chords.addChord(8, SUS2_CHORD, 2, "Sus2")
+chords.addChord(8, MAJOR_MAJOR_SIXTH_CHORD, 4, "M6", False)
 
-chords.addChord(10, MAJOR_CHORD, 0)
-chords.addChord(10, MAJOR_MAJOR_SIXTH_CHORD, 3, False)
-chords.addChord(10, MAJOR_MAJOR_SEVENTH_CHORD, 7, False)
+chords.addChord(10, MAJOR_CHORD, 0, "")
+chords.addChord(10, MAJOR_MAJOR_SIXTH_CHORD, 3, "M6", False)
+chords.addChord(10, MAJOR_MAJOR_SEVENTH_CHORD, 7, "M7", False)
 
 #-----------
 # Minor chord set
@@ -234,43 +247,43 @@ chords.addChordClass("Minor", lightingconsts.colours["ORANGE"])
 
 # Primary notes
 #--------------
-chords.addChord(0, MINOR_CHORD, 0, False)
-chords.addChord(0, SUS4_CHORD, 4)
+chords.addChord(0, MINOR_CHORD, 0, "m", False)
+chords.addChord(0, SUS4_CHORD, 4, "Sus4")
 
-chords.addChord(2, DIM_CHORD, 0)
-chords.addChord(2, DIM_MAJOR_SIXTH_CHORD, 5, False)
+chords.addChord(2, DIM_CHORD, 0, "Dim")
+chords.addChord(2, DIM_MAJOR_SIXTH_CHORD, 5, "Dim M6", False)
 
-chords.addChord(3, MAJOR_CHORD, 0, False)
-chords.addChord(3, SUS2_CHORD, 3)
+chords.addChord(3, MAJOR_CHORD, 0, "", False)
+chords.addChord(3, SUS2_CHORD, 3, "Sus2")
 
-chords.addChord(5, MINOR_CHORD, 0, False)
-chords.addChord(5, MAJOR_CHORD, 1, False)
+chords.addChord(5, MINOR_CHORD, 0, "m", False)
+chords.addChord(5, MAJOR_CHORD, 1, "", False)
 
-chords.addChord(7, MAJOR_CHORD, 0, False)
-chords.addChord(7, MINOR_CHORD, 1, False)
-chords.addChord(7, MAJOR_MINOR_SEVENTH_CHORD, 4, False)
+chords.addChord(7, MAJOR_CHORD, 0, "", False)
+chords.addChord(7, MINOR_CHORD, 1, "m", False)
+chords.addChord(7, MAJOR_MINOR_SEVENTH_CHORD, 4, "7", False)
 
-chords.addChord(8, MAJOR_CHORD, 0, False)
-chords.addChord(8, MAJOR_MAJOR_SEVENTH_CHORD, 6, False)
+chords.addChord(8, MAJOR_CHORD, 0, "", False)
+chords.addChord(8, MAJOR_MAJOR_SEVENTH_CHORD, 6, "M7", False)
 
-chords.addChord(10, MAJOR_CHORD, 0, False)
-chords.addChord(10, SUS4_CHORD, 2)
+chords.addChord(10, MAJOR_CHORD, 0, "", False)
+chords.addChord(10, SUS4_CHORD, 2, "Sus4")
 
 # Non-scale notes
 #----------------
-chords.addChord(1, MINOR_CHORD, 0)
+chords.addChord(1, MINOR_CHORD, 0, "m")
 
-chords.addChord(4, DIM_CHORD, 0)
-chords.addChord(4, DIM_MAJOR_SIXTH_CHORD, 1, False)
+chords.addChord(4, DIM_CHORD, 0, "Dim")
+chords.addChord(4, DIM_MAJOR_SIXTH_CHORD, 1, "Dim M6", False)
 
-chords.addChord(6, DIM_CHORD, 0)
-chords.addChord(6, DIM_MINOR_SEVENTH_CHORD, 7, False)
+chords.addChord(6, DIM_CHORD, 0, "Dim")
+chords.addChord(6, DIM_MINOR_SEVENTH_CHORD, 7, "Dim m7", False)
 
-chords.addChord(9, DIM_CHORD, 0)
-chords.addChord(9, DIM_MAJOR_SIXTH_CHORD, 5, False)
+chords.addChord(9, DIM_CHORD, 0, "Dim")
+chords.addChord(9, DIM_MAJOR_SIXTH_CHORD, 5, "Dim M6", False)
 
-chords.addChord(11, DIM_CHORD, 0, False)
-chords.addChord(11, DIM_MINOR_SEVENTH_CHORD, 6, False)
+chords.addChord(11, DIM_CHORD, 0, "Dim", False)
+chords.addChord(11, DIM_MINOR_SEVENTH_CHORD, 6, "Dim m7", False)
 
 #################################################################
 
@@ -338,11 +351,11 @@ def process(command):
                 notes_events.append(processorhelpers.RawEvent(command.status, notes_list[i] + ROOT_NOTE, new_velocity))
             
             send_notes = processorhelpers.ExtensibleNote(command, notes_events)
-            command.handle("Played chord")
+            command.handle("Chord on: " + chords.getRecentName())
             
             notesDown.noteOn(send_notes)
         else:
-            command.handle("Stopped chord")
+            command.handle("Chord off")
             notesDown.noteOff(command)
     
     pass
