@@ -24,7 +24,7 @@ Use the knobs and faders to adjust the panning and volume of tracks, and mute or
 
 ## Advanced Event Handling
 
-Events are processed in the context of the active window and plugin, allowing for deep integration with FL Studio and plugins ([see note](https://github.com/MiguelGuthridge/Novation-LaunchKey-Mk2-Script/wiki/Plugin-Specific-Event-Handlers#important-note)). The modular system makes writing event handlers simple, meaning that new features can be added easily over time.
+Events are processed in the context of the active window and plugin, allowing for deep integration with FL Studio and plugins (coming soon!). The modular system makes writing event handlers simple, meaning that new features can be added easily over time.
 
 # Helpful Links:
 
