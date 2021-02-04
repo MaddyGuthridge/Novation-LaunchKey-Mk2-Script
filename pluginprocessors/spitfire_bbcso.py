@@ -80,9 +80,6 @@ def process(command):
             spitfire_generic.setExpression(command)
         elif command.coord_X == 1:
             spitfire_generic.setDynamics(command)
-        
-        elif command.coord_X == 7:
-            pluginswrapper.setParamByName("Variation", command.value, -1, VARIATION, command)
     
     if command.type is eventconsts.TYPE_BASIC_KNOB:
         if command.coord_X == 0:

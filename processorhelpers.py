@@ -527,7 +527,7 @@ class ParsedEvent:
         # Bit-shift status and data bytes to get event ID
         self.id = (self.status + (self.note << 8))
 
-        self.parse()  
+        self.parse()
 
         # Process sysex events
         if self.type is eventconsts.TYPE_SYSEX_EVENT:
