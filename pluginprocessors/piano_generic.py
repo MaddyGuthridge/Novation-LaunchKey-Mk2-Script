@@ -8,7 +8,8 @@ Author: Miguel Guthridge [hdsq@outlook.com.au]
 """
 
 # Add names of plugins your script can process to this list
-PLUGINS = ["Originals - Firewood Piano", "Originals - Cinematic Soft Piano", "Addictive Keys"]
+PLUGINS = ["Originals - Firewood Piano", "Originals - Cinematic Soft Piano", 
+           "Originals - Felt Piano", "Addictive Keys"]
 
 
 # Import any modules you might need\
