@@ -96,8 +96,6 @@ def setParamByIndex(param_index, value,  plugin_index=-1, command=None):
 
     Args:
         param_index (int): index where the parameter is.
-            
-        name (str): Name of the parameter to find.
         
         value:
          *  (float):    Value to set the parameter to.
@@ -136,6 +134,23 @@ def setParamByIndex(param_index, value,  plugin_index=-1, command=None):
                     )
 
 def setCCParam(ccNum, value, plugin_index=-1, command=None):
+    """Sends a MIDI CC event to the specified plugin
+
+    Args:
+        ccNum (int): CC Number to set
+        
+        value:
+         *  (float):    Value to set the parameter to.
+         *  (int):      MIDI value to set the parameter to (will be converted to a float between
+                0 and 1).
+        
+        plugin_index (optional)
+         *  (int):              Plugin index to search. Use -1 for currently-selected
+                                    plugin's index.
+         *  (tuple: 2 ints):    Respectively, mixer track and plugin index to search.
+        
+        command (ParsedEvent, optional): Command to add handling message to        
+    """
     setParamByIndex(ccNum + 4096, value, plugin_index, command)
 
 #
@@ -143,7 +158,7 @@ def setCCParam(ccNum, value, plugin_index=-1, command=None):
 #
 
 def getParamByName(name,  plugin_index=-1, expected_param_index=-1):
-    """Sets a parameter in a plugin given the name of the parameter.
+    """Gets a parameter value in a plugin given the name of the parameter.
 
     Args:
         name (str): Name of the parameter to find.
@@ -157,7 +172,7 @@ def getParamByName(name,  plugin_index=-1, expected_param_index=-1):
             it is searched first to increase efficiency
     
     Returns:
-        int: parameter index changed
+        int: parameter value
     """
     
     plugin_index = _getPluginIndexTuple(plugin_index)
@@ -171,17 +186,18 @@ def getParamByName(name,  plugin_index=-1, expected_param_index=-1):
     return plugins.getParamValue(param_index, plugin_index[1], plugin_index[0])
 
 def getParamByIndex(param_index,  plugin_index=-1):
-    """Sets a parameter in a plugin given the name of the parameter.
+    """Gets a parameter in a plugin given the index of the parameter.
 
     Args:
-        param_index (int): index where the parameter is.
-            
-        name (str): Name of the parameter to find.
+        param_index (int): index of the parameter.
         
         plugin_index (optional)
          *  (int):              Plugin index to search. Use -1 for currently-selected
                                     plugin's index.
-         *  (tuple: 2 ints):    Respectively, mixer track and plugin index to search.        
+         *  (tuple: 2 ints):    Respectively, mixer track and plugin index to search.
+    
+    Returns:
+        int: parameter value
     """
     
     plugin_index = _getPluginIndexTuple(plugin_index)
@@ -194,5 +210,18 @@ def getParamByIndex(param_index,  plugin_index=-1):
 
 
 def getCCParam(ccNum, plugin_index=-1):
+    """Gets a current MIDI CC value of a plugin.
+
+    Args:
+        ccNum (int): MIDI CC number
+        
+        plugin_index (optional)
+         *  (int):              Plugin index to search. Use -1 for currently-selected
+                                    plugin's index.
+         *  (tuple: 2 ints):    Respectively, mixer track and plugin index to search.
+    
+    Returns:
+        int: parameter value
+    """
     return getParamByIndex(ccNum + 4096, plugin_index)
 
