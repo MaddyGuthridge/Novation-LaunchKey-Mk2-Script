@@ -1,11 +1,11 @@
 # name=LaunchKey Mk2 Extension
-# url=https://github.com/MiguelGuthridge/Novation-LaunchKey49-Mk2-Script
+# url=https://forum.image-line.com/viewtopic.php?f=1994&t=231871
 # receiveFrom=LaunchKey Mk2
 
 """
-device_LaunchKey49 port 2.py
+device_LaunchKey_extension.py
 
-This file is the controller file for port 2 of the LaunchKey49 Mk2.
+This file is the controller file for port 2 of the LaunchKey Mk2.
 It handles communication with the device, including colours.
 
 Author: Miguel Guthridge [hdsq@outlook.com.au]
