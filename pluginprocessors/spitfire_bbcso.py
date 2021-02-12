@@ -9,6 +9,9 @@ Author: Miguel Guthridge [hdsq@outlook.com.au]
 
 PLUGINS = ["BBC Symphony Orchestra"]
 
+import pluginswrapper
+from . import spitfire_generic
+
 import config
 import internal
 import lightingconsts
@@ -16,9 +19,9 @@ import eventconsts
 import processorhelpers
 
 # Constants for event remapping
-EXPRESSION = 11
-DYNAMICS = 1
-REVERB = 19
+NEAR_FAR = 6
+VARIATION = 14
+
 
 
 # Called when plugin is top plugin
@@ -66,16 +69,33 @@ def process(command):
 
             command.edit(processorhelpers.RawEvent(0x90, keyswitch_num, command.value), "Remap keyswitches")
 
-    """ Link to parameters - Fix this once API updates
-    if command.id == eventconsts.BASIC_FADER_1:
-        command.edit(eventprocessor.rawEvent(0xB0, EXPRESSION, command.value))
+    #
+    # Map parameters
+    #
     
-    if command.id == eventconsts.BASIC_FADER_2:
-        command.edit(eventprocessor.rawEvent(0xB0, DYNAMICS, command.value))
+    value = processorhelpers.toFloat(command.value)
+
+    if command.type is eventconsts.TYPE_BASIC_FADER:
+        if command.coord_X == 0:
+            spitfire_generic.setExpression(command)
+        elif command.coord_X == 1:
+            spitfire_generic.setDynamics(command)
     
-    if command.id == eventconsts.BASIC_FADER_3:
-        command.edit(eventprocessor.rawEvent(0xB0, REVERB, command.value))
-    """
+    if command.type is eventconsts.TYPE_BASIC_KNOB:
+        if command.coord_X == 0:
+            spitfire_generic.setReverb(command)
+        elif command.coord_X == 1:
+            spitfire_generic.setRelease(command)
+        elif command.coord_X == 2:
+            spitfire_generic.setTightness(command)
+            
+        elif command.coord_X == 3:
+            pluginswrapper.setParamByName("Variation", command.value, -1, VARIATION, command)
+        
+        elif command.coord_X == 4:
+            spitfire_generic.setVibrato(command)
+
+
 
     return
 

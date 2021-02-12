@@ -12,6 +12,7 @@ import time
 
 import utils
 import ui
+import plugins
 
 import config
 import eventconsts
@@ -197,13 +198,21 @@ def snap(value, snapTo):
 
     Args:
         value (float): value being snapped
-        snapTo (float): value to snap to
+        snapTo (float or list of floats): value(s) to snap to
 
     Returns:
         float: value after snapping
     """
-    if abs(value - snapTo) <= config.SNAP_RANGE and config.ENABLE_SNAPPING:
-        return snapTo
+    if not config.ENABLE_SNAPPING:
+        return value
+    
+    # Change to list
+    if type(snapTo) is float or type(snapTo) is int:
+        snapTo = [snapTo]
+    
+    for i in range(len(snapTo)):
+        if abs(value - snapTo[i]) <= config.SNAP_RANGE:
+            return snapTo[i]
     else: return value
 
 def didSnap(value, snapTo):
@@ -211,7 +220,7 @@ def didSnap(value, snapTo):
 
     Args:
         value (float): value being snapped
-        snapTo (float): value to snap to
+        snapTo (float or list of floats): value(s) to snap to
 
     Returns:
         bool: whether the value would snap
@@ -518,7 +527,7 @@ class ParsedEvent:
         # Bit-shift status and data bytes to get event ID
         self.id = (self.status + (self.note << 8))
 
-        self.parse()  
+        self.parse()
 
         # Process sysex events
         if self.type is eventconsts.TYPE_SYSEX_EVENT:
@@ -1125,3 +1134,102 @@ class KeyswitchMgr:
                 return x
             
 keyswitches = KeyswitchMgr()
+
+def getAbsNoteName(note):
+    """Returns note name relative to C
+
+    Args:
+        note (int): ntoe number relative to C (0-11)
+    """
+    # Get note in correct range
+    note %= 12
+    
+    # Whether a note is sharp or not
+    sharps_flats = [0, 1, 0, -1, 0, 0, 1, 0, -1, 0, -1, 0]
+    
+    # To append sharps or flats to note names
+    #                  0   1    2     -2   -1
+    sharp_flat_str = ["", "#", "##", "bb", "b"]
+    
+    # Interval numbers
+    interval_nums = [1, 1, 2, 3, 3, 4, 4, 5, 6, 6, 7, 7]
+    
+    # Note names for each key, used with interval number
+    note_names = ['_', 'C', 'D', 'E', 'F', 'G', 'A', 'B']
+
+    # Calculate root name
+    return note_names[interval_nums[note]] + sharp_flat_str[sharps_flats[note]]
+
+def getRelNoteName(note, key_root):
+    """Returns note name relative to root of key
+
+    Args:
+        note (int): note number relative to root (0-11)
+        key_root (int): note number of key relative to C (0-11)
+
+    Returns:
+        str: note name
+    """
+    
+    # Get notes in correct range
+    note %= 12
+    key_root %= 12
+    
+    # Whether a note is sharp or not
+    sharps_flats = [0, 1, 0, -1, 0, 0, 1, 0, -1, 0, -1, 0]
+    
+    # To append sharps or flats to note names
+    #                  0   1    2     -2   -1
+    sharp_flat_str = ["", "#", "##", "bb", "b"]
+    
+    # Interval numbers
+    interval_nums = [1, 1, 2, 3, 3, 4, 4, 5, 6, 6, 7, 7]
+    
+    # Note names for each key, used with interval number
+    note_names = ['_', 'C', 'D', 'E', 'F', 'G', 'A', 'B']
+    
+    # Get absolute note value
+    note_abs = (note + key_root) % 12
+    
+    # Calculate absolute shar and flat
+    abs_sharp_flat = sharps_flats[note_abs]
+    
+    # If it's a natural note, just return its name
+    if abs_sharp_flat == 0:
+        return note_names[interval_nums[note_abs]]
+    
+    # Otherwise get whether its a sharp or a flat in that key
+    note_sharp_flat = sharps_flats[note]
+    
+    # If it's relatively natural
+    if note_sharp_flat == 0:
+        # If the key is flat or F major, return flattened note
+        if sharps_flats[key_root] == -1 or key_root == 5:
+            # If absolute is flat
+            if abs_sharp_flat == -1:
+                return note_names[interval_nums[note_abs]] + sharp_flat_str[abs_sharp_flat]
+            # Otherwise (absolute is sharp)
+            else:
+                return note_names[interval_nums[note_abs] + 1] + sharp_flat_str[-1]
+        
+        # Otherwise (they key is sharp or some other natural key)
+        else:
+            # If absolute is sharp
+            if abs_sharp_flat == 1:
+                return note_names[interval_nums[note_abs]] + sharp_flat_str[abs_sharp_flat]
+            # Otherwise (absolute is flat)
+            else:
+                return note_names[interval_nums[note_abs] - 1] + sharp_flat_str[1]
+    
+    # If it's the same sharp/flat for absolute and relative, return that
+    if note_sharp_flat == abs_sharp_flat:
+        return note_names[interval_nums[note_abs]] + sharp_flat_str[note_sharp_flat]
+    
+    # If it's relatively sharp but absolutely flat (assumed), return the sharpened one
+    if note_sharp_flat == 1:
+        return note_names[interval_nums[note_abs - 1]] + sharp_flat_str[note_sharp_flat]
+        
+    # Otherwise (it's relatively sharp but absolutely flat), return the sharpened one
+    if note_sharp_flat == -1 and abs_sharp_flat == 1:
+        return note_names[interval_nums[note_abs + 1]] + sharp_flat_str[note_sharp_flat]
+    

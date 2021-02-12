@@ -10,7 +10,8 @@ Author: Miguel Guthridge [hdsq@outlook.com.au]
 #
 # Add custom event processors to this list
 #
-imports = ["fpc", "spitfire_bbcso", "slicex"]
+imports = ["fpc", "spitfire_bbcso", "slicex", "flex", 
+           "spitfire_labs", "piano_generic", "vital", "midi_cc", "script_output"]
 #
 #
 #
@@ -21,19 +22,27 @@ import general
 import config
 import internal
 import pluginprocessors
+import pluginswrapper
 import eventconsts
 import processorhelpers
 
 # Import custom processors specified in list above
-print("Importing Plguin Processors")
+print("Importing Plguin Processors...")
 customProcessors = []
+success = 0
+total_plugins = 0
 for x in range(len(imports)):
     try:
         customProcessors.append( __import__("pluginprocessors." + imports[x]) )
-        print (" - Successfully imported:", getattr(pluginprocessors, imports[x]).PLUGINS)
-    except ImportError:
-        print (" - Error importing: " + imports[x])
-print("Plugin Processor import complete")
+        plugin_count = len(getattr(pluginprocessors, imports[x]).PLUGINS)
+        success += 1
+        total_plugins += plugin_count
+    except ImportError as e:
+        print ("\tError importing: " + imports[x])
+        print("\t" + e)
+        if config.DEBUG_HARD_CRASHING:
+            raise e
+print("Successfully imported " + str(success) + "/" + str(len(imports)) + " modules (" + str(total_plugins) + " plugins)")
 
 # Called when plugin is top plugin
 def topPluginStart():
@@ -82,13 +91,6 @@ previous_channel_volume = None
 
 def process(command):
     
-    # REQUIRES SCRIPTING VERSION 8
-    if general.getVersion() >= 8:
-        # Process pitch bend wheel
-        if command.id == eventconsts.PITCH_BEND:
-            current_channel = channels.selectedChannel()
-            channels.setChannelPitch(current_channel, processorhelpers.toFloat(command.value, -1, 1))
-        
     # Process master fader changing selected channel volume.
     if command.id == eventconsts.BASIC_FADER_9:
         current_channel = channels.selectedChannel()
@@ -121,6 +123,21 @@ def process(command):
             object_to_call.process(command)
         
         if command.ignored: return
+    
+    # Only process mod-wheel and pitch-bend if they weren't already handled by plugin processors
+    
+    # Mod-wheel
+    if command.id == eventconsts.MOD_WHEEL:
+        pluginswrapper.setCCParam(command.note, command.value)
+        command.handle("Mod-wheel", 1)
+        
+    
+    # Pitch-bend wheel
+    if command.id == eventconsts.PITCH_BEND:
+        #pluginswrapper.setCCParam(command.note, command.value)
+        current_channel = channels.selectedChannel()
+        channels.setChannelPitch(current_channel, processorhelpers.snap(processorhelpers.toFloat(command.value, -1, 1), 0.0))
+        command.handle("Pitch Bend", 1)
 
 def beatChange(beat):
     for x in imports:
@@ -129,7 +146,7 @@ def beatChange(beat):
 
 def canHandle(object_to_call):
     for x in range(len(object_to_call.PLUGINS)):
-        if object_to_call.PLUGINS[x] == internal.window.active_plugin:
+        if object_to_call.PLUGINS[x] == internal.window.getPluginName():
             return True
 
     return False

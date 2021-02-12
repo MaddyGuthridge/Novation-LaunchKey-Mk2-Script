@@ -17,6 +17,7 @@ import internal
 import internal.consts
 import config
 import lighting
+import lightingconsts
 
 import otherprocessors.processdefault as processdefault
 import otherprocessors.processfirst as processfirst
@@ -80,7 +81,7 @@ def processExtended(command):
 
             # Shouldn't be called in extended mode
             # Attempt to process event using custom processors for plugins
-            #pluginprocessors.process(command)
+            pluginprocessors.process(command)
 
             #if command.ignored: return
 
@@ -231,7 +232,10 @@ def redraw():
         try:
             
             # Draw initialisation lightshow
-            lighting.initLightShow(lights)
+            if internal.window.getAbsoluteTick() < len(lightingconsts.PALLETE_NORMAL) + 8:
+                lighting.initLightShow(lights)
+            elif internal.window.getAbsoluteTick() == len(lightingconsts.PALLETE_NORMAL) + 8:
+                internal.window.resetAnimationTick()
 
             # Draws idle thing if idle
             lighting.idleLightshow(lights)
@@ -251,13 +255,12 @@ def redraw():
             
             if lights.isSolid(): break
 
-            # Get UI drawn from plugins
-            pluginprocessors.redraw(lights)
-            
-            if lights.isSolid(): break
-
-            # Get UI drawn from windows
-            windowprocessors.redraw(lights)
+            if not internal.extendedMode.query(eventconsts.INCONTROL_PADS):
+                # Get UI drawn from plugins
+                pluginprocessors.redraw(lights)
+            else:
+                # Get UI drawn from windows
+                windowprocessors.redraw(lights)
             
             if lights.isSolid(): break
 

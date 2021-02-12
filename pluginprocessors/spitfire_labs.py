@@ -1,14 +1,13 @@
 """
-pluginprocessors > _template.py
+pluginprocessors > spitfire_labs.py
 
-The file acts as a template for plugin handlers. Copy it and edit to add your own plugin handlers.
-To get it to be imported by the event processor, add its filename (without the .py) to processplugins.py
+This processor links parameters for the Spitfire Labs plugin
 
 Author: Miguel Guthridge [hdsq@outlook.com.au]
 """
 
 # Add names of plugins your script can process to this list
-PLUGINS = []
+PLUGINS = ["LABS"]
 
 
 # Import any modules you might need\
@@ -20,6 +19,11 @@ import eventprocessor
 import lightingconsts
 import processorhelpers
 
+from . import spitfire_generic
+
+# Constants for event remapping
+ADSR_START = 8
+
 
 def topPluginStart():
     """Called when plugin is top plugin (not neccesarily focused)
@@ -27,8 +31,8 @@ def topPluginStart():
     
     # Only in extended mode: uncomment lines to set inControl mode
     if internal.getPortExtended():
-        # internal.extendedMode.setVal(False, eventconsts.INCONTROL_FADERS) # Faders
-        # internal.extendedMode.setVal(False, eventconsts.INCONTROL_KNOBS) # Knobs
+        internal.extendedMode.setVal(False, eventconsts.INCONTROL_FADERS) # Faders
+        internal.extendedMode.setVal(False, eventconsts.INCONTROL_KNOBS) # Knobs
         # internal.extendedMode.setVal(False, eventconsts.INCONTROL_PADS) # Pads
         pass
     return
@@ -39,8 +43,8 @@ def topPluginEnd():
     
     # Only in extended mode: uncomment lines to revert to previous inControl modes
     if internal.getPortExtended():
-        # internal.extendedMode.revert(eventconsts.INCONTROL_FADERS) # Faders
-        # internal.extendedMode.revert(eventconsts.INCONTROL_KNOBS) # Knobs
+        internal.extendedMode.revert(eventconsts.INCONTROL_FADERS) # Faders
+        internal.extendedMode.revert(eventconsts.INCONTROL_KNOBS) # Knobs
         # internal.extendedMode.revert(eventconsts.INCONTROL_PADS) # Pads
         pass
     return
@@ -75,16 +79,25 @@ def process(command):
     """
     
     # Add event processor to actions list (useful for debugging)
-    command.actions.addProcessor("Your Processor Name")
+    command.actions.addProcessor("Labs Processor")
 
     # When you handle your events, use command.handle("Some action") to handle events.
+
+    if command.type is eventconsts.TYPE_BASIC_KNOB:
+        if command.coord_X < 4:
+            pluginswrapper.setParamByIndex(ADSR_START + command.coord_X, command.value, -1, command)
+    
+    elif command.type is eventconsts.TYPE_BASIC_FADER:
+        if command.coord_X == 0:
+            spitfire_generic.setExpression(command)
+        if command.coord_X == 1:
+            spitfire_generic.setDynamics(command)
+    
+    if command.id == eventconsts.PEDAL:
+        pluginswrapper.setCCParam(command.note, command.value)
+        command.handle("Pedal", 1)
 
     return
 
 def beatChange(beat):
-    """Called when the beat updates
-
-    Args:
-        beat (int): Beat type (refer to FL Studio docs)
-    """
     return

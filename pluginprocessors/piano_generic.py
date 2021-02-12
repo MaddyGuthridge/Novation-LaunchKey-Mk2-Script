@@ -8,7 +8,8 @@ Author: Miguel Guthridge [hdsq@outlook.com.au]
 """
 
 # Add names of plugins your script can process to this list
-PLUGINS = []
+PLUGINS = ["Originals - Firewood Piano", "Originals - Cinematic Soft Piano", 
+           "Originals - Felt Piano", "Addictive Keys"]
 
 
 # Import any modules you might need\
@@ -48,7 +49,6 @@ def topPluginEnd():
 def activeStart():
     """Called when plugin brought to foreground (focused)
     """
-    
     return
 
 def activeEnd():
@@ -78,6 +78,9 @@ def process(command):
     command.actions.addProcessor("Your Processor Name")
 
     # When you handle your events, use command.handle("Some action") to handle events.
+    if command.id == eventconsts.PEDAL:
+        pluginswrapper.setCCParam(command.note, command.value)
+        command.handle("Pedal", 1)
 
     return
 

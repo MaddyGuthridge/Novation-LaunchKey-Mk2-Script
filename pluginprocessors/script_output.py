@@ -8,7 +8,7 @@ Author: Miguel Guthridge [hdsq@outlook.com.au]
 """
 
 # Add names of plugins your script can process to this list
-PLUGINS = []
+PLUGINS = ["Script output"]
 
 
 # Import any modules you might need\
@@ -19,42 +19,39 @@ import eventconsts
 import eventprocessor
 import lightingconsts
 import processorhelpers
+import lighting
 
 
 def topPluginStart():
     """Called when plugin is top plugin (not neccesarily focused)
     """
-    
-    # Only in extended mode: uncomment lines to set inControl mode
-    if internal.getPortExtended():
-        # internal.extendedMode.setVal(False, eventconsts.INCONTROL_FADERS) # Faders
-        # internal.extendedMode.setVal(False, eventconsts.INCONTROL_KNOBS) # Knobs
-        # internal.extendedMode.setVal(False, eventconsts.INCONTROL_PADS) # Pads
-        pass
     return
 
 def topPluginEnd():
     """Called when plugin is no longer top plugin (not neccesarily focused)
     """
-    
-    # Only in extended mode: uncomment lines to revert to previous inControl modes
-    if internal.getPortExtended():
-        # internal.extendedMode.revert(eventconsts.INCONTROL_FADERS) # Faders
-        # internal.extendedMode.revert(eventconsts.INCONTROL_KNOBS) # Knobs
-        # internal.extendedMode.revert(eventconsts.INCONTROL_PADS) # Pads
-        pass
     return
 
 def activeStart():
     """Called when plugin brought to foreground (focused)
     """
-    
+    # Only in extended mode: uncomment lines to set inControl mode
+    if internal.getPortExtended():
+        # internal.extendedMode.setVal(False, eventconsts.INCONTROL_FADERS) # Faders
+        # internal.extendedMode.setVal(False, eventconsts.INCONTROL_KNOBS) # Knobs
+        internal.extendedMode.setVal(False, eventconsts.INCONTROL_PADS) # Pads
+        pass
     return
 
 def activeEnd():
     """Called when plugin no longer in foreground (end of focused)
     """
-    
+    # Only in extended mode: uncomment lines to revert to previous inControl modes
+    if internal.getPortExtended():
+        # internal.extendedMode.revert(eventconsts.INCONTROL_FADERS) # Faders
+        # internal.extendedMode.revert(eventconsts.INCONTROL_KNOBS) # Knobs
+        internal.extendedMode.revert(eventconsts.INCONTROL_PADS) # Pads
+        pass
     return
 
 def redraw(lights):
@@ -64,6 +61,7 @@ def redraw(lights):
         lights (LightMap): object containing state of lights for next redraw. 
             Modify the object using it's methods to set light colours.
     """
+    lighting.initLightShow(lights)
     return
 
 def process(command):

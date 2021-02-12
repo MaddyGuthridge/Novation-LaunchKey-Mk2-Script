@@ -46,7 +46,7 @@ class RecordShift(ShiftState):
             if command.is_lift:
                 coord = command.getPadCoord()
                 if coord == (0, 0):
-                    transport.globalTransport(eventconsts.midi.FPT_Metronome, True)
+                    transport.globalTransport(eventconsts.midi.FPT_Metronome, 1)
                     command.handle("Toggled metronome")
                     self.use()
                     

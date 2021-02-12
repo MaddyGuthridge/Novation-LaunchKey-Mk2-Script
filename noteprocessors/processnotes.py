@@ -23,22 +23,23 @@ import eventconsts
 import lightingconsts
 
 # Import custom processors specified in list above
-print("Importing Note Processors")
+print("Importing Note Processors...")
 customProcessors = []       # Not including hidden ones
 customProcessorsAll = []    # Includes hidden ones
+success = 0
 for x in range(len(imports)):
     try:
         __import__("noteprocessors." + imports[x])
         customProcessorsAll.append(imports[x])
         if not getattr(noteprocessors, imports[x]).SILENT:
             customProcessors.append(imports[x])
-        print (" - Successfully imported:", str(getattr(noteprocessors, imports[x]).NAME))
+        success += 1
     except ImportError as e:
-        print (" - Error importing: ", imports[x])
+        print ("\tError importing: ", imports[x])
+        print("\t" + e)
         if config.DEBUG_HARD_CRASHING:
             raise e
-print("Note Processor import complete")
-
+print("Successfully imported " + str(success) + "/" + str(len(imports)) + " modules")
 
 # Object to hold place in note mode menu
 noteModeMenu = processorhelpers.UiModeSelector(len(customProcessors) // 16 + 1)

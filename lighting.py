@@ -327,7 +327,7 @@ def initLightShow(lights):
     else:
         rainbowColours = lightingconsts.PALLETE_INIT_FAIL
 
-    x = internal.window.getAbsoluteTick()
+    x = internal.window.getAnimationTick()
 
     if x > len(rainbowColours) + 8: return
 
