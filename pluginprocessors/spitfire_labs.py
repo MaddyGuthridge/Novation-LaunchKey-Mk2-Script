@@ -22,7 +22,7 @@ import processorhelpers
 from . import spitfire_generic
 
 # Constants for event remapping
-ASDR_START = 8
+ADSR_START = 8
 
 
 def topPluginStart():
@@ -85,7 +85,7 @@ def process(command):
 
     if command.type is eventconsts.TYPE_BASIC_KNOB:
         if command.coord_X < 4:
-            pluginswrapper.setParamByIndex(ASDR_START + command.coord_X, command.value, -1, command)
+            pluginswrapper.setParamByIndex(ADSR_START + command.coord_X, command.value, -1, command)
     
     elif command.type is eventconsts.TYPE_BASIC_FADER:
         if command.coord_X == 0:
