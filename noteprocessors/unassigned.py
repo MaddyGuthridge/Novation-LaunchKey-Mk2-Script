@@ -43,7 +43,7 @@ def process(command):
     command.addProcessor("Unassigned processor")
     
     if command.type is not eventconsts.TYPE_INCONTROL and command.type is not eventconsts.TYPE_TRANSPORT:
-        command.ignore("Ignore all events")
+        command.ignore("Ignore all events", True)
     
     return
 

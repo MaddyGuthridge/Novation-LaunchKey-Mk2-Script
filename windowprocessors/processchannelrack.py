@@ -110,29 +110,24 @@ def processBitMode(command):
         if coord == [4, 1]:
             if command.is_double_click:
                 gridBits.resetScroll()
-                command.actions.appendAction("Grid Bits: Reset scroll")
-                command.handled = True
+                command.handle("Grid Bits: Reset scroll")
             else:
                 gridBits.scrollLeft()
-                command.actions.appendAction("Grid Bits: Scroll left")
-                command.handled = True
+                command.handle("Grid Bits: Scroll left")
         if coord == [5, 1]:
             gridBits.scrollRight()
-            command.actions.appendAction("Grid Bits: Scroll right")
-            command.handled = True
+            command.handle("Grid Bits: Scroll right")
         # Zoom grid bits
         if coord == [6, 1]:
             gridBits.zoomOut()
-            command.actions.appendAction("Grid Bits: Zoom out")
-            command.handled = True
+            command.handle("Grid Bits: Zoom out")
         if coord == [7, 1]:
             if command.is_double_click:
                 gridBits.resetZoom()
-                command.actions.appendAction("Grid Bits: Reset zoom")
+                command.handle("Grid Bits: Reset zoom")
             else:
                 gridBits.zoomIn()
-                command.actions.appendAction("Grid Bits: Zoom in")
-            command.handled = True
+                command.handle("Grid Bits: Zoom in")
 
 # Process when in menu
 def processMenuMode(command):
@@ -142,32 +137,26 @@ def processMenuMode(command):
         # Next/prev track
         if coord == [0, 0]:
             ui.previous()
-            command.actions.appendAction("Channel Rack: Previous channel")
-            command.handled = True
+            command.handle("Channel Rack: Previous channel")
         elif coord == [0, 1]:
             ui.next()
-            command.actions.appendAction("Channel Rack: Next channel")
-            command.handled = True
+            command.handle("Channel Rack: Next channel")
 
         # Cut, Copy, Paste
         elif coord == [2, 0]:
             ui.cut()
-            command.actions.appendAction("UI: Cut")
-            command.handled = True
+            command.handle("UI: Cut")
         elif coord == [3, 0]:
             ui.copy()
-            command.actions.appendAction("UI: Copy")
-            command.handled = True
+            command.handle("UI: Copy")
         elif coord == [4, 0]:
             ui.paste()
-            command.actions.appendAction("UI: Paste")
-            command.handled = True
+            command.handle("UI: Paste")
 
         # To piano roll
         elif coord == [7, 1]:
             ui.showWindow(internal.consts.WINDOW_PIANO_ROLL)
-            command.actions.appendAction("Sent to pianoroll")
-            command.handled = True
+            command.handle("Sent to pianoroll")
 
         # Plugin window
         elif coord == [6, 1]:

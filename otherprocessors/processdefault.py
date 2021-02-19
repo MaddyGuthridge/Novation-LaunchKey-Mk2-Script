@@ -40,26 +40,22 @@ def process(command):
         # Play-pause: only on lift
         if command.id == eventconsts.TRANSPORT_PLAY and command.is_lift: 
             transport.start()
-            command.actions.appendAction("Play/Pause Transport")
-            command.handled = True
+            command.handle("Play/Pause Transport")
 
         # Stop: only on lift
         if command.id == eventconsts.TRANSPORT_STOP and command.is_lift: 
             transport.stop()
-            command.actions.appendAction("Stop Transport")
-            command.handled = True
+            command.handle("Stop Transport")
 
         # Loop: only on lift
         if command.id == eventconsts.TRANSPORT_LOOP and command.is_lift: 
             transport.setLoopMode()
-            command.actions.appendAction("Toggle Loop Mode")
-            command.handled = True
+            command.handle("Toggle Loop Mode")
         
         # Record: only on lift
         if command.id == eventconsts.TRANSPORT_RECORD and command.is_lift: 
             transport.record()
-            command.actions.appendAction("Toggle Recording")
-            command.handled = True
+            command.handle("Toggle Recording")
 
         # Skip forward: start on press, stop on lift, faster on double press?
         if command.id == eventconsts.TRANSPORT_FORWARD:
@@ -74,7 +70,7 @@ def process(command):
             if command.is_lift is True: 
                 transport.continuousMove(speed, 0)
                 command.actions.appendAction("Stopped")
-            command.handled = True
+            command.handle("Continuous move", True)
         
         # Skip back: start on press, stop on lift, faster on double press?
         if command.id == eventconsts.TRANSPORT_BACK:
@@ -89,18 +85,16 @@ def process(command):
             if command.is_lift is True: 
                 transport.continuousMove(speed, 0)
                 command.actions.appendAction("Stopped")
-            command.handled = True
+            command.handle("Continuous move", True)
         
         # Next Track: next UI element
         if command.id == eventconsts.TRANSPORT_TRACK_NEXT and command.is_lift:
             ui.next()
-            command.actions.appendAction("Next UI Element")
-            command.handled = True
+            command.handle("Next UI Element")
 
         # Prev Track: prev UI element
         if command.id == eventconsts.TRANSPORT_TRACK_PREVIOUS and command.is_lift:
             ui.previous()
-            command.actions.appendAction("Previous UI Element")
-            command.handled = True
+            command.handle("Previous UI Element")
 
 
