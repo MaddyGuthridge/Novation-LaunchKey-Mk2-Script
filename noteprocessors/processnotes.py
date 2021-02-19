@@ -79,10 +79,8 @@ def process(command):
                 
                 object_to_call.process(command)
             
-                if command.ignored: return
-    
-    if command.ignored: return
-    
+                if command.ignored: break
+                
     # Then check the note mode menu button
     processNoteModeMenuOpener(command)
 
