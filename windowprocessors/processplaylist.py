@@ -37,18 +37,18 @@ def process(command):
     # Process marker jumps
     if command.type == eventconsts.TYPE_TRANSPORT:
         if (command.id == eventconsts.TRANSPORT_BACK or command.id == eventconsts.TRANSPORT_FORWARD):
-            if not internal.shifts["MAIN"].use():
-                if command.is_lift:
-                    # Check that markers exist
-                    if arrangement.getMarkerName(0) is not "":
+            # Only if markers exist
+            if arrangement.getMarkerName(0) is not "":
+                if not internal.shifts["MAIN"].use():
+                    if command.is_lift:
                         if command.id == eventconsts.TRANSPORT_BACK:
                             transport.markerJumpJog(-1)
                             command.handle("Transport: Jump to previous marker")
                         if command.id == eventconsts.TRANSPORT_FORWARD:
                             transport.markerJumpJog(1)
                             command.handle("Transport: Jump to next marker")
-                else:
-                    command.handle("Catch transport skips", silent=True)
+                    else:
+                        command.handle("Catch transport skips", silent=True)
             
 
 
