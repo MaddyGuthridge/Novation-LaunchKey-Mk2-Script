@@ -426,7 +426,7 @@ class ErrorState:
                 pass
 
         # Print error message
-        self.printError(False, e.args)
+        self.printError(False, e)
 
         if config.DEBUG_HARD_CRASHING:
             raise e
@@ -476,7 +476,7 @@ class ErrorState:
             lights.setPadColour(8, 1, lightingconsts.colours["GREEN"])
         lights.solidifyAll()
 
-    def printError(self, fromOther, error=""):
+    def printError(self, fromOther, error:Exception=None):
         """Print an error message
 
         Args:
@@ -498,16 +498,16 @@ class ErrorState:
         else:
             print("Please restart the script by pressing the green pad, or restart the script with debugging enabled ", end="")
             print("by pressing the orange pad. If possible, try to recreate the issue with debugging enabled.")
-        if error != "":
+        if error is not None:
             print(getLineBreak())
-            print("Error code:", error)
+            print("Error code: " + str(type(error)) + " ", error.args)
         print(getLineBreak())
         print(getLineBreak())
         print("")
         print("")
 
     def recoverError(self, enter_debug, received=False):
-        """Recover from an error
+        """Dismiss an error, and set the device back into its normal state
 
         Args:
             enter_debug (bool): Whether to enable debugging
@@ -534,7 +534,7 @@ class ErrorState:
         #config.DEBUG_HARD_CRASHING = True
             
         print(getLineBreak())
-        print("Error ignored")
+        print("Error dismissed")
         print(getLineBreak())
     
     def eventProcessError(self, command):

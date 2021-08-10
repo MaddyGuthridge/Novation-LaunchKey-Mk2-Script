@@ -46,8 +46,17 @@ def sendCompleteMidiMessage(message, str_event_out = ""):
         message (int): MIDI message
         str_event_out (str, optional): What to print about the message. Defaults to "".
     """
-    debugLog("Dispatched external MIDI message " + str_event_out + " (" + str(message) + ")", consts.DEBUG.DISPATCH_EVENT)
-    device.midiOutMsg(message)
+    try:
+        debugLog("Dispatched external MIDI message " + str_event_out + " (" + str(message) + ")", consts.DEBUG.DISPATCH_EVENT)
+        device.midiOutMsg(message)
+    except TypeError as e:
+        print(getLineBreak())
+        print('\n'.join([
+            "An error occurred when attempting to communicate with the device.",
+            "Please ensure that device input and output ports are configured correctly,",
+            "then reload the script and try again."
+            ]))
+        raise e
 
 
 def sendCompleteInternalMidiMessage(message, str_event_out = ""):
@@ -57,8 +66,17 @@ def sendCompleteInternalMidiMessage(message, str_event_out = ""):
         message (int): MIDI message
         str_event_out (str, optional): What to print about the message. Defaults to "".
     """
-    debugLog("Dispatched internal MIDI message: " + str_event_out + " (" + str(message) + ")", consts.DEBUG.DISPATCH_EVENT)
-    device.dispatch(0, message)
+    try:
+        debugLog("Dispatched internal MIDI message: " + str_event_out + " (" + str(message) + ")", consts.DEBUG.DISPATCH_EVENT)
+        device.dispatch(0, message)
+    except TypeError as e:
+        print(getLineBreak())
+        print('\n'.join([
+            "An error occurred when attempting to communicate with the other script port.",
+            "Please ensure that device input and output ports are configured correctly,",
+            "then reload the script and try again."
+            ]))
+        raise e
 
 
 def toMidiMessage(status, data1, data2):
@@ -78,5 +96,13 @@ def toMidiMessage(status, data1, data2):
 def sendUniversalDeviceEnquiry():
     """Sends a universal device enquiry to the controller.
     """
-    device.midiOutSysex(consts.DEVICE_ENQUIRY_MESSAGE)
-
+    try:
+        device.midiOutSysex(consts.DEVICE_ENQUIRY_MESSAGE)
+    except TypeError as e:
+        print(getLineBreak())
+        print('\n'.join([
+            "An error occurred when attempting to communicate with the device.",
+            "Please ensure that device input and output ports are configured correctly,",
+            "then reload the script and try again."
+            ]))
+        raise e

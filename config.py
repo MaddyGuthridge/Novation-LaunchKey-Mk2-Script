@@ -85,11 +85,10 @@ LIGHTS_REDUCE_MOTION = False
 #-------------------------------
 
 # For fun when the script crashes
-CHAOTIC_EVIL_ERROR_NOTE_HANDLER = True
+CHAOTIC_EVIL_ERROR_NOTE_HANDLER = False
 
 # Controls which console messages are printed. Add things from the DEBUG object
 CONSOLE_DEBUG_MODE = []
 
 # Whether script should stop entirely when it encounters an error.
 DEBUG_HARD_CRASHING = False
-
