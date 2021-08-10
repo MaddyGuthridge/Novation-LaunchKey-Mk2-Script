@@ -85,7 +85,8 @@ class BeatMgr:
 beat = BeatMgr()
 
 def processSysEx(event):
-    """Process SysEx events (which are always responses to universal device enquiries since the script doesn't really do any others)
+    """Process SysEx events (which are always responses to universal device
+    enquiries since the script doesn't really do any others)
 
     Args:
         event (ParsedEvent): processed MIDI Sysex Event
