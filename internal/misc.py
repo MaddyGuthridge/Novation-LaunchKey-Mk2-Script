@@ -25,8 +25,6 @@ def refreshProcessor():
     """Called on refresh
     """
     snap.refresh()
-    
-
 
 def idleProcessor():
     """Called on idle
