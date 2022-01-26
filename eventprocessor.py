@@ -154,7 +154,13 @@ def processReceived(command):
 
     data = command.getDataMIDI()
 
-    if data == internal.consts.MESSAGE_RESET_INTERNAL_CONTROLLER:
+    if data == internal.consts.MESSAGE_IDLE_NOTIFICATION:
+        internal.idleProcessor()
+        if internal.shifts["MAIN"].query():
+            internal.state.idleShift()
+        command.handle("Receive idle tick", True)
+    
+    elif data == internal.consts.MESSAGE_RESET_INTERNAL_CONTROLLER:
         internal.window.resetIdleTick()
         command.handle("Reset idle tick", True)
 

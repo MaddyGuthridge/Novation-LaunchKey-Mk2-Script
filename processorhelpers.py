@@ -105,7 +105,7 @@ class UiModeHandler:
         
     def process(self, command):
         
-        # For mode toggler
+        # For mode toggle
         if (command.type is eventconsts.TYPE_BASIC_PAD or command.type is eventconsts.TYPE_PAD) and command.coord_Y == 0 and command.coord_X == 8:
             if command.is_lift:
                 self.lift()
@@ -623,7 +623,7 @@ class ParsedEvent:
             self.type = eventconsts.TYPE_INTERNAL_EVENT
         
         # Check if buttons were lifted
-        if self.value is 0: 
+        if self.value == 0: 
             self.is_lift = True
         else: 
             self.is_lift = False
@@ -1015,12 +1015,12 @@ class ParsedEvent:
         # Append hex value of ID
         a = str(hex(self.id + (self.value << 16)))
         # If string requires leading zeros
-        if len(a) is 7: a = "0x0" + a[2:].upper()
-        elif len(a) is 6: a = "0x00" + a[2:].upper()
-        elif len(a) is 5: a = "0x000" + a[2:].upper()
-        elif len(a) is 4: a = "0x0000" + a[2:].upper()
-        elif len(a) is 3: a = "0x00000" + a[2:].upper()
-        elif len(a) is 2: a = "0x000000" + a[2:].upper()
+        if len(a) == 7: a = "0x0" + a[2:].upper()
+        elif len(a) == 6: a = "0x00" + a[2:].upper()
+        elif len(a) == 5: a = "0x000" + a[2:].upper()
+        elif len(a) == 4: a = "0x0000" + a[2:].upper()
+        elif len(a) == 3: a = "0x00000" + a[2:].upper()
+        elif len(a) == 2: a = "0x000000" + a[2:].upper()
         else: a = "0x" + a[2:].upper()
 
         a = a[:2] + " " + a[2:4] + " " + a[4:6] + " " + a[6:8]

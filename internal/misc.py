@@ -77,13 +77,14 @@ class BeatMgr:
             bar_col = lightingconsts.BEAT_PAT_BAR
             beat_col = lightingconsts.BEAT_PAT_BEAT
 
-        if self.beat is 1: lights.setPadColour(8, 0, bar_col)     # Bar
-        elif self.beat is 2: lights.setPadColour(8, 0, beat_col)  # Beat
+        if self.beat == 1: lights.setPadColour(8, 0, bar_col)     # Bar
+        elif self.beat == 2: lights.setPadColour(8, 0, beat_col)  # Beat
 
 beat = BeatMgr()
 
 def processSysEx(event):
-    """Process SysEx events (which are always responses to universal device enquiries since the script doesn't really do any others)
+    """Process SysEx events (which are always responses to universal device
+    enquiries since the script doesn't really do any others)
 
     Args:
         event (ParsedEvent): processed MIDI Sysex Event
