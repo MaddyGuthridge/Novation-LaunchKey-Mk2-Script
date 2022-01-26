@@ -38,7 +38,7 @@ def process(command):
     if command.type == eventconsts.TYPE_TRANSPORT:
         if (command.id == eventconsts.TRANSPORT_BACK or command.id == eventconsts.TRANSPORT_FORWARD):
             # Only if markers exist
-            if arrangement.getMarkerName(0) is not "":
+            if arrangement.getMarkerName(0) != "":
                 if not internal.shifts["MAIN"].use():
                     if command.is_lift:
                         if command.id == eventconsts.TRANSPORT_BACK:
