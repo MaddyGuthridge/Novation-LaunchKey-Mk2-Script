@@ -135,7 +135,8 @@ MESSAGE_SHIFT_USE = 0x0101BE
 # Sent for note processor modes
 MESSAGE_INPUT_MODE_SELECT = 0x02BE # Mode number as velocity
 
-
+# Sent for idle notification (which is broken for FL Studio 20.9 and up)
+MESSAGE_IDLE_NOTIFICATION = 0x0003BE
 
 #---------------------------------
 # Note States

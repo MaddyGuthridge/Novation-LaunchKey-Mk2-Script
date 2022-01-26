@@ -26,7 +26,7 @@ import general
 import launchMapPages 
 import playlist
 import ui
-import screen
+# import screen
 
 import midi
 import utils
@@ -125,14 +125,14 @@ class TGeneric():
     def OnIdle(self):
         internal.idleProcessor()
         eventprocessor.redraw()
-        return
+        # Notify standard script that an idle event has occurred
+        internal.messages.sendCompleteInternalMidiMessage(internal.consts.MESSAGE_IDLE_NOTIFICATION, "Idle notification")
 
     def OnRefresh(self, flags):
         internal.refreshProcessor()
         
         # Prevent idle lightshow when other parts of FL are being used
         internal.window.resetIdleTick()
-        return
     
     def OnUpdateBeatIndicator(self, beat):
         eventprocessor.beatChange(beat)

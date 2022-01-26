@@ -18,3 +18,4 @@ from .shiftstate import shifts
 from .misc import idleProcessor, beat, refreshProcessor, processSysEx
 from .notemanager import noteMode, notesDown
 from .snap import snap
+from .performance import PerformanceMontor
