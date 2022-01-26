@@ -77,7 +77,7 @@ IDLE_WAIT_TIME = 1156 * 5
 # Controls the frequency at which the script executes a full redraw (to fix dud lights)
 LIGHTS_FULL_REDRAW_FREQUENCY = 5
 # If enabled, animations will be disabled
-LIGHTS_REDUCE_MOTION = True
+LIGHTS_REDUCE_MOTION = False
 
 
 #-------------------------------
